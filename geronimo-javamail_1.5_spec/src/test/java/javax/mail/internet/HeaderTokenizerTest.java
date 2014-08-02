@@ -94,21 +94,21 @@ public class HeaderTokenizerTest extends TestCase {
         checkTokenParse("(Foo \n Bar)", Token.COMMENT, "Foo \n Bar");
     }
     
-    public void testJava15NextMethod() throws ParseException{
+    public void testJavaMail15NextMethod() throws ParseException{
         HeaderTokenizer ht;
         ht =
             new HeaderTokenizer("To: \"Geronimo List\\\" <geronimo-dev@apache.org>, \n\r Geronimo User <geronimo-user@apache.org>");
         validateToken(ht.next('>', false), Token.QUOTEDSTRING, "To: \"Geronimo List\" <geronimo-dev@apache.org");
     }
     
-    public void testJava15NextMethodEscapes() throws ParseException{
+    public void testJavaMail15NextMethodEscapes() throws ParseException{
         HeaderTokenizer ht;
         ht =
             new HeaderTokenizer("To: \"Geronimo List\\\" <geronimo-dev@apache.org>, \n\r Geronimo User <geronimo-user@apache.org>");
         validateToken(ht.next('<', true), Token.QUOTEDSTRING, "To: \"Geronimo List\\\" ");
     }
     
-    public void testJava15NextMethodEscapes2() throws ParseException{
+    public void testJavaMail15NextMethodEscapes2() throws ParseException{
         HeaderTokenizer ht;
         ht =
             new HeaderTokenizer("To: \"Geronimo List\" <geronimo-dev@apac\\he.org>, \n\r Geronimo User <geronimo-user@apache.org>");
@@ -118,7 +118,7 @@ public class HeaderTokenizerTest extends TestCase {
         validateToken(ht.next(',', false), Token.QUOTEDSTRING, "<geronimo-dev@apache.org>");
     }
     
-    public void testJava15NextMethodEscapes3() throws ParseException{
+    public void testJavaMail15NextMethodEscapes3() throws ParseException{
         HeaderTokenizer ht;
         ht =
             new HeaderTokenizer("To: \"Geronimo List\" <geronimo-dev@apac\\he.org>, \n\r Geronimo User <geronimo-user@apache.org>");
