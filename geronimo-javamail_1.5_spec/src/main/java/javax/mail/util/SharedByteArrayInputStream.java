@@ -20,7 +20,6 @@
 package javax.mail.util;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.mail.internet.SharedInputStream;
@@ -38,7 +37,7 @@ public class SharedByteArrayInputStream extends ByteArrayInputStream implements 
      *
      * @param buf    The input data.
      */
-    public SharedByteArrayInputStream(byte[] buf) {
+    public SharedByteArrayInputStream(final byte[] buf) {
         this(buf, 0, buf.length);
     }
 
@@ -51,7 +50,7 @@ public class SharedByteArrayInputStream extends ByteArrayInputStream implements 
      * @param offset The starting offset within the array.
      * @param length The length of data to use.
      */
-    public SharedByteArrayInputStream(byte[] buf, int offset, int length) {
+    public SharedByteArrayInputStream(final byte[] buf, final int offset, final int length) {
         super(buf, offset, length);
         start = offset;
     }
@@ -81,7 +80,7 @@ public class SharedByteArrayInputStream extends ByteArrayInputStream implements 
      *
      * @return An InputStream configured to access the indicated data subrange.
      */
-    public InputStream newStream(long offset, long end) {
+    public InputStream newStream(final long offset, long end) {
         if (offset < 0) {
             throw new IllegalArgumentException("Starting position must be non-negative");
         }

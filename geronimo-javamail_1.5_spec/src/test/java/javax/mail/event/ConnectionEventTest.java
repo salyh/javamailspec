@@ -27,13 +27,13 @@ import junit.framework.TestCase;
 public class ConnectionEventTest extends TestCase {
     public static class ConnectionListenerTest implements ConnectionListener {
         private int state = 0;
-        public void closed(ConnectionEvent event) {
+        public void closed(final ConnectionEvent event) {
             if (state != 0) {
                 fail("Recycled ConnectionListener");
             }
             state = ConnectionEvent.CLOSED;
         }
-        public void disconnected(ConnectionEvent event) {
+        public void disconnected(final ConnectionEvent event) {
             if (state != 0) {
                 fail("Recycled ConnectionListener");
             }
@@ -42,21 +42,21 @@ public class ConnectionEventTest extends TestCase {
         public int getState() {
             return state;
         }
-        public void opened(ConnectionEvent event) {
+        public void opened(final ConnectionEvent event) {
             if (state != 0) {
                 fail("Recycled ConnectionListener");
             }
             state = ConnectionEvent.OPENED;
         }
     }
-    public ConnectionEventTest(String name) {
+    public ConnectionEventTest(final String name) {
         super(name);
     }
-    private void doEventTests(int type) {
-        ConnectionEvent event = new ConnectionEvent(this, type);
+    private void doEventTests(final int type) {
+        final ConnectionEvent event = new ConnectionEvent(this, type);
         assertEquals(this, event.getSource());
         assertEquals(type, event.getType());
-        ConnectionListenerTest listener = new ConnectionListenerTest();
+        final ConnectionListenerTest listener = new ConnectionListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }

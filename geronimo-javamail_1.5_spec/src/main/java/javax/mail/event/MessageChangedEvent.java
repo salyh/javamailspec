@@ -48,14 +48,15 @@ public class MessageChangedEvent extends MailEvent {
      * @param type the event type
      * @param message the affected message
      */
-    public MessageChangedEvent(Object source, int type, Message message) {
+    public MessageChangedEvent(final Object source, final int type, final Message message) {
         super(source);
         msg = message;
         this.type = type;
     }
 
-    public void dispatch(Object listener) {
-        MessageChangedListener l = (MessageChangedListener) listener;
+    @Override
+    public void dispatch(final Object listener) {
+        final MessageChangedListener l = (MessageChangedListener) listener;
         l.messageChanged(this);
     }
 

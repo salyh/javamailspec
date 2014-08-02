@@ -30,7 +30,7 @@ public class MethodNotSupportedException extends MessagingException {
         super();
     }
 
-    public MethodNotSupportedException(String message) {
+    public MethodNotSupportedException(final String message) {
         super(message);
     }
     
@@ -43,7 +43,7 @@ public class MethodNotSupportedException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public MethodNotSupportedException(String s, Exception e) {
+    public MethodNotSupportedException(final String s, final Exception e) {
         super(s, e);
     }
 }

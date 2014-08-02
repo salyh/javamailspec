@@ -31,7 +31,7 @@ public class AuthenticationFailedException extends MessagingException {
         super();
     }
 
-    public AuthenticationFailedException(String message) {
+    public AuthenticationFailedException(final String message) {
         super(message);
     }
     
@@ -44,7 +44,7 @@ public class AuthenticationFailedException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public AuthenticationFailedException(String message, Exception e) {
+    public AuthenticationFailedException(final String message, final Exception e) {
         super(message, e);
     }
 }

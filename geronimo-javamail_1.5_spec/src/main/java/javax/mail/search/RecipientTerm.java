@@ -31,9 +31,9 @@ public final class RecipientTerm extends AddressTerm {
 	
 	private static final long serialVersionUID = 6548700653122680468L;
 	
-    private Message.RecipientType type;
+    private final Message.RecipientType type;
 
-    public RecipientTerm(Message.RecipientType type, Address address) {
+    public RecipientTerm(final Message.RecipientType type, final Address address) {
         super(address);
         this.type = type;
     }
@@ -42,25 +42,27 @@ public final class RecipientTerm extends AddressTerm {
         return type;
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            Address from[] = message.getRecipients(type);
+            final Address from[] = message.getRecipients(type);
             if (from == null) {
                 return false; 
             }
             for (int i = 0; i < from.length; i++) {
-                Address address = from[i];
+                final Address address = from[i];
                 if (match(address)) {
                     return true;
                 }
             }
             return false;
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof RecipientTerm == false) return false;
 
@@ -68,6 +70,7 @@ public final class RecipientTerm extends AddressTerm {
         return address.equals(recipientTerm.address) && type == recipientTerm.type;
     }
 
+    @Override
     public int hashCode() {
         return address.hashCode() + type.hashCode();
     }

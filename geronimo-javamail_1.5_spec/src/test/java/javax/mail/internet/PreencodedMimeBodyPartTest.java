@@ -20,7 +20,6 @@
 package javax.mail.internet;
 
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 
@@ -32,12 +31,12 @@ import junit.framework.TestCase;
 public class PreencodedMimeBodyPartTest extends TestCase {
 
      public void testEncoding() throws Exception {
-         PreencodedMimeBodyPart part = new PreencodedMimeBodyPart("base64");
+         final PreencodedMimeBodyPart part = new PreencodedMimeBodyPart("base64");
          assertEquals("base64", part.getEncoding());
      }
 
      public void testUpdateHeaders() throws Exception {
-         TestBodyPart part = new TestBodyPart("base64");
+         final TestBodyPart part = new TestBodyPart("base64");
 
          part.updateHeaders();
 
@@ -45,17 +44,17 @@ public class PreencodedMimeBodyPartTest extends TestCase {
      }
 
      public void testWriteTo() throws Exception {
-         PreencodedMimeBodyPart part = new PreencodedMimeBodyPart("binary");
+         final PreencodedMimeBodyPart part = new PreencodedMimeBodyPart("binary");
 
-         byte[] content = new byte[] { 81, 82, 83, 84, 85, 86 };
+         final byte[] content = new byte[] { 81, 82, 83, 84, 85, 86 };
 
          part.setContent(new String(content, "UTF-8"), "text/plain; charset=\"UTF-8\"");
 
-         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
          part.writeTo(out);
 
-         byte[] data = out.toByteArray();
+         final byte[] data = out.toByteArray();
 
          // we need to scan forward to the actual content and verify it has been written without additional
          // encoding.  Our marker is a "crlfcrlf" sequence.
@@ -76,11 +75,12 @@ public class PreencodedMimeBodyPartTest extends TestCase {
 
      public class TestBodyPart extends PreencodedMimeBodyPart {
 
-         public TestBodyPart(String encoding) {
+         public TestBodyPart(final String encoding) {
              super(encoding);
          }
 
-         public void updateHeaders() throws MessagingException {
+         @Override
+        public void updateHeaders() throws MessagingException {
              super.updateHeaders();
          }
      }

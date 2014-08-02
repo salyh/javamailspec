@@ -19,7 +19,6 @@
 
 package javax.mail;
 
-import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,11 +40,11 @@ public class URLName {
     protected String fullURL;
     private int hashCode;
 
-    public URLName(String url) {
+    public URLName(final String url) {
         parseString(url);
     }
 
-    protected void parseString(String url) {
+    protected void parseString(final String url) {
         URI uri;
         try {
             if (url == null) {
@@ -53,7 +52,7 @@ public class URLName {
             } else {
                 uri = new URI(url);
             }
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             uri = null;
         }
         if (uri == null) {
@@ -79,12 +78,12 @@ public class URLName {
         }
         
         ref = checkBlank(uri.getFragment());
-        String userInfo = checkBlank(uri.getUserInfo());
+        final String userInfo = checkBlank(uri.getUserInfo());
         if (userInfo == null) {
             username = null;
             password = null;
         } else {
-            int pos = userInfo.indexOf(':');
+            final int pos = userInfo.indexOf(':');
             if (pos == -1) {
                 username = userInfo;
                 password = null;
@@ -96,7 +95,7 @@ public class URLName {
         updateFullURL();
     }
 
-    public URLName(String protocol, String host, int port, String file, String username, String password) {
+    public URLName(final String protocol, final String host, final int port, final String file, String username, String password) {
         this.protocol = checkBlank(protocol);
         this.host = checkBlank(host);
         this.port = port;
@@ -104,7 +103,7 @@ public class URLName {
             this.file = null;
             ref = null;
         } else {
-            int pos = file.indexOf('#');
+            final int pos = file.indexOf('#');
             if (pos == -1) {
                 this.file = file;
                 ref = null;
@@ -124,18 +123,18 @@ public class URLName {
         updateFullURL();
     }
 
-    public URLName(URL url) {
+    public URLName(final URL url) {
         protocol = checkBlank(url.getProtocol());
         host = checkBlank(url.getHost());
         port = url.getPort();
         file = checkBlank(url.getFile());
         ref = checkBlank(url.getRef());
-        String userInfo = checkBlank(url.getUserInfo());
+        final String userInfo = checkBlank(url.getUserInfo());
         if (userInfo == null) {
             username = null;
             password = null;
         } else {
-            int pos = userInfo.indexOf(':');
+            final int pos = userInfo.indexOf(':');
             if (pos == -1) {
                 username = userInfo;
                 password = null;
@@ -147,7 +146,7 @@ public class URLName {
         updateFullURL();
     }
 
-    private static String checkBlank(String target) {
+    private static String checkBlank(final String target) {
         if (target == null || target.length() == 0) {
             return null;
         } else {
@@ -157,7 +156,7 @@ public class URLName {
 
     private void updateFullURL() {
         hashCode = 0;
-        StringBuffer buf = new StringBuffer(100);
+        final StringBuffer buf = new StringBuffer(100);
         if (protocol != null) {
             buf.append(protocol).append(':');
             if (host != null) {
@@ -185,11 +184,12 @@ public class URLName {
         fullURL = buf.toString();
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (o instanceof URLName == false) {
             return false;
         }
-        URLName other = (URLName) o;
+        final URLName other = (URLName) o;
         // check same protocol - false if either is null
         if (protocol == null || other.protocol == null || !protocol.equals(other.protocol)) {
             return false;
@@ -203,7 +203,7 @@ public class URLName {
         return areSame(host, other.host) && areSame(file, other.file) && areSame(username, other.username) && areSame(password, other.password);
     }
 
-    private static boolean areSame(String s1, String s2) {
+    private static boolean areSame(final String s1, final String s2) {
         if (s1 == null) {
             return s2 == null;
         } else {
@@ -211,10 +211,12 @@ public class URLName {
         }
     }
 
+    @Override
     public int hashCode() {
         return hashCode;
     }
 
+    @Override
     public String toString() {
         return fullURL;
     }
@@ -259,7 +261,7 @@ public class URLName {
      * 
      * @return The HTTP encoded version of the string. 
      */
-    private static String encode(String v) {
+    private static String encode(final String v) {
         // make sure we don't operate on a null string
         if (v == null) {
             return null; 
@@ -280,16 +282,16 @@ public class URLName {
         
         // we know we're going to be larger, but not sure by how much.  
         // just give a little extra
-        StringBuffer encoded = new StringBuffer(v.length() + 10);
+        final StringBuffer encoded = new StringBuffer(v.length() + 10);
             
         // we get the bytes so that we can have the default encoding applied to 
         // this string.  This will flag the ones we need to give special processing to. 
-        byte[] data = v.getBytes(); 
+        final byte[] data = v.getBytes(); 
         
         for (int i = 0; i < data.length; i++) {
             // pick this up as a one-byte character The 7-bit ascii ones will be fine 
             // here. 
-            char ch = (char)(data[i] & 0xff); 
+            final char ch = (char)(data[i] & 0xff); 
             // blanks get special treatment 
             if (ch == ' ') {
                 encoded.append('+'); 
@@ -298,8 +300,8 @@ public class URLName {
             else if (nonEncodedChars.indexOf(ch) == -1) {
                 // forDigit() uses the lowercase letters for the radix.  The HTML specifications 
                 // require the uppercase letters. 
-                char firstChar = Character.toUpperCase(Character.forDigit((ch >> 4) & 0xf, 16)); 
-                char secondChar = Character.toUpperCase(Character.forDigit(ch & 0xf, 16)); 
+                final char firstChar = Character.toUpperCase(Character.forDigit((ch >> 4) & 0xf, 16)); 
+                final char secondChar = Character.toUpperCase(Character.forDigit(ch & 0xf, 16)); 
                 
                 // now append the encoded triplet. 
                 encoded.append('%'); 

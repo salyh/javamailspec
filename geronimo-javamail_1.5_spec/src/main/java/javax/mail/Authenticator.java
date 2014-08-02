@@ -31,7 +31,7 @@ public abstract class Authenticator {
     private String protocol;
     private String username;
 
-    synchronized PasswordAuthentication authenticate(InetAddress host, int port, String protocol, String prompt, String username) {
+    synchronized PasswordAuthentication authenticate(final InetAddress host, final int port, final String protocol, final String prompt, final String username) {
         this.host = host;
         this.port = port;
         this.protocol = protocol;

@@ -29,11 +29,11 @@ public class FolderClosedException extends MessagingException {
 	
     private transient Folder _folder;
 
-    public FolderClosedException(Folder folder) {
+    public FolderClosedException(final Folder folder) {
         this(folder, "Folder Closed: " + folder.getName());
     }
 
-    public FolderClosedException(Folder folder, String message) {
+    public FolderClosedException(final Folder folder, final String message) {
         super(message);
         _folder = folder;
     }
@@ -48,7 +48,7 @@ public class FolderClosedException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public FolderClosedException(Folder folder, String message, Exception e) {
+    public FolderClosedException(final Folder folder, final String message, final Exception e) {
         super(message, e);
         _folder = folder;
     }

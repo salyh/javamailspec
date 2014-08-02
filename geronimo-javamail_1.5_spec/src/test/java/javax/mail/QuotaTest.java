@@ -19,8 +19,6 @@
 
 package javax.mail;
 
-import javax.mail.MessagingException;
-
 import junit.framework.TestCase;
 
 /**
@@ -29,7 +27,7 @@ import junit.framework.TestCase;
 public class QuotaTest extends TestCase {
 
     public void testQuota() throws MessagingException {
-        Quota quota = new Quota("Fred");
+        final Quota quota = new Quota("Fred");
 
         assertEquals(quota.quotaRoot, "Fred");
         assertNull(quota.resources);

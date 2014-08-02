@@ -19,22 +19,11 @@
 package org.apache.geronimo.mail;
 
 import java.net.URL;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.BundleTracker;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * The activator that starts and manages the tracking of
@@ -54,7 +43,7 @@ public class MailProviderRegistry {
      *
      * @return A URL object if this bundle contains a mailcap file.
      */
-    static Object registerBundle(Bundle bundle) {
+    static Object registerBundle(final Bundle bundle) {
         // potential tracker return result
         Object result = null;
         // a given bundle might have a javamail.providers definition and/or a
@@ -83,7 +72,7 @@ public class MailProviderRegistry {
      *
      * @param bundle The potential source bundle.
      */
-    static void unregisterBundle(Bundle bundle) {
+    static void unregisterBundle(final Bundle bundle) {
         // remove these items
         providers.remove(bundle.getBundleId());
         defaultProviders.remove(bundle.getBundleId());

@@ -26,17 +26,20 @@ public class TestData {
         return new Store(
             getTestSession(),
             new URLName("http://alex@test.com")) {
+            @Override
             public Folder getDefaultFolder() throws MessagingException {
                 return getTestFolder();
             }
-            public Folder getFolder(String name) throws MessagingException {
+            @Override
+            public Folder getFolder(final String name) throws MessagingException {
                 if (name.equals("test")) {
                     return getTestFolder();
                 } else {
                     return null;
                 }
             }
-            public Folder getFolder(URLName name) throws MessagingException {
+            @Override
+            public Folder getFolder(final URLName name) throws MessagingException {
                 return getTestFolder();
             }
         };
@@ -46,62 +49,82 @@ public class TestData {
     }
     public static Folder getTestFolder() {
         return new Folder(getTestStore()) {
-            public void appendMessages(Message[] messages)
+            @Override
+            public void appendMessages(final Message[] messages)
                 throws MessagingException {
             }
-            public void close(boolean expunge) throws MessagingException {
+            @Override
+            public void close(final boolean expunge) throws MessagingException {
             }
-            public boolean create(int type) throws MessagingException {
+            @Override
+            public boolean create(final int type) throws MessagingException {
                 return false;
             }
-            public boolean delete(boolean recurse) throws MessagingException {
+            @Override
+            public boolean delete(final boolean recurse) throws MessagingException {
                 return false;
             }
+            @Override
             public boolean exists() throws MessagingException {
                 return false;
             }
+            @Override
             public Message[] expunge() throws MessagingException {
                 return null;
             }
-            public Folder getFolder(String name) throws MessagingException {
+            @Override
+            public Folder getFolder(final String name) throws MessagingException {
                 return null;
             }
+            @Override
             public String getFullName() {
                 return null;
             }
-            public Message getMessage(int id) throws MessagingException {
+            @Override
+            public Message getMessage(final int id) throws MessagingException {
                 return null;
             }
+            @Override
             public int getMessageCount() throws MessagingException {
                 return 0;
             }
+            @Override
             public String getName() {
                 return null;
             }
+            @Override
             public Folder getParent() throws MessagingException {
                 return null;
             }
+            @Override
             public Flags getPermanentFlags() {
                 return null;
             }
+            @Override
             public char getSeparator() throws MessagingException {
                 return 0;
             }
+            @Override
             public int getType() throws MessagingException {
                 return 0;
             }
+            @Override
             public boolean hasNewMessages() throws MessagingException {
                 return false;
             }
+            @Override
             public boolean isOpen() {
                 return false;
             }
-            public Folder[] list(String pattern) throws MessagingException {
+            @Override
+            public Folder[] list(final String pattern) throws MessagingException {
                 return null;
             }
-            public void open(int mode) throws MessagingException {
+            @Override
+            public void open(final int mode) throws MessagingException {
             }
-            public boolean renameTo(Folder newName) throws MessagingException {
+            @Override
+            public boolean renameTo(final Folder newName) throws MessagingException {
                 return false;
             }
         };
@@ -110,9 +133,9 @@ public class TestData {
         return new Transport(
             getTestSession(),
             new URLName("http://host.name")) {
-            public void sendMessage(Message message, Address[] addresses)
+            @Override
+            public void sendMessage(final Message message, final Address[] addresses)
                 throws MessagingException {
-                // TODO Auto-generated method stub
             }
         };
     }

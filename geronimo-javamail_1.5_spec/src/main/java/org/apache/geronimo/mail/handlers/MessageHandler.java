@@ -19,21 +19,18 @@
 
 package org.apache.geronimo.mail.handlers;
 
+import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.activation.ActivationDataFlavor;
 import javax.activation.DataContentHandler;
 import javax.activation.DataSource;
-import javax.mail.internet.ContentType;
 import javax.mail.Message;
 import javax.mail.MessageAware;
 import javax.mail.MessageContext;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
-import javax.mail.internet.ParseException;
-import java.awt.datatransfer.DataFlavor;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 
 public class MessageHandler implements DataContentHandler {
     /**
@@ -72,7 +69,7 @@ public class MessageHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getTransferData(DataFlavor dataflavor, DataSource datasource)
+    public Object getTransferData(final DataFlavor dataflavor, final DataSource datasource)
             throws IOException {
         if (getDF().equals(dataflavor)) {
             return getContent(datasource);
@@ -87,18 +84,18 @@ public class MessageHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getContent(DataSource datasource) throws IOException {
+    public Object getContent(final DataSource datasource) throws IOException {
 
         try {
             // if this is a proper message, it implements the MessageAware interface.  We need this to
             // get the associated session.
             if (datasource instanceof MessageAware) {
-                MessageContext context = ((MessageAware)datasource).getMessageContext();
+                final MessageContext context = ((MessageAware)datasource).getMessageContext();
                 // construct a mime message instance from the stream, associating it with the
                 // data source session.
                 return new MimeMessage(context.getSession(), datasource.getInputStream());
             }
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             // we need to transform any exceptions into an IOException.
             throw new IOException("Exception writing MimeMultipart: " + e.toString());
         }
@@ -113,12 +110,12 @@ public class MessageHandler implements DataContentHandler {
      * @param outputstream
      * @throws IOException
      */
-    public void writeTo(Object object, String s, OutputStream outputstream) throws IOException {
+    public void writeTo(final Object object, final String s, final OutputStream outputstream) throws IOException {
         // proper message type?
         if (object instanceof Message) {
             try {
                 ((Message)object).writeTo(outputstream);
-            } catch (MessagingException e) {
+            } catch (final MessagingException e) {
                 throw new IOException("Error parsing message: " + e.toString());
             }
         }

@@ -29,19 +29,21 @@ public final class SizeTerm extends IntegerComparisonTerm {
 	
 	private static final long serialVersionUID = -2556219451005103709L;
 	
-    public SizeTerm(int comparison, int size) {
+    public SizeTerm(final int comparison, final int size) {
         super(comparison, size);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
             return match(message.getSize());
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof SizeTerm == false) return false;
         return super.equals(other);

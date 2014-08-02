@@ -19,35 +19,29 @@
 
 package javax.mail.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.mail.internet.SharedInputStream;
-
 import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
  */
 public class SharedByteArrayInputStreamTest extends TestCase {
-    private String testString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private byte[] testData = testString.getBytes();
+    private final String testString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private final byte[] testData = testString.getBytes();
 
 
 
-    public SharedByteArrayInputStreamTest(String arg0) {
+    public SharedByteArrayInputStreamTest(final String arg0) {
         super(arg0);
     }
 
     public void testInput() throws Exception {
-        SharedByteArrayInputStream in = new SharedByteArrayInputStream(testData);
+        final SharedByteArrayInputStream in = new SharedByteArrayInputStream(testData);
 
         assertEquals(in.read(), '0');
 
         assertEquals(in.getPosition(), 1);
 
-        byte[] bytes = new byte[10];
+        final byte[] bytes = new byte[10];
 
         assertEquals(in.read(bytes), 10);
         assertEquals(new String(bytes), "123456789a");
@@ -69,9 +63,9 @@ public class SharedByteArrayInputStreamTest extends TestCase {
 
 
     public void testNewStream() throws Exception {
-        SharedByteArrayInputStream in = new SharedByteArrayInputStream(testData);
+        final SharedByteArrayInputStream in = new SharedByteArrayInputStream(testData);
 
-        SharedByteArrayInputStream sub = (SharedByteArrayInputStream)in.newStream(10, 10 + 26);
+        final SharedByteArrayInputStream sub = (SharedByteArrayInputStream)in.newStream(10, 10 + 26);
 
         assertEquals(sub.getPosition(), 0);
 
@@ -86,7 +80,7 @@ public class SharedByteArrayInputStreamTest extends TestCase {
 
         assertEquals(sub.read(), -1);
 
-        SharedByteArrayInputStream sub2 = (SharedByteArrayInputStream)sub.newStream(5, 10);
+        final SharedByteArrayInputStream sub2 = (SharedByteArrayInputStream)sub.newStream(5, 10);
 
         assertEquals(sub2.getPosition(), 0);
         assertEquals(sub2.read(), 'f');

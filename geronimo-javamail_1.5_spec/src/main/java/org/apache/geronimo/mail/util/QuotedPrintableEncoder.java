@@ -19,7 +19,6 @@
 
 package org.apache.geronimo.mail.util;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -74,16 +73,16 @@ public class QuotedPrintableEncoder implements Encoder {
         this(null, DEFAULT_CHARS_PER_LINE);
     }
 
-    public QuotedPrintableEncoder(OutputStream out) {
+    public QuotedPrintableEncoder(final OutputStream out) {
         this(out, DEFAULT_CHARS_PER_LINE);
     }
 
-    public QuotedPrintableEncoder(OutputStream out, int lineLength) {
+    public QuotedPrintableEncoder(final OutputStream out, final int lineLength) {
         this.out = out;
         this.lineLength = lineLength;
     }
 
-    private void checkDeferred(int ch) throws IOException {
+    private void checkDeferred(final int ch) throws IOException {
         // was the last character we looked at a whitespace?  Try to decide what to do with it now.
         if (lastWhitespace) {
             // if this whitespace is at the end of the line, write it out encoded
@@ -118,12 +117,12 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @return the number of bytes produced.
      */
-    public int encode(byte[] data, int off, int length) throws IOException {
-        int endOffset = off + length;
+    public int encode(final byte[] data, int off, final int length) throws IOException {
+        final int endOffset = off + length;
 
         while (off < endOffset) {
             // get the character
-            byte ch = data[off++];
+            final byte ch = data[off++];
 
             // handle the encoding of this character.
             encode(ch);
@@ -201,12 +200,12 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @return the number of bytes produced.
      */
-    public int encode(byte[] data, int off, int length, String specials) throws IOException {
-        int endOffset = off + length;
+    public int encode(final byte[] data, int off, final int length, final String specials) throws IOException {
+        final int endOffset = off + length;
 
         while (off < endOffset) {
             // get the character
-            byte ch = data[off++];
+            final byte ch = data[off++];
 
             // handle the encoding of this character.
             encode(ch, specials);
@@ -225,7 +224,7 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @return the number of bytes produced.
      */
-    public int encode(PushbackInputStream in, StringBuffer out, String specials, int limit) throws IOException {
+    public int encode(final PushbackInputStream in, final StringBuffer out, final String specials, final int limit) throws IOException {
         int count = 0;
 
         while (count < limit) {
@@ -278,7 +277,7 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @exception IOException
      */
-    public void encode(int ch, String specials) throws IOException {
+    public void encode(int ch, final String specials) throws IOException {
         // make sure this is just a single byte value.
         ch = ch &0xFF;
 
@@ -309,7 +308,7 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @return the number of bytes produced.
      */
-    public int encode(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public int encode(final byte[] data, final int off, final int length, final OutputStream out) throws IOException {
         // make sure we're writing to the correct stream
         this.out = out;
         bytesWritten = 0;
@@ -330,15 +329,15 @@ public class QuotedPrintableEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public int decode(final byte[] data, int off, final int length, final OutputStream out) throws IOException {
         // make sure we're writing to the correct stream
         this.out = out;
 
-        int endOffset = off + length;
+        final int endOffset = off + length;
         int bytesWritten = 0;
 
         while (off < endOffset) {
-            byte ch = data[off++];
+            final byte ch = data[off++];
 
             // space characters are a pain.  We need to scan ahead until we find a non-space character.
             // if the character is a line terminator, we need to discard the blanks.
@@ -410,7 +409,7 @@ public class QuotedPrintableEncoder implements Encoder {
      * @return The number of bytes written to the stream.
      * @exception IOException
      */
-    public int decodeWord(byte[] data, OutputStream out) throws IOException {
+    public int decodeWord(final byte[] data, final OutputStream out) throws IOException {
         return decodeWord(data, 0, data.length, out);
     }
 
@@ -426,15 +425,15 @@ public class QuotedPrintableEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public int decodeWord(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public int decodeWord(final byte[] data, int off, final int length, final OutputStream out) throws IOException {
         // make sure we're writing to the correct stream
         this.out = out;
 
-        int endOffset = off + length;
+        final int endOffset = off + length;
         int bytesWritten = 0;
 
         while (off < endOffset) {
-            byte ch = data[off++];
+            final byte ch = data[off++];
 
             // space characters were translated to '_' on encode, so we need to translate them back.
             if (ch == '_') {
@@ -447,8 +446,8 @@ public class QuotedPrintableEncoder implements Encoder {
                     throw new IOException("Invalid quoted printable encoding");
                 }
                 // convert the two bytes back from hex.
-                byte b1 = data[off++];
-                byte b2 = data[off++];
+                final byte b1 = data[off++];
+                final byte b2 = data[off++];
 
                 // we've found an encoded carriage return.  The next char needs to be a newline
                 if (b1 == '\r') {
@@ -460,8 +459,8 @@ public class QuotedPrintableEncoder implements Encoder {
                 }
                 else {
                     // this is a hex pair we need to convert back to a single byte.
-                    byte c1 = decodingTable[b1];
-                    byte c2 = decodingTable[b2];
+                    final byte c1 = decodingTable[b1];
+                    final byte c2 = decodingTable[b2];
                     out.write((c1 << 4) | c2);
                     // 3 bytes in, one byte out
                     bytesWritten++;
@@ -487,17 +486,17 @@ public class QuotedPrintableEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public int decode(String data, OutputStream out) throws IOException {
+    public int decode(final String data, final OutputStream out) throws IOException {
         try {
             // just get the byte data and decode.
-            byte[] bytes = data.getBytes("US-ASCII");
+            final byte[] bytes = data.getBytes("US-ASCII");
             return decode(bytes, 0, bytes.length, out);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new IOException("Invalid UUEncoding");
         }
     }
 
-    private void checkLineLength(int required) throws IOException {
+    private void checkLineLength(final int required) throws IOException {
         // if we're at our line length limit, write out a soft line break and reset.
         if ((lineCount + required) >= lineLength ) {
             out.write('=');
@@ -509,7 +508,7 @@ public class QuotedPrintableEncoder implements Encoder {
     }
 
 
-    public void writeEncodedCharacter(int ch) throws IOException {
+    public void writeEncodedCharacter(final int ch) throws IOException {
         // we need 3 characters for an encoded value
         checkLineLength(3);
         out.write('=');
@@ -520,7 +519,7 @@ public class QuotedPrintableEncoder implements Encoder {
     }
 
 
-    public void writeCharacter(int ch) throws IOException {
+    public void writeCharacter(final int ch) throws IOException {
         // we need 3 characters for an encoded value
         checkLineLength(1);
         out.write(ch);
@@ -537,7 +536,7 @@ public class QuotedPrintableEncoder implements Encoder {
     }
 
 
-    public int decode(InputStream in) throws IOException {
+    public int decode(final InputStream in) throws IOException {
 
         // we potentially need to scan over spans of whitespace characters to determine if they're real
         // we just return blanks until the count goes to zero.
@@ -549,7 +548,7 @@ public class QuotedPrintableEncoder implements Encoder {
         // we may have needed to scan ahead to find the first non-blank character, which we would store here.
         // hand that back once we're done with the blanks.
         if (cachedCharacter != -1) {
-            int result = cachedCharacter;
+            final int result = cachedCharacter;
             cachedCharacter = -1;
             return result;
         }
@@ -584,7 +583,7 @@ public class QuotedPrintableEncoder implements Encoder {
         return decodeNonspaceChar(in, ch);
     }
 
-       private int decodeNonspaceChar(InputStream in, int ch) throws IOException {
+       private int decodeNonspaceChar(final InputStream in, final int ch) throws IOException {
                if (ch == '=') {
             int b1 = in.read();
             // we need to get two characters after the quotation marker
@@ -631,17 +630,17 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @exception IOException
      */
-    public void encodeWord(InputStream in, String charset, String specials, OutputStream out, boolean fold) throws IOException
+    public void encodeWord(final InputStream in, final String charset, final String specials, final OutputStream out, final boolean fold) throws IOException
     {
         // we need to scan ahead in a few places, which may require pushing characters back on to the stream.
         // make sure we have a stream where this is possible.
-        PushbackInputStream inStream = new PushbackInputStream(in);
-        PrintStream writer = new PrintStream(out);
+        final PushbackInputStream inStream = new PushbackInputStream(in);
+        final PrintStream writer = new PrintStream(out);
 
         // segments of encoded data are limited to 75 byes, including the control sections.
-        int limit = 75 - 7 - charset.length();
+        final int limit = 75 - 7 - charset.length();
         boolean firstLine = true;
-        StringBuffer encodedString = new StringBuffer(76);
+        final StringBuffer encodedString = new StringBuffer(76);
 
         while (true) {
 
@@ -691,7 +690,7 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @exception IOException
      */
-    public void encodeWord(byte[] data, StringBuffer out, String charset, String specials) throws IOException
+    public void encodeWord(final byte[] data, final StringBuffer out, final String charset, final String specials) throws IOException
     {
         // append the word header 
         out.append("=?");
@@ -716,9 +715,9 @@ public class QuotedPrintableEncoder implements Encoder {
      *
      * @exception IOException
      */
-    public void encodeWordData(byte[] data, StringBuffer out, String specials) throws IOException {
+    public void encodeWordData(final byte[] data, final StringBuffer out, final String specials) throws IOException {
         for (int i = 0; i < data.length; i++) {
-            int ch = data[i] & 0xff; ; 
+            final int ch = data[i] & 0xff; ; 
 
             // spaces require special handling.  If the next character is a line terminator, then
             // the space needs to be encoded.
@@ -751,13 +750,13 @@ public class QuotedPrintableEncoder implements Encoder {
      * 
      * @return The size of the byte data in encoded form. 
      */
-    public int estimateEncodedLength(byte[] data, String specials) 
+    public int estimateEncodedLength(final byte[] data, final String specials) 
     {
         int count = 0; 
         
         for (int i = 0; i < data.length; i++) {
             // make sure this is just a single byte value.
-            int  ch = data[i] & 0xff;
+            final int  ch = data[i] & 0xff;
 
             // non-ascii chars and the designated specials all get encoded.
             if (ch < 32 || ch >= 127 || specials.indexOf(ch) != -1) {

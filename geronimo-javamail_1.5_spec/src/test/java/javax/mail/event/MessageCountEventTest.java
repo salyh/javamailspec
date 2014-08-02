@@ -21,13 +21,14 @@ package javax.mail.event;
 
 import javax.mail.Folder;
 import javax.mail.TestData;
+
 import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
  */
 public class MessageCountEventTest extends TestCase {
-    public MessageCountEventTest(String name) {
+    public MessageCountEventTest(final String name) {
         super(name);
     }
     public void testEvent() {
@@ -36,29 +37,29 @@ public class MessageCountEventTest extends TestCase {
         try {
             doEventTests(-12345);
             fail("Expected exception due to invalid type -12345");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
-    private void doEventTests(int type) {
-        Folder folder = TestData.getTestFolder();
-        MessageCountEvent event =
+    private void doEventTests(final int type) {
+        final Folder folder = TestData.getTestFolder();
+        final MessageCountEvent event =
             new MessageCountEvent(folder, type, false, null);
         assertEquals(folder, event.getSource());
         assertEquals(type, event.getType());
-        MessageCountListenerTest listener = new MessageCountListenerTest();
+        final MessageCountListenerTest listener = new MessageCountListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     public static class MessageCountListenerTest
         implements MessageCountListener {
         private int state = 0;
-        public void messagesAdded(MessageCountEvent event) {
+        public void messagesAdded(final MessageCountEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = MessageCountEvent.ADDED;
         }
-        public void messagesRemoved(MessageCountEvent event) {
+        public void messagesRemoved(final MessageCountEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

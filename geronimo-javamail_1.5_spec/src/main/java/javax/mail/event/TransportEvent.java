@@ -82,7 +82,7 @@ public class TransportEvent extends MailEvent {
      * @param invalid     invalid addresses
      * @param message     the associated message
      */
-    public TransportEvent(Transport transport, int type, Address[] validSent, Address[] validUnsent, Address[] invalid, Message message) {
+    public TransportEvent(final Transport transport, final int type, final Address[] validSent, final Address[] validUnsent, final Address[] invalid, final Message message) {
         super(transport);
         this.type = type;
         this.validSent = validSent;
@@ -111,8 +111,9 @@ public class TransportEvent extends MailEvent {
         return type;
     }
 
-    public void dispatch(Object listener) {
-        TransportListener l = (TransportListener) listener;
+    @Override
+    public void dispatch(final Object listener) {
+        final TransportListener l = (TransportListener) listener;
         switch (type) {
         case MESSAGE_DELIVERED:
             l.messageDelivered(this);

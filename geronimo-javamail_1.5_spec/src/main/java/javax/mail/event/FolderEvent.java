@@ -44,7 +44,7 @@ public class FolderEvent extends MailEvent {
      * @param newFolder the folder with the new name
      * @param type the event type
      */
-    public FolderEvent(Object source, Folder oldFolder, Folder newFolder, int type) {
+    public FolderEvent(final Object source, final Folder oldFolder, final Folder newFolder, final int type) {
         super(source);
         folder = oldFolder;
         this.newFolder = newFolder;
@@ -58,12 +58,13 @@ public class FolderEvent extends MailEvent {
      * @param folder the folder affected
      * @param type the event type
      */
-    public FolderEvent(Object source, Folder folder, int type) {
+    public FolderEvent(final Object source, final Folder folder, final int type) {
         this(source, folder, null, type);
     }
 
-    public void dispatch(Object listener) {
-        FolderListener l = (FolderListener) listener;
+    @Override
+    public void dispatch(final Object listener) {
+        final FolderListener l = (FolderListener) listener;
         switch (type) {
         case CREATED:
             l.folderCreated(this);

@@ -20,6 +20,7 @@
 package javax.mail.search;
 
 import java.util.Arrays;
+
 import javax.mail.Message;
 
 /**
@@ -34,7 +35,7 @@ public final class AndTerm extends SearchTerm {
     /**
      * Terms to which the AND operator should be applied.
      */
-    private SearchTerm[] terms;
+    private final SearchTerm[] terms;
 
     /**
      * Constructor for performing a binary AND.
@@ -42,7 +43,7 @@ public final class AndTerm extends SearchTerm {
      * @param a the first term
      * @param b the second ter,
      */
-    public AndTerm(SearchTerm a, SearchTerm b) {
+    public AndTerm(final SearchTerm a, final SearchTerm b) {
         terms = new SearchTerm[]{a, b};
     }
 
@@ -50,7 +51,7 @@ public final class AndTerm extends SearchTerm {
      * Constructor for performing and AND across an arbitraty number of terms.
      * @param terms the terms to AND together
      */
-    public AndTerm(SearchTerm[] terms) {
+    public AndTerm(final SearchTerm[] terms) {
         this.terms = terms;
     }
 
@@ -69,9 +70,10 @@ public final class AndTerm extends SearchTerm {
      * @param message the Message to apply the terms to
      * @return true if all terms match
      */
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         for (int i = 0; i < terms.length; i++) {
-            SearchTerm term = terms[i];
+            final SearchTerm term = terms[i];
             if (!term.match(message)) {
                 return false;
             }
@@ -79,12 +81,14 @@ public final class AndTerm extends SearchTerm {
         return true;
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof AndTerm == false) return false;
         return Arrays.equals(terms, ((AndTerm) other).terms);
     }
 
+    @Override
     public int hashCode() {
         int hash = 0;
         for (int i = 0; i < terms.length; i++) {

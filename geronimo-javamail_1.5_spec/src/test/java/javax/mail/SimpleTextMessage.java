@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.activation.DataHandler;
 import javax.mail.internet.InternetAddress;
 
@@ -35,11 +36,11 @@ import javax.mail.internet.InternetAddress;
  */
 public class SimpleTextMessage extends Message {
     public static final Address[] ADDRESS_ARRAY = new Address[0];
-    private List _bcc = new LinkedList();
-    private List _cc = new LinkedList();
+    private final List _bcc = new LinkedList();
+    private final List _cc = new LinkedList();
     private String _description;
-    private Flags _flags = new Flags();
-    private List _from = new LinkedList();
+    private final Flags _flags = new Flags();
+    private final List _from = new LinkedList();
     private Date _received;
     private Date _sent;
     private String _subject;
@@ -49,26 +50,28 @@ public class SimpleTextMessage extends Message {
      * @param folder
      * @param number
      */
-    public SimpleTextMessage(Folder folder, int number) {
+    public SimpleTextMessage(final Folder folder, final int number) {
         super(folder, number);
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#addFrom(javax.mail.Address[])
      */
-    public void addFrom(Address[] addresses) throws MessagingException {
+    @Override
+    public void addFrom(final Address[] addresses) throws MessagingException {
         _from.addAll(Arrays.asList(addresses));
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#addHeader(java.lang.String, java.lang.String)
      */
-    public void addHeader(String name, String value)
+    public void addHeader(final String name, final String value)
         throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#addRecipients(javax.mail.Message.RecipientType, javax.mail.Address[])
      */
-    public void addRecipients(RecipientType type, Address[] addresses)
+    @Override
+    public void addRecipients(final RecipientType type, final Address[] addresses)
         throws MessagingException {
         getList(type).addAll(Arrays.asList(addresses));
     }
@@ -117,19 +120,21 @@ public class SimpleTextMessage extends Message {
     /* (non-Javadoc)
      * @see javax.mail.Message#getFlags()
      */
+    @Override
     public Flags getFlags() throws MessagingException {
         return _flags;
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#getFrom()
      */
+    @Override
     public Address[] getFrom() throws MessagingException {
         return (Address[]) _from.toArray(ADDRESS_ARRAY);
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#getHeader(java.lang.String)
      */
-    public String[] getHeader(String name) throws MessagingException {
+    public String[] getHeader(final String name) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
@@ -145,7 +150,7 @@ public class SimpleTextMessage extends Message {
     public int getLineCount() throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    private List getList(RecipientType type) throws MessagingException {
+    private List getList(final RecipientType type) throws MessagingException {
         List list;
         if (type == RecipientType.TO) {
             list = _to;
@@ -161,33 +166,36 @@ public class SimpleTextMessage extends Message {
     /* (non-Javadoc)
      * @see javax.mail.Part#getMatchingHeaders(java.lang.String[])
      */
-    public Enumeration getMatchingHeaders(String[] names)
+    public Enumeration getMatchingHeaders(final String[] names)
         throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#getNonMatchingHeaders(java.lang.String[])
      */
-    public Enumeration getNonMatchingHeaders(String[] names)
+    public Enumeration getNonMatchingHeaders(final String[] names)
         throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#getReceivedDate()
      */
+    @Override
     public Date getReceivedDate() throws MessagingException {
         return _received;
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#getRecipients(javax.mail.Message.RecipientType)
      */
-    public Address[] getRecipients(RecipientType type)
+    @Override
+    public Address[] getRecipients(final RecipientType type)
         throws MessagingException {
         return (Address[]) getList(type).toArray(ADDRESS_ARRAY);
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#getSentDate()
      */
+    @Override
     public Date getSentDate() throws MessagingException {
         return _sent;
     }
@@ -200,83 +208,87 @@ public class SimpleTextMessage extends Message {
     /* (non-Javadoc)
      * @see javax.mail.Message#getSubject()
      */
+    @Override
     public String getSubject() throws MessagingException {
         return _subject;
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#isMimeType(java.lang.String)
      */
-    public boolean isMimeType(String mimeType) throws MessagingException {
+    public boolean isMimeType(final String mimeType) throws MessagingException {
         return mimeType.equals("text/plain") || mimeType.equals("text/*");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#removeHeader(java.lang.String)
      */
-    public void removeHeader(String name) throws MessagingException {
+    public void removeHeader(final String name) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#reply(boolean)
      */
-    public Message reply(boolean replyToAll) throws MessagingException {
+    @Override
+    public Message reply(final boolean replyToAll) throws MessagingException {
         try {
-            SimpleTextMessage reply = (SimpleTextMessage) this.clone();
+            final SimpleTextMessage reply = (SimpleTextMessage) this.clone();
             reply._to = new LinkedList(_from);
             if (replyToAll) {
                 reply._to.addAll(_cc);
             }
             return reply;
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new MessagingException(e.getMessage());
         }
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#saveChanges()
      */
+    @Override
     public void saveChanges() throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setContent(javax.mail.Multipart)
      */
-    public void setContent(Multipart content) throws MessagingException {
+    public void setContent(final Multipart content) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setContent(java.lang.Object, java.lang.String)
      */
-    public void setContent(Object content, String type)
+    public void setContent(final Object content, final String type)
         throws MessagingException {
         setText((String) content);
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setDataHandler(javax.activation.DataHandler)
      */
-    public void setDataHandler(DataHandler handler) throws MessagingException {
+    public void setDataHandler(final DataHandler handler) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setDescription(java.lang.String)
      */
-    public void setDescription(String description) throws MessagingException {
+    public void setDescription(final String description) throws MessagingException {
         _description = description;
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setDisposition(java.lang.String)
      */
-    public void setDisposition(String disposition) throws MessagingException {
+    public void setDisposition(final String disposition) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setFileName(java.lang.String)
      */
-    public void setFileName(String name) throws MessagingException {
+    public void setFileName(final String name) throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#setFlags(javax.mail.Flags, boolean)
      */
-    public void setFlags(Flags flags, boolean set) throws MessagingException {
+    @Override
+    public void setFlags(final Flags flags, final boolean set) throws MessagingException {
         if (set) {
             _flags.add(flags);
         } else {
@@ -286,54 +298,59 @@ public class SimpleTextMessage extends Message {
     /* (non-Javadoc)
      * @see javax.mail.Message#setFrom()
      */
+    @Override
     public void setFrom() throws MessagingException {
         setFrom(new InternetAddress("root@localhost"));
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#setFrom(javax.mail.Address)
      */
-    public void setFrom(Address address) throws MessagingException {
+    @Override
+    public void setFrom(final Address address) throws MessagingException {
         _from.clear();
         _from.add(address);
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setHeader(java.lang.String, java.lang.String)
      */
-    public void setHeader(String name, String value)
+    public void setHeader(final String name, final String value)
         throws MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#setRecipients(javax.mail.Message.RecipientType, javax.mail.Address[])
      */
-    public void setRecipients(RecipientType type, Address[] addresses)
+    @Override
+    public void setRecipients(final RecipientType type, final Address[] addresses)
         throws MessagingException {
-        List list = getList(type);
+        final List list = getList(type);
         list.clear();
         list.addAll(Arrays.asList(addresses));
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#setSentDate(java.util.Date)
      */
-    public void setSentDate(Date sent) throws MessagingException {
+    @Override
+    public void setSentDate(final Date sent) throws MessagingException {
         _sent = sent;
     }
     /* (non-Javadoc)
      * @see javax.mail.Message#setSubject(java.lang.String)
      */
-    public void setSubject(String subject) throws MessagingException {
+    @Override
+    public void setSubject(final String subject) throws MessagingException {
         _subject = subject;
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#setText(java.lang.String)
      */
-    public void setText(String content) throws MessagingException {
+    public void setText(final String content) throws MessagingException {
         _text = content;
     }
     /* (non-Javadoc)
      * @see javax.mail.Part#writeTo(java.io.OutputStream)
      */
-    public void writeTo(OutputStream out)
+    public void writeTo(final OutputStream out)
         throws IOException, MessagingException {
         throw new UnsupportedOperationException("Method not implemented");
     }

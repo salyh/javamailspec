@@ -25,11 +25,11 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class ContentTypeTest extends TestCase {
-    public ContentTypeTest(String arg0) {
+    public ContentTypeTest(final String arg0) {
         super(arg0);
     }
     public void testContentType() throws ParseException {
-        ContentType type = new ContentType();
+        final ContentType type = new ContentType();
         assertNull(type.getPrimaryType());
         assertNull(type.getSubType());
         assertNull(type.getParameter("charset"));
@@ -37,12 +37,12 @@ public class ContentTypeTest extends TestCase {
 
     public void testContentTypeStringStringParameterList() throws ParseException {
         ContentType type;
-        ParameterList list = new ParameterList(";charset=us-ascii");
+        final ParameterList list = new ParameterList(";charset=us-ascii");
         type = new ContentType("text", "plain", list);
         assertEquals("text", type.getPrimaryType());
         assertEquals("plain", type.getSubType());
         assertEquals("text/plain", type.getBaseType());
-        ParameterList parameterList = type.getParameterList();
+        final ParameterList parameterList = type.getParameterList();
         assertEquals("us-ascii", parameterList.get("charset"));
         assertEquals("us-ascii", type.getParameter("charset"));
 
@@ -57,7 +57,7 @@ public class ContentTypeTest extends TestCase {
         assertNotNull(type.getParameterList());
         assertNull(type.getParameter("charset"));
         type = new ContentType("image/audio;charset=us-ascii");
-        ParameterList parameterList = type.getParameterList();
+        final ParameterList parameterList = type.getParameterList();
         assertEquals("image", type.getPrimaryType());
         assertEquals("audio", type.getSubType());
         assertEquals("image/audio", type.getBaseType());
@@ -75,14 +75,14 @@ public class ContentTypeTest extends TestCase {
     public void testGetParameterList() throws ParseException {
     }
     public void testSetPrimaryType() throws ParseException {
-        ContentType type = new ContentType("text/plain");
+        final ContentType type = new ContentType("text/plain");
         type.setPrimaryType("binary");
         assertEquals("binary", type.getPrimaryType());
         assertEquals("plain", type.getSubType());
         assertEquals("binary/plain", type.getBaseType());
     }
     public void testSetSubType() throws ParseException {
-        ContentType type = new ContentType("text/plain");
+        final ContentType type = new ContentType("text/plain");
         type.setSubType("html");
         assertEquals("text", type.getPrimaryType());
         assertEquals("html", type.getSubType());
@@ -93,7 +93,7 @@ public class ContentTypeTest extends TestCase {
     public void testSetParameterList() throws ParseException {
     }
     public void testToString() throws ParseException {
-        ContentType type = new ContentType("text/plain");
+        final ContentType type = new ContentType("text/plain");
         assertEquals("text/plain", type.toString());
         type.setParameter("foo", "bar");
         assertEquals("text/plain; foo=bar", type.toString());
@@ -101,7 +101,7 @@ public class ContentTypeTest extends TestCase {
         assertEquals("text/plain; foo=bar; bar=\"me@apache.org\"", type.toString());
     }
     public void testMatchContentType() throws ParseException {
-        ContentType type = new ContentType("text/plain");
+        final ContentType type = new ContentType("text/plain");
 
         ContentType test = new ContentType("text/plain");
 
@@ -132,7 +132,7 @@ public class ContentTypeTest extends TestCase {
         assertFalse(test.match(type));
     }
     public void testMatchString() throws ParseException {
-        ContentType type = new ContentType("text/plain");
+        final ContentType type = new ContentType("text/plain");
         assertTrue(type.match("text/plain"));
         assertTrue(type.match("TEXT/plain"));
         assertTrue(type.match("text/PLAIN"));
@@ -147,7 +147,7 @@ public class ContentTypeTest extends TestCase {
     }
     
     public void testSOAP12ContentType() throws ParseException {
-        ContentType type = new ContentType("multipart/related; type=\"application/xop+xml\"; start=\"<rootpart@soapui.org>\"; start-info=\"application/soap+xml; action=\\\"urn:upload\\\"\"; boundary=\"----=_Part_10_5804917.1223557742343\"");
+        final ContentType type = new ContentType("multipart/related; type=\"application/xop+xml\"; start=\"<rootpart@soapui.org>\"; start-info=\"application/soap+xml; action=\\\"urn:upload\\\"\"; boundary=\"----=_Part_10_5804917.1223557742343\"");
         assertEquals("multipart/related", type.getBaseType());
         assertEquals("application/xop+xml", type.getParameter("type"));
         assertEquals("<rootpart@soapui.org>", type.getParameter("start"));

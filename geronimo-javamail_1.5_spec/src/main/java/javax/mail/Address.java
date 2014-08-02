@@ -37,6 +37,7 @@ public abstract class Address implements Serializable {
      * @param object the object to compare t
      * @return true if the subclass determines the other object is equal to this Address
      */
+    @Override
     public abstract boolean equals(Object object);
 
     /**
@@ -49,5 +50,6 @@ public abstract class Address implements Serializable {
      * Subclasses must provide a suitable representation of their address.
      * @return a representation of an Address as a String
      */
+    @Override
     public abstract String toString();
 }

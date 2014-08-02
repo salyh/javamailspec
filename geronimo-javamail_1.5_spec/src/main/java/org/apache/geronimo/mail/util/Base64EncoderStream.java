@@ -19,9 +19,9 @@
 
 package org.apache.geronimo.mail.util;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.FilterOutputStream;
 
 /**
  * An implementation of a FilterOutputStream that encodes the
@@ -65,12 +65,12 @@ public class Base64EncoderStream extends FilterOutputStream {
      *
      * @param out    The wrapped output stream.
      */
-    public Base64EncoderStream(OutputStream out) {
+    public Base64EncoderStream(final OutputStream out) {
         this(out, DEFAULT_LINEBREAK);
     }
 
 
-    public Base64EncoderStream(OutputStream out, int lineBreak) {
+    public Base64EncoderStream(final OutputStream out, final int lineBreak) {
         super(out);
         // lines are processed only in multiple of 4, so round this down.
         this.lineBreak = (lineBreak / 4) * 4 ;
@@ -78,7 +78,8 @@ public class Base64EncoderStream extends FilterOutputStream {
 
     // in order for this to work, we need to override the 3 different signatures for write
 
-    public void write(int ch) throws IOException {
+    @Override
+    public void write(final int ch) throws IOException {
         // store this in the buffer.
         buffer[bufferedBytes++] = (byte)ch;
         // if the buffer is filled, encode these bytes
@@ -93,11 +94,13 @@ public class Base64EncoderStream extends FilterOutputStream {
         }
     }
 
-    public void write(byte [] data) throws IOException {
+    @Override
+    public void write(final byte [] data) throws IOException {
         write(data, 0, data.length);
     }
 
-    public void write(byte [] data, int offset, int length) throws IOException {
+    @Override
+    public void write(final byte [] data, int offset, int length) throws IOException {
         // if we have something in the buffer, we need to write enough bytes out to flush
         // those into the output stream AND continue on to finish off a line.  Once we're done there
         // we can write additional data out in complete blocks.
@@ -113,7 +116,7 @@ public class Base64EncoderStream extends FilterOutputStream {
             }
             else {
                 // calculate the size of a segment we can encode directly as a line.
-                int segmentSize = (lineBreak / 4) * 3;
+                final int segmentSize = (lineBreak / 4) * 3;
 
                 // write this out a block at a time, with separators between.
                 while (length > segmentSize) {
@@ -137,11 +140,13 @@ public class Base64EncoderStream extends FilterOutputStream {
         }
     }
 
+    @Override
     public void close() throws IOException {
         flush();
         out.close();
     }
 
+    @Override
     public void flush() throws IOException {
         if (bufferedBytes > 0) {
             encoder.encode(buffer, 0, bufferedBytes, out);
@@ -159,7 +164,7 @@ public class Base64EncoderStream extends FilterOutputStream {
      *
      * @exception IOException
      */
-    private void checkEOL(int required) throws IOException {
+    private void checkEOL(final int required) throws IOException {
         if (lineBreak != Integer.MAX_VALUE) {
             // if this write would exceed the line maximum, add a linebreak to the stream.
             if (outputCount + required > lineBreak) {
@@ -175,7 +180,7 @@ public class Base64EncoderStream extends FilterOutputStream {
      *
      * @param added  The number of characters just added.
      */
-    private void updateLineCount(int added) {
+    private void updateLineCount(final int added) {
         if (lineBreak != Integer.MAX_VALUE) {
             outputCount += added;
         }

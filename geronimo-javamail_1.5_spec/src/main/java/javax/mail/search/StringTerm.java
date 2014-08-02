@@ -43,7 +43,7 @@ public abstract class StringTerm extends SearchTerm {
      * Defaults to case insensitive matching.
      * @param pattern the pattern for this term
      */
-    protected StringTerm(String pattern) {
+    protected StringTerm(final String pattern) {
         this(pattern, true);
     }
 
@@ -52,7 +52,7 @@ public abstract class StringTerm extends SearchTerm {
      * @param pattern the pattern for this term
      * @param ignoreCase if true, case should be ignored during matching
      */
-    protected StringTerm(String pattern, boolean ignoreCase) {
+    protected StringTerm(final String pattern, final boolean ignoreCase) {
         this.pattern = pattern;
         this.ignoreCase = ignoreCase;
     }
@@ -80,9 +80,9 @@ public abstract class StringTerm extends SearchTerm {
      * @param match the String to compare to
      * @return true if this patter is a substring of the supplied String
      */
-    protected boolean match(String match) {
-        int matchLength = pattern.length(); 
-        int length = match.length() - matchLength;        
+    protected boolean match(final String match) {
+        final int matchLength = pattern.length(); 
+        final int length = match.length() - matchLength;        
         
         for (int i = 0; i <= length; i++) {
             if (match.regionMatches(ignoreCase, i, pattern, 0, matchLength)) {
@@ -92,11 +92,12 @@ public abstract class StringTerm extends SearchTerm {
         return false;
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof StringTerm == false) return false;
         
-        StringTerm term = (StringTerm)other; 
+        final StringTerm term = (StringTerm)other; 
         
         if (ignoreCase) {
             return term.pattern.equalsIgnoreCase(pattern) && term.ignoreCase == ignoreCase; 
@@ -106,6 +107,7 @@ public abstract class StringTerm extends SearchTerm {
         }
     }
 
+    @Override
     public int hashCode() {
         return pattern.hashCode() + (ignoreCase ? 32 : 79);
     }

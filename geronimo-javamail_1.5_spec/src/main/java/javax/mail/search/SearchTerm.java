@@ -20,6 +20,7 @@
 package javax.mail.search;
 
 import java.io.Serializable;
+
 import javax.mail.Message;
 
 /**

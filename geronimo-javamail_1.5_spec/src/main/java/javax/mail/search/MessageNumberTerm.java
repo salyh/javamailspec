@@ -28,15 +28,17 @@ public final class MessageNumberTerm extends IntegerComparisonTerm {
 	
 	private static final long serialVersionUID = -5379625829658623812L;
 	
-    public MessageNumberTerm(int number) {
+    public MessageNumberTerm(final int number) {
         super(EQ, number);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         return match(message.getMessageNumber());
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (!(other instanceof MessageNumberTerm)) {
             return false; 
         }

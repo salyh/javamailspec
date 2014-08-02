@@ -38,14 +38,15 @@ public class StringBufferOutputStream extends OutputStream {
      *
      * @param out    The wrapped output stream.
      */
-    public StringBufferOutputStream(StringBuffer out) {
+    public StringBufferOutputStream(final StringBuffer out) {
         buffer = out;
     }
 
 
     // in order for this to work, we only need override the single character form, as the others
     // funnel through this one by default.
-    public void write(int ch) throws IOException {
+    @Override
+    public void write(final int ch) throws IOException {
         // just append the character
         buffer.append((char)ch);
     }

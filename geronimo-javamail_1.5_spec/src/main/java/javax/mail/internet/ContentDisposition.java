@@ -33,12 +33,12 @@ public class ContentDisposition {
         setParameterList(null);
     }
 
-    public ContentDisposition(String disposition) throws ParseException {
+    public ContentDisposition(final String disposition) throws ParseException {
         // get a token parser for the type information
-        HeaderTokenizer tokenizer = new HeaderTokenizer(disposition, HeaderTokenizer.MIME);
+        final HeaderTokenizer tokenizer = new HeaderTokenizer(disposition, HeaderTokenizer.MIME);
 
         // get the first token, which must be an ATOM
-        HeaderTokenizer.Token token = tokenizer.next();
+        final HeaderTokenizer.Token token = tokenizer.next();
         if (token.getType() != HeaderTokenizer.Token.ATOM) {
             throw new ParseException("Invalid content disposition");
         }
@@ -46,13 +46,13 @@ public class ContentDisposition {
         _disposition = token.getValue();
 
         // the remainder is parameters, which ParameterList will take care of parsing.
-        String remainder = tokenizer.getRemainder();
+        final String remainder = tokenizer.getRemainder();
         if (remainder != null) {
             _list = new ParameterList(remainder);
         }
     }
 
-    public ContentDisposition(String disposition, ParameterList list) {
+    public ContentDisposition(final String disposition, final ParameterList list) {
         setDisposition(disposition);
         setParameterList(list);
     }
@@ -61,7 +61,7 @@ public class ContentDisposition {
         return _disposition;
     }
 
-    public String getParameter(String name) {
+    public String getParameter(final String name) {
         if (_list == null) {
             return null;
         } else {
@@ -73,18 +73,18 @@ public class ContentDisposition {
         return _list;
     }
 
-    public void setDisposition(String string) {
+    public void setDisposition(final String string) {
         _disposition = string;
     }
 
-    public void setParameter(String name, String value) {
+    public void setParameter(final String name, final String value) {
         if (_list == null) {
             _list = new ParameterList();
         }
         _list.set(name, value);
     }
 
-    public void setParameterList(ParameterList list) {
+    public void setParameterList(final ParameterList list) {
         if (list == null) {
             _list = new ParameterList();
         } else {
@@ -100,26 +100,24 @@ public class ContentDisposition {
      * @return  RFC2045 style string
      * @since       JavaMail 1.2
      */
+    @Override
     public String toString() {
         
-        //FIXME  
-        /*
-         * The general contract of Object.toString is that it never returns null.
-The toString methods of ContentType and ContentDisposition were defined
-to return null in certain error cases.  Given the general toString contract
-it seems unlikely that anyone ever depended on these special cases, and
-it would be more useful for these classes to obey the general contract.
-These methods have been changed to return an empty string in these error
-cases.
+        /* Since JavaMail 1.5:
+           The general contract of Object.toString is that it never returns null.
+           The toString methods of ContentType and ContentDisposition were defined
+           to return null in certain error cases.  Given the general toString contract
+           it seems unlikely that anyone ever depended on these special cases, and
+           it would be more useful for these classes to obey the general contract.
+           These methods have been changed to return an empty string in these error
+           cases.
         */
         
-        
-        
-        
+
         // it is possible we might have a parameter list, but this is meaningless if
         // there is no disposition string.  Return a failure.
         if (_disposition == null) {
-            return null;
+            return "";
         }
 
 

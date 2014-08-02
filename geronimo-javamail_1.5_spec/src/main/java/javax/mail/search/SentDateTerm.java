@@ -20,6 +20,7 @@
 package javax.mail.search;
 
 import java.util.Date;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -30,24 +31,26 @@ public final class SentDateTerm extends DateTerm {
 	
 	private static final long serialVersionUID = 5647755030530907263L;
 	
-    public SentDateTerm(int comparison, Date date) {
+    public SentDateTerm(final int comparison, final Date date) {
         super(comparison, date);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            Date date = message.getSentDate(); 
+            final Date date = message.getSentDate(); 
             if (date == null) {
                 return false; 
             }
             
             return match(message.getSentDate());
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof SentDateTerm == false) return false;
         return super.equals(other);

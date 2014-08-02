@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 import javax.activation.CommandMap;
@@ -32,7 +31,6 @@ import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.swing.text.AbstractDocument.Content;
 
 import junit.framework.TestCase;
 
@@ -44,29 +42,29 @@ public class MimeMessageTest extends TestCase {
     private Session session;
 
     public void testWriteTo() throws MessagingException, IOException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
         msg.setSender(new InternetAddress("foo"));
         msg.setHeader("foo", "bar");
-        MimeMultipart mp = new MimeMultipart();
-        MimeBodyPart part1 = new MimeBodyPart();
+        final MimeMultipart mp = new MimeMultipart();
+        final MimeBodyPart part1 = new MimeBodyPart();
         part1.setHeader("foo", "bar");
         part1.setContent("Hello World", "text/plain");
         mp.addBodyPart(part1);
-        MimeBodyPart part2 = new MimeBodyPart();
+        final MimeBodyPart part2 = new MimeBodyPart();
         part2.setContent("Hello Again", "text/plain");
         mp.addBodyPart(part2);
         msg.setContent(mp);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
         msg.writeTo(out);
 
-        InputStream in = new ByteArrayInputStream(out.toByteArray());
+        final InputStream in = new ByteArrayInputStream(out.toByteArray());
 
         MimeMessage newMessage = new MimeMessage(session, in);
 
         assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo");
 
-        String[] headers = newMessage.getHeader("foo");
+        final String[] headers = newMessage.getHeader("foo");
         assertTrue(headers.length == 1);
         assertEquals(headers[0], "bar");
 
@@ -79,10 +77,10 @@ public class MimeMessageTest extends TestCase {
 
 
     public void testFrom() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
-        InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
 
         msg.setSender(dev);
 
@@ -102,13 +100,13 @@ public class MimeMessageTest extends TestCase {
         assertEquals(from[1], dev);
 
         msg.setFrom();
-        InternetAddress local = InternetAddress.getLocalAddress(session);
+        final InternetAddress local = InternetAddress.getLocalAddress(session);
         from = msg.getFrom();
 
         assertTrue(from.length == 1);
         assertEquals(local, from[0]);
 
-        msg.setFrom(null);
+        msg.setFrom((Address) null);
         from = msg.getFrom();
 
         assertTrue(from.length == 1);
@@ -121,14 +119,14 @@ public class MimeMessageTest extends TestCase {
 
 
     public void testSender() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
-        InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
 
         msg.setSender(dev);
 
-        Address[] from = msg.getFrom();
+        final Address[] from = msg.getFrom();
         assertTrue(from.length == 1);
         assertEquals(from[0], dev);
 
@@ -139,13 +137,13 @@ public class MimeMessageTest extends TestCase {
     }
 
     public void testGetAllRecipients() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
-        InternetAddress user = new InternetAddress("geronimo-user@apache.org");
-        InternetAddress user1 = new InternetAddress("geronimo-user1@apache.org");
-        InternetAddress user2 = new InternetAddress("geronimo-user2@apache.org");
-        NewsAddress group = new NewsAddress("comp.lang.rexx");
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+        final InternetAddress user1 = new InternetAddress("geronimo-user1@apache.org");
+        final InternetAddress user2 = new InternetAddress("geronimo-user2@apache.org");
+        final NewsAddress group = new NewsAddress("comp.lang.rexx");
 
         Address[] recipients = msg.getAllRecipients();
         assertNull(recipients);
@@ -200,11 +198,11 @@ public class MimeMessageTest extends TestCase {
         doNewsgroupRecipientTest(MimeMessage.RecipientType.NEWSGROUPS);
     }
 
-    private void doRecipientTest(Message.RecipientType type) throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+    private void doRecipientTest(final Message.RecipientType type) throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
 
-        InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
-        InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
 
         Address[] recipients = msg.getRecipients(type);
         assertNull(recipients);
@@ -252,11 +250,11 @@ public class MimeMessageTest extends TestCase {
     }
 
 
-    private void doNewsgroupRecipientTest(Message.RecipientType type) throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+    private void doNewsgroupRecipientTest(final Message.RecipientType type) throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
 
-        Address dev = new NewsAddress("geronimo-dev");
-        Address user = new NewsAddress("geronimo-user");
+        final Address dev = new NewsAddress("geronimo-dev");
+        final Address user = new NewsAddress("geronimo-user");
 
         Address[] recipients = msg.getRecipients(type);
         assertNull(recipients);
@@ -304,10 +302,10 @@ public class MimeMessageTest extends TestCase {
     }
 
     public void testReplyTo() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
-        InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
 
         msg.setReplyTo(new Address[] { dev });
 
@@ -330,13 +328,13 @@ public class MimeMessageTest extends TestCase {
 
 
     public void testSetSubject() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        String simpleSubject = "Yada, yada";
+        final String simpleSubject = "Yada, yada";
 
-        String complexSubject = "Yada, yada\u0081";
+        final String complexSubject = "Yada, yada\u0081";
 
-        String mungedSubject = "Yada, yada\u003F";
+        final String mungedSubject = "Yada, yada\u003F";
 
         msg.setSubject(simpleSubject);
         assertEquals(msg.getSubject(), simpleSubject);
@@ -350,13 +348,13 @@ public class MimeMessageTest extends TestCase {
 
 
     public void testSetDescription() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
-        String simpleSubject = "Yada, yada";
+        final String simpleSubject = "Yada, yada";
 
-        String complexSubject = "Yada, yada\u0081";
+        final String complexSubject = "Yada, yada\u0081";
 
-        String mungedSubject = "Yada, yada\u003F";
+        final String mungedSubject = "Yada, yada\u003F";
 
         msg.setDescription(simpleSubject);
         assertEquals(msg.getDescription(), simpleSubject);
@@ -370,7 +368,7 @@ public class MimeMessageTest extends TestCase {
 
 
     public void testGetContentType() throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
         assertEquals(msg.getContentType(), "text/plain");
 
         msg.setHeader("Content-Type", "text/xml");
@@ -403,19 +401,21 @@ public class MimeMessageTest extends TestCase {
 
 
 
+    @Override
     protected void setUp() throws Exception {
         defaultMap = CommandMap.getDefaultCommandMap();
-        MailcapCommandMap myMap = new MailcapCommandMap();
+        final MailcapCommandMap myMap = new MailcapCommandMap();
         myMap.addMailcap("text/plain;;    x-java-content-handler=" + MimeMultipartTest.DummyTextHandler.class.getName());
         myMap.addMailcap("multipart/*;;    x-java-content-handler=" + MimeMultipartTest.DummyMultipartHandler.class.getName());
         CommandMap.setDefaultCommandMap(myMap);
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.put("mail.user", "tester");
         props.put("mail.host", "apache.org");
 
         session = Session.getInstance(props);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         CommandMap.setDefaultCommandMap(defaultMap);
     }

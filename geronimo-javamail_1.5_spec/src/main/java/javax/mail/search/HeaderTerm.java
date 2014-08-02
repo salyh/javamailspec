@@ -29,9 +29,9 @@ public final class HeaderTerm extends StringTerm {
 	
 	private static final long serialVersionUID = 8342514650333389122L;
 	
-    private String headerName;
+    private final String headerName;
 
-    public HeaderTerm(String header, String pattern) {
+    public HeaderTerm(final String header, final String pattern) {
         super(pattern);
         this.headerName = header;
     }
@@ -40,30 +40,33 @@ public final class HeaderTerm extends StringTerm {
         return headerName;
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            String values[] = message.getHeader(headerName);
+            final String values[] = message.getHeader(headerName);
             if (values != null) {
                 for (int i = 0; i < values.length; i++) {
-                    String value = values[i];
+                    final String value = values[i];
                     if (match(value)) {
                         return true;
                     }
                 }
             }
             return false;
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof HeaderTerm == false) return false;
         // we need to compare with more than just the header name. 
         return headerName.equalsIgnoreCase(((HeaderTerm) other).headerName) && super.equals(other);
     }
 
+    @Override
     public int hashCode() {
         return headerName.toLowerCase().hashCode() + super.hashCode();
     }

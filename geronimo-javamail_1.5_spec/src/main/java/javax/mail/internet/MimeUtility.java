@@ -19,9 +19,7 @@
 
 package javax.mail.internet;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +33,7 @@ import java.util.StringTokenizer;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.mail.EncodingAware;
 import javax.mail.MessagingException;
 
 import org.apache.geronimo.mail.util.ASCIIUtil;
@@ -43,9 +42,8 @@ import org.apache.geronimo.mail.util.Base64DecoderStream;
 import org.apache.geronimo.mail.util.Base64Encoder;
 import org.apache.geronimo.mail.util.Base64EncoderStream;
 import org.apache.geronimo.mail.util.QuotedPrintableDecoderStream;
-import org.apache.geronimo.mail.util.QuotedPrintableEncoderStream;
 import org.apache.geronimo.mail.util.QuotedPrintableEncoder;
-import org.apache.geronimo.mail.util.QuotedPrintable;
+import org.apache.geronimo.mail.util.QuotedPrintableEncoderStream;
 import org.apache.geronimo.mail.util.SessionUtil;
 import org.apache.geronimo.mail.util.UUDecoderStream;
 import org.apache.geronimo.mail.util.UUEncoderStream;
@@ -85,7 +83,7 @@ public class MimeUtility {
         loadCharacterSetMappings();
     }
 
-    public static InputStream decode(InputStream in, String encoding) throws MessagingException {
+    public static InputStream decode(final InputStream in, String encoding) throws MessagingException {
         encoding = encoding.toLowerCase();
 
         // some encodies are just pass-throughs, with no real decoding.
@@ -118,7 +116,7 @@ public class MimeUtility {
      * @return The decoded test string.
      * @exception UnsupportedEncodingException
      */
-    public static String decodeText(String text) throws UnsupportedEncodingException {
+    public static String decodeText(final String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
         // source string doesn't contain that sequent, no decoding is required.
         if (text.indexOf("=?") < 0) {
@@ -131,12 +129,12 @@ public class MimeUtility {
         }
 
         int offset = 0;
-        int endOffset = text.length();
+        final int endOffset = text.length();
 
         int startWhiteSpace = -1;
         int endWhiteSpace = -1;
 
-        StringBuffer decodedText = new StringBuffer(text.length());
+        final StringBuffer decodedText = new StringBuffer(text.length());
 
         boolean previousTokenEncoded = false;
 
@@ -162,7 +160,7 @@ public class MimeUtility {
             }
             else {
                 // we have a word token.  We need to scan over the word and then try to parse it.
-                int wordStart = offset;
+                final int wordStart = offset;
 
                 while (offset < endOffset) {
                     // step over the white space characters.
@@ -177,12 +175,12 @@ public class MimeUtility {
                     //NB:  Trailing whitespace on these header strings will just be discarded.
                 }
                 // pull out the word token.
-                String word = text.substring(wordStart, offset);
+                final String word = text.substring(wordStart, offset);
                 // is the token encoded?  decode the word
                 if (word.startsWith("=?")) {
                     try {
                         // if this gives a parsing failure, treat it like a non-encoded word.
-                        String decodedWord = decodeWord(word);
+                        final String decodedWord = decodeWord(word);
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
                         if (!previousTokenEncoded) {
@@ -199,7 +197,7 @@ public class MimeUtility {
                         // and get handled as normal text.
                         continue;
 
-                    } catch (ParseException e) {
+                    } catch (final ParseException e) {
                     }
                 }
                 // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
@@ -232,14 +230,14 @@ public class MimeUtility {
      * @return The decoded test string.
      * @exception UnsupportedEncodingException
      */
-    private static String decodeTextNonStrict(String text) throws UnsupportedEncodingException {
+    private static String decodeTextNonStrict(final String text) throws UnsupportedEncodingException {
         int offset = 0;
-        int endOffset = text.length();
+        final int endOffset = text.length();
 
         int startWhiteSpace = -1;
         int endWhiteSpace = -1;
 
-        StringBuffer decodedText = new StringBuffer(text.length());
+        final StringBuffer decodedText = new StringBuffer(text.length());
 
         boolean previousTokenEncoded = false;
 
@@ -265,7 +263,7 @@ public class MimeUtility {
             }
             else {
                 // we're at the start of a word token.  We potentially need to break this up into subtokens
-                int wordStart = offset;
+                final int wordStart = offset;
 
                 while (offset < endOffset) {
                     // step over the white space characters.
@@ -280,13 +278,13 @@ public class MimeUtility {
                     //NB:  Trailing whitespace on these header strings will just be discarded.
                 }
                 // pull out the word token.
-                String word = text.substring(wordStart, offset);
+                final String word = text.substring(wordStart, offset);
 
                 int decodeStart = 0;
 
                 // now scan and process each of the bits within here.
                 while (decodeStart < word.length()) {
-                    int tokenStart = word.indexOf("=?", decodeStart);
+                    final int tokenStart = word.indexOf("=?", decodeStart);
                     if (tokenStart == -1) {
                         // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
                         // if we have it.
@@ -316,7 +314,7 @@ public class MimeUtility {
                         }
 
                         // now find the end marker.
-                        int tokenEnd = word.indexOf("?=", tokenStart);
+                        final int tokenEnd = word.indexOf("?=", tokenStart);
                         // sigh, an invalid token.  Treat this as plain text.
                         if (tokenEnd == -1) {
                             // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
@@ -335,10 +333,10 @@ public class MimeUtility {
                             // update our ticker
                             decodeStart = tokenEnd + 2;
 
-                            String token = word.substring(tokenStart, tokenEnd);
+                            final String token = word.substring(tokenStart, tokenEnd);
                             try {
                                 // if this gives a parsing failure, treat it like a non-encoded word.
-                                String decodedWord = decodeWord(token);
+                                final String decodedWord = decodeWord(token);
 
                                 // are any whitespace characters significant?  Append 'em if we've got 'em.
                                 if (!previousTokenEncoded) {
@@ -355,7 +353,7 @@ public class MimeUtility {
                                 // and get handled as normal text.
                                 continue;
 
-                            } catch (ParseException e) {
+                            } catch (final ParseException e) {
                             }
                             // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
                             // if we have it.
@@ -387,7 +385,7 @@ public class MimeUtility {
      * @exception ParseException
      * @exception UnsupportedEncodingException
      */
-    public static String decodeWord(String word) throws ParseException, UnsupportedEncodingException {
+    public static String decodeWord(final String word) throws ParseException, UnsupportedEncodingException {
         // encoded words start with the characters "=?".  If this not an encoded word, we throw a
         // ParseException for the caller.
 
@@ -395,29 +393,29 @@ public class MimeUtility {
             throw new ParseException("Invalid RFC 2047 encoded-word: " + word);
         }
 
-        int charsetPos = word.indexOf('?', 2);
+        final int charsetPos = word.indexOf('?', 2);
         if (charsetPos == -1) {
             throw new ParseException("Missing charset in RFC 2047 encoded-word: " + word);
         }
 
         // pull out the character set information (this is the MIME name at this point).
-        String charset = word.substring(2, charsetPos).toLowerCase();
+        final String charset = word.substring(2, charsetPos).toLowerCase();
 
         // now pull out the encoding token the same way.
-        int encodingPos = word.indexOf('?', charsetPos + 1);
+        final int encodingPos = word.indexOf('?', charsetPos + 1);
         if (encodingPos == -1) {
             throw new ParseException("Missing encoding in RFC 2047 encoded-word: " + word);
         }
 
-        String encoding = word.substring(charsetPos + 1, encodingPos);
+        final String encoding = word.substring(charsetPos + 1, encodingPos);
 
         // and finally the encoded text.
-        int encodedTextPos = word.indexOf("?=", encodingPos + 1);
+        final int encodedTextPos = word.indexOf("?=", encodingPos + 1);
         if (encodedTextPos == -1) {
             throw new ParseException("Missing encoded text in RFC 2047 encoded-word: " + word);
         }
 
-        String encodedText = word.substring(encodingPos + 1, encodedTextPos);
+        final String encodedText = word.substring(encodingPos + 1, encodedTextPos);
 
         // seems a bit silly to encode a null string, but easy to deal with.
         if (encodedText.length() == 0) {
@@ -426,9 +424,9 @@ public class MimeUtility {
 
         try {
             // the decoder writes directly to an output stream.
-            ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
-            byte[] encodedData = encodedText.getBytes("US-ASCII");
+            final byte[] encodedData = encodedText.getBytes("US-ASCII");
 
             // Base64 encoded?
             if (encoding.equals("B")) {
@@ -436,16 +434,16 @@ public class MimeUtility {
             }
             // maybe quoted printable.
             else if (encoding.equals("Q")) {
-                QuotedPrintableEncoder dataEncoder = new QuotedPrintableEncoder();
+                final QuotedPrintableEncoder dataEncoder = new QuotedPrintableEncoder();
                 dataEncoder.decodeWord(encodedData, out);
             }
             else {
                 throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }
             // get the decoded byte data and convert into a string.
-            byte[] decodedData = out.toByteArray();
+            final byte[] decodedData = out.toByteArray();
             return new String(decodedData, javaCharset(charset));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UnsupportedEncodingException("Invalid RFC 2047 encoding");
         }
 
@@ -461,7 +459,7 @@ public class MimeUtility {
      *         encoding for the requested encoding type.
      * @exception MessagingException
      */
-    public static OutputStream encode(OutputStream out, String encoding) throws MessagingException {
+    public static OutputStream encode(final OutputStream out, String encoding) throws MessagingException {
         // no encoding specified, so assume it goes out unchanged.
         if (encoding == null) {
             return out;
@@ -499,7 +497,7 @@ public class MimeUtility {
      *         encoding for the requested encoding type.
      * @exception MessagingException
      */
-    public static OutputStream encode(OutputStream out, String encoding, String filename) throws MessagingException {
+    public static OutputStream encode(final OutputStream out, String encoding, final String filename) throws MessagingException {
         encoding = encoding.toLowerCase();
 
         // some encodies are just pass-throughs, with no real decoding.
@@ -522,24 +520,24 @@ public class MimeUtility {
     }
 
 
-    public static String encodeText(String word) throws UnsupportedEncodingException {
+    public static String encodeText(final String word) throws UnsupportedEncodingException {
         return encodeText(word, null, null);
     }
 
-    public static String encodeText(String word, String charset, String encoding) throws UnsupportedEncodingException {
+    public static String encodeText(final String word, final String charset, final String encoding) throws UnsupportedEncodingException {
         return encodeWord(word, charset, encoding, false);
     }
 
-    public static String encodeWord(String word) throws UnsupportedEncodingException {
+    public static String encodeWord(final String word) throws UnsupportedEncodingException {
         return encodeWord(word, null, null);
     }
 
-    public static String encodeWord(String word, String charset, String encoding) throws UnsupportedEncodingException {
+    public static String encodeWord(final String word, final String charset, final String encoding) throws UnsupportedEncodingException {
         return encodeWord(word, charset, encoding, true);
     }
 
 
-    private static String encodeWord(String word, String charset, String encoding, boolean encodingWord) throws UnsupportedEncodingException {
+    private static String encodeWord(final String word, String charset, final String encoding, final boolean encodingWord) throws UnsupportedEncodingException {
 
         // figure out what we need to encode this.
         String encoder = ASCIIUtil.getTextTransferEncoding(word);
@@ -569,26 +567,26 @@ public class MimeUtility {
         try {
             
             // we'll format this directly into the string buffer 
-            StringBuffer result = new StringBuffer(); 
+            final StringBuffer result = new StringBuffer(); 
             
             // this is the maximum size of a segment of encoded data, which is based off 
             // of a 75 character size limit and all of the encoding overhead elements.
-            int sizeLimit = 75 - 7 - charset.length();
+            final int sizeLimit = 75 - 7 - charset.length();
             
             // now do the appropriate encoding work 
             if (encoder.equals("base64")) {
-                Base64Encoder dataEncoder = new Base64Encoder();
+                final Base64Encoder dataEncoder = new Base64Encoder();
                 // this may recurse on the encoding if the string is too long.  The left-most will not 
                 // get a segment delimiter 
                 encodeBase64(word, result, sizeLimit, charset, dataEncoder, true, SessionUtil.getBooleanProperty(MIME_FOLDENCODEDWORDS, false)); 
             }
             else {
-                QuotedPrintableEncoder dataEncoder = new QuotedPrintableEncoder();
+                final QuotedPrintableEncoder dataEncoder = new QuotedPrintableEncoder();
                 encodeQuotedPrintable(word, result, sizeLimit, charset, dataEncoder, true, 
                     SessionUtil.getBooleanProperty(MIME_FOLDENCODEDWORDS, false), encodingWord ? QP_WORD_SPECIALS : QP_TEXT_SPECIALS); 
             }
             return result.toString();    
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UnsupportedEncodingException("Invalid encoding");
         }
     }
@@ -612,12 +610,12 @@ public class MimeUtility {
      * @param foldSegments
      *                  Indicates the type of delimiter to use (blank or newline sequence).
      */
-    static private void encodeBase64(String data, StringBuffer out, int sizeLimit, String charset, Base64Encoder encoder, boolean firstSegment, boolean foldSegments) throws IOException
+    static private void encodeBase64(final String data, final StringBuffer out, final int sizeLimit, final String charset, final Base64Encoder encoder, final boolean firstSegment, final boolean foldSegments) throws IOException
     {
         // this needs to be converted into the appropriate transfer encoding. 
-        byte [] bytes = data.getBytes(javaCharset(charset)); 
+        final byte [] bytes = data.getBytes(javaCharset(charset)); 
         
-        int estimatedSize = encoder.estimateEncodedLength(bytes); 
+        final int estimatedSize = encoder.estimateEncodedLength(bytes); 
         
         // if the estimated encoding size is over our segment limit, split the string in half and 
         // recurse.  Eventually we'll reach a point where things are small enough.  
@@ -663,13 +661,13 @@ public class MimeUtility {
      * @param foldSegments
      *                  Indicates the type of delimiter to use (blank or newline sequence).
      */
-    static private void encodeQuotedPrintable(String data, StringBuffer out, int sizeLimit, String charset, QuotedPrintableEncoder encoder, 
-        boolean firstSegment, boolean foldSegments, String specials)  throws IOException 
+    static private void encodeQuotedPrintable(final String data, final StringBuffer out, final int sizeLimit, final String charset, final QuotedPrintableEncoder encoder, 
+        final boolean firstSegment, final boolean foldSegments, final String specials)  throws IOException 
     {
         // this needs to be converted into the appropriate transfer encoding. 
-        byte [] bytes = data.getBytes(javaCharset(charset)); 
+        final byte [] bytes = data.getBytes(javaCharset(charset)); 
         
-        int estimatedSize = encoder.estimateEncodedLength(bytes, specials); 
+        final int estimatedSize = encoder.estimateEncodedLength(bytes, specials); 
         
         // if the estimated encoding size is over our segment limit, split the string in half and 
         // recurse.  Eventually we'll reach a point where things are small enough.  
@@ -707,25 +705,25 @@ public class MimeUtility {
      *
      * @return The string name of an encoding used to transfer the content.
      */
-    public static String getEncoding(DataHandler handler) {
+    public static String getEncoding(final DataHandler handler) {
 
 
         // if this handler has an associated data source, we can read directly from the
         // data source to make this judgment.  This is generally MUCH faster than asking the
         // DataHandler to write out the data for us.
-        DataSource ds = handler.getDataSource();
+        final DataSource ds = handler.getDataSource();
         if (ds != null) {
             return getEncoding(ds);
         }
 
         try {
             // get a parser that allows us to make comparisons.
-            ContentType content = new ContentType(ds.getContentType());
+            final ContentType content = new ContentType(ds.getContentType());
 
             // The only access to the content bytes at this point is by asking the handler to write
             // the information out to a stream.  We're going to pipe this through a special stream
             // that examines the bytes as they go by.
-            ContentCheckingOutputStream checker = new ContentCheckingOutputStream();
+            final ContentCheckingOutputStream checker = new ContentCheckingOutputStream();
 
             handler.writeTo(checker);
 
@@ -737,7 +735,7 @@ public class MimeUtility {
                 return checker.getBinaryTransferEncoding();
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // any unexpected I/O exceptions we'll force to a "safe" fallback position.
             return "base64";
         }
@@ -753,12 +751,21 @@ public class MimeUtility {
      * @return The string name of the encoding form that should be used for
      *         the data.
      */
-    public static String getEncoding(DataSource source) {
+    public static String getEncoding(final DataSource source) {
+        
+        if(source instanceof EncodingAware) {
+            String encoding = ((EncodingAware) source).getEncoding();
+            
+            if(encoding != null) {
+                return encoding;
+            }
+        }
+        
         InputStream in = null;
 
         try {
             // get a parser that allows us to make comparisons.
-            ContentType content = new ContentType(source.getContentType());
+            final ContentType content = new ContentType(source.getContentType());
 
             // we're probably going to have to scan the data.
             in = source.getInputStream();
@@ -771,7 +778,7 @@ public class MimeUtility {
             else {
                 return ASCIIUtil.getTextTransferEncoding(in);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // this was a problem...not sure what makes sense here, so we'll assume it's binary
             // and we need to transfer this using Base64 encoding.
             return "base64";
@@ -781,7 +788,7 @@ public class MimeUtility {
                 if (in != null) {
                     in.close();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
             }
         }
     }
@@ -799,12 +806,12 @@ public class MimeUtility {
      * @return The quoted value.  This will be unchanged if the word doesn't contain
      *         any of the designated special characters.
      */
-    public static String quote(String word, String specials) {
-        int wordLength = word.length();
-        boolean requiresQuoting = false;
+    public static String quote(final String word, final String specials) {
+        final int wordLength = word.length();
+        final boolean requiresQuoting = false;
         // scan the string looking for problem characters
         for (int i =0; i < wordLength; i++) {
-            char ch = word.charAt(i);
+            final char ch = word.charAt(i);
             // special escaped characters require escaping, which also implies quoting.
             if (escapedChars.indexOf(ch) >= 0) {
                 return quoteAndEscapeString(word);
@@ -827,15 +834,15 @@ public class MimeUtility {
      *
      * @return The quoted string.
      */
-    private static String quoteAndEscapeString(String word) {
-        int wordLength = word.length();
+    private static String quoteAndEscapeString(final String word) {
+        final int wordLength = word.length();
         // allocate at least enough for the string and two quotes plus a reasonable number of escaped chars.
-        StringBuffer buffer = new StringBuffer(wordLength + 10);
+        final StringBuffer buffer = new StringBuffer(wordLength + 10);
         // add the leading quote.
         buffer.append('"');
 
         for (int i = 0; i < wordLength; i++) {
-            char ch = word.charAt(i);
+            final char ch = word.charAt(i);
             // is this an escaped char?
             if (escapedChars.indexOf(ch) >= 0) {
                 // add the escape marker before appending.
@@ -856,13 +863,13 @@ public class MimeUtility {
      *
      * @return The Java equivalent for this name.
      */
-    public static String javaCharset(String charset) {
+    public static String javaCharset(final String charset) {
         // nothing in, nothing out.
         if (charset == null) {
             return null;
         }
 
-        String mappedCharset = (String)mime2java.get(charset.toLowerCase());
+        final String mappedCharset = (String)mime2java.get(charset.toLowerCase());
         // if there is no mapping, then the original name is used.  Many of the MIME character set
         // names map directly back into Java.  The reverse isn't necessarily true.
         return mappedCharset == null ? charset : mappedCharset;
@@ -875,13 +882,13 @@ public class MimeUtility {
      *
      * @return The MIME standard equivalent for this character set name.
      */
-    public static String mimeCharset(String charset) {
+    public static String mimeCharset(final String charset) {
         // nothing in, nothing out.
         if (charset == null) {
             return null;
         }
 
-        String mappedCharset = (String)java2mime.get(charset.toLowerCase());
+        final String mappedCharset = (String)java2mime.get(charset.toLowerCase());
         // if there is no mapping, then the original name is used.  Many of the MIME character set
         // names map directly back into Java.  The reverse isn't necessarily true.
         return mappedCharset == null ? charset : mappedCharset;
@@ -898,7 +905,7 @@ public class MimeUtility {
      * @return The character string value of the default character set.
      */
     public static String getDefaultJavaCharset() {
-        String charset = SessionUtil.getProperty("mail.mime.charset");
+        final String charset = SessionUtil.getProperty("mail.mime.charset");
         if (charset != null) {
             return javaCharset(charset);
         }
@@ -916,7 +923,7 @@ public class MimeUtility {
      */
     static String getDefaultMIMECharset() {
         // if the property is specified, this can be used directly.
-        String charset = SessionUtil.getProperty("mail.mime.charset");
+        final String charset = SessionUtil.getProperty("mail.mime.charset");
         if (charset != null) {
             return charset;
         }
@@ -941,16 +948,16 @@ public class MimeUtility {
 
         // normally, these come from a character map file contained in the jar file.
         try {
-            InputStream map = javax.mail.internet.MimeUtility.class.getResourceAsStream("/META-INF/javamail.charset.map");
+            final InputStream map = javax.mail.internet.MimeUtility.class.getResourceAsStream("/META-INF/javamail.charset.map");
 
             if (map != null) {
                 // get a reader for this so we can load.
-                BufferedReader reader = new BufferedReader(new InputStreamReader(map));
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(map));
 
                 readMappings(reader, java2mime);
                 readMappings(reader, mime2java);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
         }
 
         // if any sort of error occurred reading the preferred file version, we could end up with empty
@@ -1030,7 +1037,7 @@ public class MimeUtility {
      * @param reader The source of the file information.
      * @param table  The mapping table used to store the information.
      */
-    static private void readMappings(BufferedReader reader, Map table) throws IOException {
+    static private void readMappings(final BufferedReader reader, final Map table) throws IOException {
         // process lines to the EOF or the end of table marker.
         while (true) {
             String line = reader.readLine();
@@ -1052,14 +1059,14 @@ public class MimeUtility {
             }
 
             // we allow either blanks or tabs as token delimiters.
-            StringTokenizer tokenizer = new StringTokenizer(line, " \t");
+            final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
 
             try {
-                String from = tokenizer.nextToken().toLowerCase();
-                String to = tokenizer.nextToken();
+                final String from = tokenizer.nextToken().toLowerCase();
+                final String to = tokenizer.nextToken();
 
                 table.put(from, to);
-            } catch (NoSuchElementException e) {
+            } catch (final NoSuchElementException e) {
                 // just ignore the line if invalid.
             }
         }
@@ -1087,7 +1094,7 @@ public class MimeUtility {
         // now we need to strip off any trailing "whitespace", where whitespace is blanks, tabs,
         // and line break characters.
         for (end = s.length() - 1; end >= 0; end--) {
-            int ch = s.charAt(end);
+            final int ch = s.charAt(end);
             if (ch != ' ' && ch != '\t' ) {
                 break;
             }
@@ -1106,7 +1113,7 @@ public class MimeUtility {
         // get a buffer for the length of the string, plus room for a few line breaks.
         // these are soft line breaks, so we generally need more that just the line breaks (an escape +
         // CR + LF + leading space on next line);
-        StringBuffer newString = new StringBuffer(s.length() + 8);
+        final StringBuffer newString = new StringBuffer(s.length() + 8);
 
 
         // now keep chopping this down until we've accomplished what we need.
@@ -1185,7 +1192,7 @@ public class MimeUtility {
      *
      * @return A new string with unfolding rules applied.
      */
-    public static String unfold(String s) {
+    public static String unfold(final String s) {
         // if folding is disable, unfolding is also.  Return the string unchanged.
         if (!SessionUtil.getBooleanProperty(MIME_FOLDTEXT, true)) {
             return s;
@@ -1197,13 +1204,13 @@ public class MimeUtility {
         }
 
         // we need to scan and fix things up.
-        int length = s.length();
+        final int length = s.length();
 
-        StringBuffer newString = new StringBuffer(length);
+        final StringBuffer newString = new StringBuffer(length);
 
         // scan the entire string
         for (int i = 0; i < length; i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
 
             // we have a backslash.  In folded strings, escape characters are only processed as such if
             // they preceed line breaks.  Otherwise, we leave it be.
@@ -1213,7 +1220,7 @@ public class MimeUtility {
                     newString.append(ch);
                 }
                 else {
-                    int nextChar = s.charAt(i + 1);
+                    final int nextChar = s.charAt(i + 1);
 
                     // naked newline?  Add the new line to the buffer, and skip the escape char.
                     if (nextChar == '\n') {
@@ -1242,7 +1249,7 @@ public class MimeUtility {
             // we have an unescaped line break
             else if (ch == '\n' || ch == '\r') {
                 // remember the position in case we need to backtrack.
-                int lineBreak = i;
+                final int lineBreak = i;
                 boolean CRLF = false;
 
                 if (ch == '\r') {
@@ -1255,7 +1262,7 @@ public class MimeUtility {
                 }
 
                 // get a temp position scanner.
-                int scan = i + 1;
+                final int scan = i + 1;
 
                 // does a blank follow this new line?  we need to scrap the new line and reduce the leading blanks
                 // down to a single blank.
@@ -1307,17 +1314,20 @@ class ContentCheckingOutputStream extends OutputStream {
     ContentCheckingOutputStream() {
     }
 
-    public void write(byte[] data) throws IOException {
+    @Override
+    public void write(final byte[] data) throws IOException {
         write(data, 0, data.length);
     }
 
-    public void write(byte[] data, int offset, int length) throws IOException {
+    @Override
+    public void write(final byte[] data, final int offset, final int length) throws IOException {
         for (int i = 0; i < length; i++) {
             write(data[offset + i]);
         }
     }
 
-    public void write(int ch) {
+    @Override
+    public void write(final int ch) {
         // we found a linebreak.  Reset the line length counters on either one.  We don't
         // really need to validate here.
         if (ch == '\n' || ch == '\r') {

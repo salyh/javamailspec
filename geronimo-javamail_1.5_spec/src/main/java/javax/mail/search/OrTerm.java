@@ -20,6 +20,7 @@
 package javax.mail.search;
 
 import java.util.Arrays;
+
 import javax.mail.Message;
 
 /**
@@ -29,13 +30,13 @@ public final class OrTerm extends SearchTerm {
 	
 	private static final long serialVersionUID = 5380534067523646936L;
 	
-    private SearchTerm[] terms;
+    private final SearchTerm[] terms;
 
-    public OrTerm(SearchTerm a, SearchTerm b) {
+    public OrTerm(final SearchTerm a, final SearchTerm b) {
         terms = new SearchTerm[]{a, b};
     }
 
-    public OrTerm(SearchTerm[] terms) {
+    public OrTerm(final SearchTerm[] terms) {
         this.terms = terms;
     }
 
@@ -43,9 +44,10 @@ public final class OrTerm extends SearchTerm {
         return terms;
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         for (int i = 0; i < terms.length; i++) {
-            SearchTerm term = terms[i];
+            final SearchTerm term = terms[i];
             if (term.match(message)) {
                 return true;
             }
@@ -53,12 +55,14 @@ public final class OrTerm extends SearchTerm {
         return false;
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof OrTerm == false) return false;
         return Arrays.equals(terms, ((OrTerm) other).terms);
     }
 
+    @Override
     public int hashCode() {
         int hash = 0;
         for (int i = 0; i < terms.length; i++) {

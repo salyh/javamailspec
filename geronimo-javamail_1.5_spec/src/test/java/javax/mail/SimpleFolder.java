@@ -30,26 +30,28 @@ public class SimpleFolder extends Folder {
     private static final Message[] MESSAGE_ARRAY = new Message[0];
     private List _messages = new LinkedList();
     private String _name;
-    public SimpleFolder(Store store) {
+    public SimpleFolder(final Store store) {
         this(store, "SimpleFolder");
     }
-    SimpleFolder(Store store, String name) {
+    SimpleFolder(final Store store, final String name) {
         super(store);
         _name = name;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#appendMessages(javax.mail.Message[])
      */
-    public void appendMessages(Message[] messages) throws MessagingException {
+    @Override
+    public void appendMessages(final Message[] messages) throws MessagingException {
         for (int i = 0; i < messages.length; i++) {
-            Message message = messages[i];
+            final Message message = messages[i];
             _messages.add(message);
         }
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#close(boolean)
      */
-    public void close(boolean expunge) throws MessagingException {
+    @Override
+    public void close(final boolean expunge) throws MessagingException {
         if (expunge) {
             expunge();
         }
@@ -57,7 +59,8 @@ public class SimpleFolder extends Folder {
     /* (non-Javadoc)
      * @see javax.mail.Folder#create(int)
      */
-    public boolean create(int type) throws MessagingException {
+    @Override
+    public boolean create(final int type) throws MessagingException {
         if (type == HOLDS_MESSAGES) {
             return true;
         } else {
@@ -67,24 +70,27 @@ public class SimpleFolder extends Folder {
     /* (non-Javadoc)
      * @see javax.mail.Folder#delete(boolean)
      */
-    public boolean delete(boolean recurse) throws MessagingException {
+    @Override
+    public boolean delete(final boolean recurse) throws MessagingException {
         _messages = new LinkedList();
         return true;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#exists()
      */
+    @Override
     public boolean exists() throws MessagingException {
         return true;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#expunge()
      */
+    @Override
     public Message[] expunge() throws MessagingException {
-        Iterator it = _messages.iterator();
-        List result = new LinkedList();
+        final Iterator it = _messages.iterator();
+        final List result = new LinkedList();
         while (it.hasNext()) {
-            Message message = (Message) it.next();
+            final Message message = (Message) it.next();
             if (message.isSet(Flags.Flag.DELETED)) {
                 it.remove();
                 result.add(message);
@@ -92,7 +98,7 @@ public class SimpleFolder extends Folder {
         }
         // run through and renumber the messages
         for (int i = 0; i < _messages.size(); i++) {
-            Message message = (Message) _messages.get(i);
+            final Message message = (Message) _messages.get(i);
             message.setMessageNumber(i);
         }
         return (Message[]) result.toArray(MESSAGE_ARRAY);
@@ -100,79 +106,92 @@ public class SimpleFolder extends Folder {
     /* (non-Javadoc)
      * @see javax.mail.Folder#getFolder(java.lang.String)
      */
-    public Folder getFolder(String name) throws MessagingException {
+    @Override
+    public Folder getFolder(final String name) throws MessagingException {
         return null;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getFullName()
      */
+    @Override
     public String getFullName() {
         return getName();
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getMessage(int)
      */
-    public Message getMessage(int id) throws MessagingException {
+    @Override
+    public Message getMessage(final int id) throws MessagingException {
         return (Message) _messages.get(id);
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getMessageCount()
      */
+    @Override
     public int getMessageCount() throws MessagingException {
         return _messages.size();
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getName()
      */
+    @Override
     public String getName() {
         return _name;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getParent()
      */
+    @Override
     public Folder getParent() throws MessagingException {
         return null;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getPermanentFlags()
      */
+    @Override
     public Flags getPermanentFlags() {
         return null;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getSeparator()
      */
+    @Override
     public char getSeparator() throws MessagingException {
         return '/';
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#getType()
      */
+    @Override
     public int getType() throws MessagingException {
         return HOLDS_MESSAGES;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#hasNewMessages()
      */
+    @Override
     public boolean hasNewMessages() throws MessagingException {
         return false;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#isOpen()
      */
+    @Override
     public boolean isOpen() {
         return true;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#list(java.lang.String)
      */
-    public Folder[] list(String pattern) throws MessagingException {
+    @Override
+    public Folder[] list(final String pattern) throws MessagingException {
         return null;
     }
     /* (non-Javadoc)
      * @see javax.mail.Folder#open(int)
      */
-    public void open(int mode) throws MessagingException {
+    @Override
+    public void open(final int mode) throws MessagingException {
         if (mode != HOLDS_MESSAGES) {
             throw new MessagingException("SimpleFolder can only be opened with HOLDS_MESSAGES");
         }
@@ -180,7 +199,8 @@ public class SimpleFolder extends Folder {
     /* (non-Javadoc)
      * @see javax.mail.Folder#renameTo(javax.mail.Folder)
      */
-    public boolean renameTo(Folder newName) throws MessagingException {
+    @Override
+    public boolean renameTo(final Folder newName) throws MessagingException {
         _name = newName.getName();
         return true;
     }

@@ -21,9 +21,8 @@ package javax.mail;
 
 import java.util.Vector;
 
-import javax.mail.MessagingException;
-import javax.mail.event.FolderEvent;          
-import javax.mail.event.FolderListener;       
+import javax.mail.event.FolderEvent;
+import javax.mail.event.FolderListener;
 
 import junit.framework.TestCase;
 
@@ -33,10 +32,12 @@ import junit.framework.TestCase;
 public class EventQueueTest extends TestCase {
     protected EventQueue queue; 
     
+    @Override
     public void setUp() throws Exception {
         queue = new EventQueue();
     }
     
+    @Override
     public void tearDown() throws Exception {
         queue.stop(); 
     }
@@ -47,42 +48,43 @@ public class EventQueueTest extends TestCase {
         doEventTests(FolderEvent.DELETED);
     }
     
-    private void doEventTests(int type) {
+    private void doEventTests(final int type) {
         
         // These tests are essentially the same as the 
         // folder event tests, but done using the asynchronous 
         // event queue.  
-        FolderEvent event = new FolderEvent(this, null, type);
+        final FolderEvent event = new FolderEvent(this, null, type);
         assertEquals(this, event.getSource());
         assertEquals(type, event.getType());
-        FolderListenerTest listener = new FolderListenerTest();
-        Vector listeners = new Vector(); 
+        final FolderListenerTest listener = new FolderListenerTest();
+        final Vector listeners = new Vector(); 
         listeners.add(listener); 
         queue.queueEvent(event, listeners);
         // we need to make sure the queue thread has a chance to dispatch 
         // this before we check. 
         try {
-            Thread.currentThread().sleep(1000); 
-        } catch (InterruptedException e ) {
+            Thread.currentThread();
+            Thread.sleep(1000); 
+        } catch (final InterruptedException e ) {
         }
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     
     public static class FolderListenerTest implements FolderListener {
         private int state = 0;
-        public void folderCreated(FolderEvent event) {
+        public void folderCreated(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = FolderEvent.CREATED;
         }
-        public void folderDeleted(FolderEvent event) {
+        public void folderDeleted(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = FolderEvent.DELETED;
         }
-        public void folderRenamed(FolderEvent event) {
+        public void folderRenamed(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

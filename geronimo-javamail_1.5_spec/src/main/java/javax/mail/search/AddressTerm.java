@@ -39,7 +39,7 @@ public abstract class AddressTerm extends SearchTerm {
      * Constructor taking the address for this term.
      * @param address the address
      */
-    protected AddressTerm(Address address) {
+    protected AddressTerm(final Address address) {
         this.address = address;
     }
 
@@ -58,17 +58,19 @@ public abstract class AddressTerm extends SearchTerm {
      * @param address the address to match with
      * @return true if the addresses match
      */
-    protected boolean match(Address address) {
+    protected boolean match(final Address address) {
         return this.address.equals(address);
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof AddressTerm == false) return false;
 
         return address.equals(((AddressTerm) other).address);
     }
 
+    @Override
     public int hashCode() {
         return address.hashCode();
     }

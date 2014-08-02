@@ -30,7 +30,7 @@ public class MessageRemovedException extends MessagingException {
         super();
     }
 
-    public MessageRemovedException(String message) {
+    public MessageRemovedException(final String message) {
         super(message);
     }
     
@@ -43,7 +43,7 @@ public class MessageRemovedException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public MessageRemovedException(String s, Exception e) {
+    public MessageRemovedException(final String s, final Exception e) {
         super(s, e);
     }
 }

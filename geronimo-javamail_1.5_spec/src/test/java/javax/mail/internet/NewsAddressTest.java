@@ -26,12 +26,12 @@ import junit.framework.TestCase;
  */
 public class NewsAddressTest extends TestCase {
     public void testNewsAddress() throws AddressException {
-        NewsAddress na = new NewsAddress("geronimo-dev", "news.apache.org");
+        final NewsAddress na = new NewsAddress("geronimo-dev", "news.apache.org");
         assertEquals("geronimo-dev", na.getNewsgroup());
         assertEquals("news.apache.org", na.getHost());
         assertEquals("news", na.getType());
         assertEquals("geronimo-dev", na.toString());
-        NewsAddress[] nas =
+        final NewsAddress[] nas =
             NewsAddress.parse(
                 "geronimo-dev@news.apache.org, geronimo-user@news.apache.org");
         assertEquals(2, nas.length);

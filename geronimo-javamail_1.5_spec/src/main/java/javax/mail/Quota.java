@@ -41,7 +41,7 @@ public class Quota {
      *
      * @param quotaRoot The quota root name.
      */
-    public Quota(String quotaRoot) {
+    public Quota(final String quotaRoot) {
         this.quotaRoot = quotaRoot;
     }
 
@@ -53,8 +53,8 @@ public class Quota {
      * @param name   The target resource name.
      * @param limit  The new limit value for the resource.
      */
-    public void setResourceLimit(String name, long limit) {
-        Resource target = findResource(name);
+    public void setResourceLimit(final String name, final long limit) {
+        final Resource target = findResource(name);
         target.limit = limit;
     }
 
@@ -66,26 +66,26 @@ public class Quota {
      *
      * @return A Resource item for this named resource (either existing or new).
      */
-    private Resource findResource(String name) {
+    private Resource findResource(final String name) {
         // no resources yet?  Make it so.
         if (resources == null) {
-            Resource target = new Resource(name, 0, 0);
+            final Resource target = new Resource(name, 0, 0);
             resources = new Resource[] { target };
             return target;
         }
 
         // see if this one exists and return it.
         for (int i = 0; i < resources.length; i++) {
-            Resource current = resources[i];
+            final Resource current = resources[i];
             if (current.name.equalsIgnoreCase(name)) {
                 return current;
             }
         }
 
         // have to extend the array...this is a pain.
-        Resource[] newResources = new Resource[resources.length + 1];
+        final Resource[] newResources = new Resource[resources.length + 1];
         System.arraycopy(resources, 0, newResources, 0, resources.length);
-        Resource target = new Resource(name, 0, 0);
+        final Resource target = new Resource(name, 0, 0);
         newResources[resources.length] = target;
         resources = newResources;
         return target;
@@ -119,7 +119,7 @@ public class Quota {
          * @param usage  The current resource usage.
          * @param limit  The Resource limit value.
          */
-        public Resource(String name, long usage, long limit) {
+        public Resource(final String name, final long usage, final long limit) {
             this.name = name;
             this.usage = usage;
             this.limit = limit;

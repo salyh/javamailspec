@@ -32,16 +32,16 @@ public class FolderNotFoundException extends MessagingException {
         super();
     }
 
-    public FolderNotFoundException(Folder folder) {
+    public FolderNotFoundException(final Folder folder) {
         this(folder, "Folder not found: " + folder.getName());
     }
 
-    public FolderNotFoundException(Folder folder, String message) {
+    public FolderNotFoundException(final Folder folder, final String message) {
         super(message);
         _folder = folder;
     }
 
-    public FolderNotFoundException(String message, Folder folder) {
+    public FolderNotFoundException(final String message, final Folder folder) {
         this(folder, message);
     }
     
@@ -55,7 +55,7 @@ public class FolderNotFoundException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public FolderNotFoundException(Folder folder, String s, Exception e) {
+    public FolderNotFoundException(final Folder folder, final String s, final Exception e) {
         super(s, e);
         _folder = folder;
     }

@@ -28,7 +28,7 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class URLNameTest extends TestCase {
-    public URLNameTest(String name) {
+    public URLNameTest(final String name) {
         super(name);
     }
 
@@ -48,7 +48,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -64,7 +64,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -80,7 +80,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -96,7 +96,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -112,7 +112,7 @@ public class URLNameTest extends TestCase {
         assertEquals("doe", name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
         
@@ -128,7 +128,7 @@ public class URLNameTest extends TestCase {
         assertEquals("doe", name.getPassword());
         try {
             assertEquals(new URL(s), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -144,7 +144,7 @@ public class URLNameTest extends TestCase {
         try {
             name.getURL();
             fail();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // OK
         }
 
@@ -159,7 +159,7 @@ public class URLNameTest extends TestCase {
         try {
             name.getURL();
             fail();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // OK
         }
 
@@ -174,7 +174,7 @@ public class URLNameTest extends TestCase {
         try {
             name.getURL();
             fail();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // OK
         }
     }
@@ -192,7 +192,7 @@ public class URLNameTest extends TestCase {
         try {
             name.getURL();
             fail();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // OK
         }
 
@@ -207,7 +207,7 @@ public class URLNameTest extends TestCase {
         try {
             name.getURL();
             fail();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // OK
         }
 
@@ -222,7 +222,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL("http://www.apache.org"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -237,7 +237,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL("http://www.apache.org:8080"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -252,7 +252,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL("http://www.apache.org/file/file2"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -267,7 +267,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL("http://john@www.apache.org/file/file2"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -282,7 +282,7 @@ public class URLNameTest extends TestCase {
         assertEquals("doe", name.getPassword());
         try {
             assertEquals(new URL("http://john:doe@www.apache.org/file/file2"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -297,7 +297,7 @@ public class URLNameTest extends TestCase {
         assertEquals("doe", name.getPassword());
         try {
             assertEquals(new URL("http://john%40gmail.com:doe@www.apache.org/file/file2"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
 
@@ -312,7 +312,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(new URL("http://www.apache.org/file/file2"), name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
     }
@@ -332,7 +332,7 @@ public class URLNameTest extends TestCase {
         assertNull(name.getPassword());
         try {
             assertEquals(url, name.getURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             fail();
         }
     }
@@ -359,14 +359,14 @@ public class URLNameTest extends TestCase {
     }
 
     public void testHashCode() {
-        URLName name1 = new URLName("http://www.apache.org/file");
-        URLName name2 = new URLName("http://www.apache.org/file#ref");
+        final URLName name1 = new URLName("http://www.apache.org/file");
+        final URLName name2 = new URLName("http://www.apache.org/file#ref");
         assertTrue(name1.equals(name2));
         assertTrue(name1.hashCode() == name2.hashCode());
     }
 
     public void testNullProtocol() {
-        URLName name1 = new URLName(null, "www.apache.org", -1, null, null, null);
+        final URLName name1 = new URLName(null, "www.apache.org", -1, null, null, null);
         assertTrue(!name1.equals(name1));
     }
 

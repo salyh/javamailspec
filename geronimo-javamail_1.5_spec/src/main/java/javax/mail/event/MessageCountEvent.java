@@ -66,7 +66,7 @@ public class MessageCountEvent extends MailEvent {
      * @param removed  indicator of whether messages were expunged by this client
      * @param messages the affected messages
      */
-    public MessageCountEvent(Folder folder, int type, boolean removed, Message messages[]) {
+    public MessageCountEvent(final Folder folder, final int type, final boolean removed, final Message messages[]) {
         super(folder);
         this.msgs = messages;
         this.type = type;
@@ -99,8 +99,9 @@ public class MessageCountEvent extends MailEvent {
         return msgs;
     }
 
-    public void dispatch(Object listener) {
-        MessageCountListener l = (MessageCountListener) listener;
+    @Override
+    public void dispatch(final Object listener) {
+        final MessageCountListener l = (MessageCountListener) listener;
         switch (type) {
         case ADDED:
             l.messagesAdded(this);

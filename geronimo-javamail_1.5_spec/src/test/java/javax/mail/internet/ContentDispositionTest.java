@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  */
 public class ContentDispositionTest extends TestCase {
 
-    public ContentDispositionTest(String name) {
+    public ContentDispositionTest(final String name) {
         super(name);
     }
 
@@ -36,13 +36,14 @@ public class ContentDispositionTest extends TestCase {
         assertNotNull(c.getParameterList());
         assertNull(c.getParameterList().get("nothing"));
         assertNull(c.getDisposition());
-        assertNull(c.toString());
+        assertEquals("", c.toString());
         c.setDisposition("inline");
         assertEquals("inline",c.getDisposition());
         c.setParameter("file","file.txt");
         assertEquals("file.txt",c.getParameterList().get("file"));
         assertEquals("inline; file=file.txt",c.toString());
         c = new ContentDisposition("inline");
+        assertNotNull(c.getParameterList());
         assertEquals(0,c.getParameterList().size());
         assertEquals("inline",c.getDisposition());
         c = new ContentDisposition("inline",new ParameterList(";charset=us-ascii;content-type=\"text/plain\""));

@@ -19,9 +19,9 @@
 
 package org.apache.geronimo.mail.util;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.FilterOutputStream;
 
 /**
  * An implementation of a FilterOutputStream that encodes the
@@ -46,12 +46,12 @@ public class QuotedPrintableEncoderStream extends FilterOutputStream {
      *
      * @param out    The wrapped output stream.
      */
-    public QuotedPrintableEncoderStream(OutputStream out) {
+    public QuotedPrintableEncoderStream(final OutputStream out) {
         this(out, DEFAULT_LINEBREAK);
     }
 
 
-    public QuotedPrintableEncoderStream(OutputStream out, int lineBreak) {
+    public QuotedPrintableEncoderStream(final OutputStream out, final int lineBreak) {
         super(out);
         // lines are processed only in multiple of 4, so round this down.
         this.lineBreak = (lineBreak / 4) * 4 ;
@@ -61,24 +61,29 @@ public class QuotedPrintableEncoderStream extends FilterOutputStream {
     }
 
 
-    public void write(int ch) throws IOException {
+    @Override
+    public void write(final int ch) throws IOException {
         // have the encoder do the heavy lifting here.
         encoder.encode(ch);
     }
 
-    public void write(byte [] data) throws IOException {
+    @Override
+    public void write(final byte [] data) throws IOException {
         write(data, 0, data.length);
     }
 
-    public void write(byte [] data, int offset, int length) throws IOException {
+    @Override
+    public void write(final byte [] data, final int offset, final int length) throws IOException {
         // the encoder does the heavy lifting here.
         encoder.encode(data, offset, length);
     }
 
+    @Override
     public void close() throws IOException {
         out.close();
     }
 
+    @Override
     public void flush() throws IOException {
         out.flush();
     }

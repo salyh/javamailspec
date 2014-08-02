@@ -20,6 +20,7 @@
 package javax.mail;
 
 import java.util.Vector;
+
 import javax.mail.event.FolderEvent;
 import javax.mail.event.FolderListener;
 import javax.mail.event.StoreEvent;
@@ -42,7 +43,7 @@ public abstract class Store extends Service {
      * @param session the session associated with this store
      * @param name the URL of the store
      */
-    protected Store(Session session, URLName name) {
+    protected Store(final Session session, final URLName name) {
         super(session, name);
     }
 
@@ -97,7 +98,7 @@ public abstract class Store extends Service {
      * @return the root folders of the given user's peronal namespaces
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Folder[] getUserNamespaces(String user) throws MessagingException {
+    public Folder[] getUserNamespaces(final String user) throws MessagingException {
         return FOLDER_ARRAY;
     }
 
@@ -113,32 +114,32 @@ public abstract class Store extends Service {
     }
 
 
-    public void addStoreListener(StoreListener listener) {
+    public void addStoreListener(final StoreListener listener) {
         storeListeners.add(listener);
     }
 
-    public void removeStoreListener(StoreListener listener) {
+    public void removeStoreListener(final StoreListener listener) {
         storeListeners.remove(listener);
     }
 
-    protected void notifyStoreListeners(int type, String message) {
+    protected void notifyStoreListeners(final int type, final String message) {
         queueEvent(new StoreEvent(this, type, message), storeListeners);
     }
 
 
-    public void addFolderListener(FolderListener listener) {
+    public void addFolderListener(final FolderListener listener) {
         folderListeners.add(listener);
     }
 
-    public void removeFolderListener(FolderListener listener) {
+    public void removeFolderListener(final FolderListener listener) {
         folderListeners.remove(listener);
     }
 
-    protected void notifyFolderListeners(int type, Folder folder) {
+    protected void notifyFolderListeners(final int type, final Folder folder) {
         queueEvent(new FolderEvent(this, folder, type), folderListeners);
     }
 
-    protected void notifyFolderRenamedListeners(Folder oldFolder, Folder newFolder) {
+    protected void notifyFolderRenamedListeners(final Folder oldFolder, final Folder newFolder) {
         queueEvent(new FolderEvent(this, oldFolder, newFolder, FolderEvent.RENAMED), folderListeners);
     }
 }

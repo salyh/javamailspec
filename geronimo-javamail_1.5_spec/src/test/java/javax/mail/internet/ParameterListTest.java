@@ -25,11 +25,11 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class ParameterListTest extends TestCase {
-    public ParameterListTest(String arg0) {
+    public ParameterListTest(final String arg0) {
         super(arg0);
     }
     public void testParameters() throws ParseException {
-        ParameterList list =
+        final ParameterList list =
             new ParameterList(";thing=value;thong=vulue;thung=git");
         assertEquals("value", list.get("thing"));
         assertEquals("vulue", list.get("thong"));
@@ -37,7 +37,7 @@ public class ParameterListTest extends TestCase {
     }
 
     public void testQuotedParameter() throws ParseException {
-        ParameterList list = new ParameterList(";foo=one;bar=\"two\"");
+        final ParameterList list = new ParameterList(";foo=one;bar=\"two\"");
         assertEquals("one", list.get("foo"));
         assertEquals("two", list.get("bar"));
     }
@@ -47,19 +47,19 @@ public class ParameterListTest extends TestCase {
         System.setProperty("mail.mime.encodeparameters", "true");
         System.setProperty("mail.mime.decodeparameters", "true");
 
-        String value = " '*% abc \u0081\u0082\r\n\t";
-        String encodedTest = "; one*=UTF-8''%20%27%2A%25%20abc%20%C2%81%C2%82%0D%0A%09";
+        final String value = " '*% abc \u0081\u0082\r\n\t";
+        final String encodedTest = "; one*=UTF-8''%20%27%2A%25%20abc%20%C2%81%C2%82%0D%0A%09";
 
-        ParameterList list = new ParameterList();
+        final ParameterList list = new ParameterList();
         list.set("one", value, "UTF-8");
 
         assertEquals(value, list.get("one"));
 
-        String encoded = list.toString();
+        final String encoded = list.toString();
 
         assertEquals(encoded, encodedTest);
 
-        ParameterList list2 = new ParameterList(encoded);
+        final ParameterList list2 = new ParameterList(encoded);
         assertEquals(value, list.get("one"));
         assertEquals(list2.toString(), encodedTest);
     }

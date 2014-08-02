@@ -29,23 +29,25 @@ public final class SubjectTerm extends StringTerm {
 	
 	private static final long serialVersionUID = 7481568618055573432L;
 	
-    public SubjectTerm(String subject) {
+    public SubjectTerm(final String subject) {
         super(subject);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            String subject = message.getSubject(); 
+            final String subject = message.getSubject(); 
             if (subject == null) {
                 return false; 
             }
             return match(subject);
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (this == other) return true;
         if (other instanceof SubjectTerm == false) return false;
         return super.equals(other); 

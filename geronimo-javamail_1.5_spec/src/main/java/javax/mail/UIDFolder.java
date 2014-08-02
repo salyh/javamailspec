@@ -102,7 +102,7 @@ public interface UIDFolder {
     public static class FetchProfileItem extends FetchProfile.Item {
         public static final FetchProfileItem UID = new FetchProfileItem("UID");
 
-        protected FetchProfileItem(String name) {
+        protected FetchProfileItem(final String name) {
             super(name);
         }
     }

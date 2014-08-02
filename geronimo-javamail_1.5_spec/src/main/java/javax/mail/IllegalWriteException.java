@@ -30,7 +30,7 @@ public class IllegalWriteException extends MessagingException {
         super();
     }
 
-    public IllegalWriteException(String message) {
+    public IllegalWriteException(final String message) {
         super(message);
     }
     
@@ -43,7 +43,7 @@ public class IllegalWriteException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public IllegalWriteException(String s, Exception e) {
+    public IllegalWriteException(final String s, final Exception e) {
         super(s, e);
     }
 }

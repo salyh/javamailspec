@@ -31,6 +31,7 @@ import javax.activation.DataSource;
 import javax.mail.Session;
 
 import junit.framework.TestCase;
+
 import org.apache.geronimo.mail.util.Base64;
 
 public class MimeTest extends TestCase {
@@ -38,59 +39,59 @@ public class MimeTest extends TestCase {
     public void testWriteRead() throws Exception {
         System.setProperty("mail.mime.decodefilename", "true");
 
-        Session session = Session.getDefaultInstance(new Properties(), null);
-        MimeMessage mime = new MimeMessage(session);
-        MimeMultipart parts = new MimeMultipart("related; type=\"text/xml\"; start=\"<xml>\"");
-        MimeBodyPart xmlPart = new MimeBodyPart();
+        final Session session = Session.getDefaultInstance(new Properties(), null);
+        final MimeMessage mime = new MimeMessage(session);
+        final MimeMultipart parts = new MimeMultipart("related; type=\"text/xml\"; start=\"<xml>\"");
+        final MimeBodyPart xmlPart = new MimeBodyPart();
         xmlPart.setContentID("<xml>");
         xmlPart.setDataHandler(new DataHandler(new ByteArrayDataSource("<hello/>".getBytes(), "text/xml")));
         parts.addBodyPart(xmlPart);
-        MimeBodyPart jpegPart = new MimeBodyPart();
+        final MimeBodyPart jpegPart = new MimeBodyPart();
         jpegPart.setContentID("<jpeg>");
-        String filename = "filename";
-        String encodedFilename = "=?UTF-8?B?" + new String(Base64.encode(filename.getBytes()), "ISO8859-1") + "?=";
+        final String filename = "filename";
+        final String encodedFilename = "=?UTF-8?B?" + new String(Base64.encode(filename.getBytes()), "ISO8859-1") + "?=";
         jpegPart.setFileName(encodedFilename);
         jpegPart.setDataHandler(new DataHandler(new ByteArrayDataSource(new byte[] { 0, 1, 2, 3, 4, 5 }, "image/jpeg")));
         parts.addBodyPart(jpegPart);
         mime.setContent(parts);
         mime.setHeader("Content-Type", parts.getContentType());
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mime.writeTo(baos);
 
-        MimeMessage mime2 = new MimeMessage(session, new ByteArrayInputStream(baos.toByteArray()));
+        final MimeMessage mime2 = new MimeMessage(session, new ByteArrayInputStream(baos.toByteArray()));
         assertTrue(mime2.getContent() instanceof MimeMultipart);
-        MimeMultipart parts2 = (MimeMultipart) mime2.getContent();
+        final MimeMultipart parts2 = (MimeMultipart) mime2.getContent();
         assertEquals(mime.getContentType(), mime2.getContentType());
         assertEquals(parts.getCount(), parts2.getCount());
         assertTrue(parts2.getBodyPart(0) instanceof MimeBodyPart);
         assertTrue(parts2.getBodyPart(1) instanceof MimeBodyPart);
 
-        MimeBodyPart xmlPart2 = (MimeBodyPart) parts2.getBodyPart(0);
+        final MimeBodyPart xmlPart2 = (MimeBodyPart) parts2.getBodyPart(0);
         assertEquals(xmlPart.getContentID(), xmlPart2.getContentID());
-        ByteArrayOutputStream xmlBaos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream xmlBaos = new ByteArrayOutputStream();
         copyInputStream(xmlPart.getDataHandler().getInputStream(), xmlBaos);
-        ByteArrayOutputStream xmlBaos2 = new ByteArrayOutputStream();
+        final ByteArrayOutputStream xmlBaos2 = new ByteArrayOutputStream();
         copyInputStream(xmlPart2.getDataHandler().getInputStream(), xmlBaos2);
         assertEquals(xmlBaos.toString(), xmlBaos2.toString());
 
-        MimeBodyPart jpegPart2 = (MimeBodyPart) parts2.getBodyPart(1);
+        final MimeBodyPart jpegPart2 = (MimeBodyPart) parts2.getBodyPart(1);
         assertEquals(jpegPart.getContentID(), jpegPart2.getContentID());
         assertEquals(jpegPart.getFileName(), jpegPart2.getDataHandler().getName());
         assertEquals(filename, jpegPart2.getDataHandler().getName());
-        ByteArrayOutputStream jpegBaos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream jpegBaos = new ByteArrayOutputStream();
         copyInputStream(jpegPart.getDataHandler().getInputStream(), jpegBaos);
-        ByteArrayOutputStream jpegBaos2 = new ByteArrayOutputStream();
+        final ByteArrayOutputStream jpegBaos2 = new ByteArrayOutputStream();
         copyInputStream(jpegPart2.getDataHandler().getInputStream(), jpegBaos2);
         assertEquals(jpegBaos.toString(), jpegBaos2.toString());
     }
 
     public static class ByteArrayDataSource implements DataSource {
-        private byte[] data;
-        private String type;
+        private final byte[] data;
+        private final String type;
         private String name = "unused";
 
-        public ByteArrayDataSource(byte[] data, String type) {
+        public ByteArrayDataSource(final byte[] data, final String type) {
             this.data = data;
             this.type = type;
         }
@@ -112,13 +113,13 @@ public class MimeTest extends TestCase {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
     }
 
-    public static void copyInputStream(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
+    public static void copyInputStream(final InputStream in, final OutputStream out) throws IOException {
+        final byte[] buffer = new byte[1024];
         int len;
         while ((len = in.read(buffer)) >= 0) {
             out.write(buffer, 0, len);

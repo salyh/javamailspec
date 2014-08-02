@@ -20,11 +20,12 @@
 package javax.mail.search;
 
 import java.io.IOException;
+
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Part;
 import javax.mail.Multipart;
-import javax.mail.BodyPart;
+import javax.mail.Part;
 
 /**
  * Term that matches on a message body. All {@link javax.mail.BodyPart parts} that have
@@ -36,33 +37,34 @@ public final class BodyTerm extends StringTerm {
 	
 	private static final long serialVersionUID = -4888862527916911385L;
 	
-    public BodyTerm(String pattern) {
+    public BodyTerm(final String pattern) {
         super(pattern);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
             return matchPart(message);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return false;
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    private boolean matchPart(Part part) throws MessagingException, IOException {
+    private boolean matchPart(final Part part) throws MessagingException, IOException {
         if (part.isMimeType("multipart/*")) {
-            Multipart mp = (Multipart) part.getContent();
-            int count = mp.getCount();
+            final Multipart mp = (Multipart) part.getContent();
+            final int count = mp.getCount();
             for (int i=0; i < count; i++) {
-                BodyPart bp = mp.getBodyPart(i);
+                final BodyPart bp = mp.getBodyPart(i);
                 if (matchPart(bp)) {
                     return true;
                 }
             }
             return false;
         } else if (part.isMimeType("text/*")) {
-            String content = (String) part.getContent();
+            final String content = (String) part.getContent();
             return super.match(content);
         } else if (part.isMimeType("message/rfc822")) {
             // nested messages need recursion        

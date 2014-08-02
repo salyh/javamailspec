@@ -20,17 +20,11 @@
 package javax.mail.internet;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import javax.mail.Address;
 import javax.mail.Session;
-
-import org.apache.geronimo.mail.util.SessionUtil;
 
 /**
  * A representation of an Internet email address as specified by RFC822 in
@@ -68,17 +62,17 @@ public class InternetAddress extends Address implements Cloneable {
     public InternetAddress() {
     }
 
-    public InternetAddress(String address) throws AddressException {
+    public InternetAddress(final String address) throws AddressException {
         this(address, true);
     }
 
-    public InternetAddress(String address, boolean strict) throws AddressException {
+    public InternetAddress(final String address, final boolean strict) throws AddressException {
         // use the parse method to process the address.  This has the wierd side effect of creating a new
         // InternetAddress instance to create an InternetAddress, but these are lightweight objects and
         // we need access to multiple pieces of data from the parsing process.
-        AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
 
-        InternetAddress parsedAddress = parser.parseAddress();
+        final InternetAddress parsedAddress = parser.parseAddress();
         // copy the important information, which right now is just the address and
         // personal info.
         this.address = parsedAddress.address;
@@ -86,11 +80,11 @@ public class InternetAddress extends Address implements Cloneable {
         this.encodedPersonal = parsedAddress.encodedPersonal;
     }
 
-    public InternetAddress(String address, String personal) throws UnsupportedEncodingException {
+    public InternetAddress(final String address, final String personal) throws UnsupportedEncodingException {
         this(address, personal, null);
     }
 
-    public InternetAddress(String address, String personal, String charset) throws UnsupportedEncodingException {
+    public InternetAddress(final String address, final String personal, final String charset) throws UnsupportedEncodingException {
         this.address = address;
         setPersonal(personal, charset);
     }
@@ -100,10 +94,11 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @return a copy of this object as created by Object.clone()
      */
+    @Override
     public Object clone() {
         try {
             return super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (final CloneNotSupportedException e) {
             throw new Error();
         }
     }
@@ -113,6 +108,7 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @return the type of this address; always "rfc822"
      */
+    @Override
     public String getType() {
         return "rfc822";
     }
@@ -123,7 +119,7 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @param address the address to set
      */
-    public void setAddress(String address) {
+    public void setAddress(final String address) {
         this.address = address;
     }
 
@@ -136,7 +132,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @param charset the charset to use; see {@link MimeUtility#encodeWord(String, String, String) MimeUtilityencodeWord}
      * @throws UnsupportedEncodingException if the name cannot be encoded
      */
-    public void setPersonal(String name, String charset) throws UnsupportedEncodingException {
+    public void setPersonal(final String name, final String charset) throws UnsupportedEncodingException {
         personal = name;
         if (name != null) {
             encodedPersonal = MimeUtility.encodeWord(name, charset, null);
@@ -154,7 +150,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @param name the new personal name
      * @throws UnsupportedEncodingException if the name cannot be encoded
      */
-    public void setPersonal(String name) throws UnsupportedEncodingException {
+    public void setPersonal(final String name) throws UnsupportedEncodingException {
         personal = name;
         if (name != null) {
             encodedPersonal = MimeUtility.encodeWord(name);
@@ -186,9 +182,9 @@ public class InternetAddress extends Address implements Cloneable {
         if (personal == null && encodedPersonal != null) {
             try {
                 personal = MimeUtility.decodeWord(encodedPersonal);
-            } catch (ParseException e) {
+            } catch (final ParseException e) {
                 return encodedPersonal;
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 return encodedPersonal;
             }
         }
@@ -208,7 +204,7 @@ public class InternetAddress extends Address implements Cloneable {
         if (encodedPersonal == null && personal != null) {
             try {
                 encodedPersonal = MimeUtility.encodeWord(personal);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 // as we could not encode this, return null
                 return null;
             }
@@ -222,6 +218,7 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @return a string representation of this address
      */
+    @Override
     public String toString() {
         // group addresses are always returned without modification.
         if (isGroup()) {
@@ -233,12 +230,12 @@ public class InternetAddress extends Address implements Cloneable {
         // the address without the angle brackets.  However, if the address contains anything other
         // than atoms, '@', and '.' (e.g., uses domain literals, has specified routes, or uses
         // quoted strings in the local-part), we bracket the address.
-        String p = getEncodedPersonal();
+        final String p = getEncodedPersonal();
         if (p == null) {
             return formatAddress(address);
         }
         else {
-            StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
+            final StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
             buf.append(AddressParser.quoteString(p));
             buf.append(" <").append(address).append(">");
             return buf.toString();
@@ -253,7 +250,7 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @return A formatted address, which can be the original address string.
      */
-    private String formatAddress(String a)
+    private String formatAddress(final String a)
     {
         // this could be a group address....we don't muck with those.
         if (address.endsWith(";") && address.indexOf(":") > 0) {
@@ -261,7 +258,7 @@ public class InternetAddress extends Address implements Cloneable {
         }
 
         if (AddressParser.containsCharacters(a, "()<>,;:\"[]")) {
-            StringBuffer buf = new StringBuffer(address.length() + 3);
+            final StringBuffer buf = new StringBuffer(address.length() + 3);
             buf.append("<").append(address).append(">");
             return buf.toString();
         }
@@ -288,12 +285,12 @@ public class InternetAddress extends Address implements Cloneable {
         // NB:  The difference between toString() and toUnicodeString() is the use of getPersonal()
         // vs. getEncodedPersonal() for the personal portion.  If the personal information contains only
         // ASCII-7 characters, these are the same.
-        String p = getPersonal();
+        final String p = getPersonal();
         if (p == null) {
             return formatAddress(address);
         }
         else {
-            StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
+            final StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
             buf.append(AddressParser.quoteString(p));
             buf.append(" <").append(address).append(">");
             return buf.toString();
@@ -309,12 +306,13 @@ public class InternetAddress extends Address implements Cloneable {
      * @param o the other object
      * @return true if the addresses are the same
      */
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (!(o instanceof InternetAddress)) return false;
 
-        InternetAddress other = (InternetAddress) o;
-        String myAddress = getAddress();
+        final InternetAddress other = (InternetAddress) o;
+        final String myAddress = getAddress();
         return myAddress == null ? (other.getAddress() == null) : myAddress.equalsIgnoreCase(other.getAddress());
     }
 
@@ -324,6 +322,7 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @return a hashCode for this address
      */
+    @Override
     public int hashCode() {
         return (address == null) ? 0 : address.toLowerCase().hashCode();
     }
@@ -356,13 +355,13 @@ public class InternetAddress extends Address implements Cloneable {
      * @return an array of InternetAddress objects for the group members, or null if this address is not a group
      * @throws AddressException if there was a problem parsing the header
      */
-    public InternetAddress[] getGroup(boolean strict) throws AddressException {
+    public InternetAddress[] getGroup(final boolean strict) throws AddressException {
         if (address == null) {
             return null;
         }
 
         // create an address parser and use it to extract the group information.
-        AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
         return parser.extractGroupList();
     }
 
@@ -385,7 +384,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @param session used to obtain mail properties
      * @return an InternetAddress for the current user, or null if it cannot be determined
      */
-    public static InternetAddress getLocalAddress(Session session) {
+    public static InternetAddress getLocalAddress(final Session session) {
         String host = null;
         String user = null;
 
@@ -393,12 +392,12 @@ public class InternetAddress extends Address implements Cloneable {
         // configured already, which will be a full InternetAddress string.  If we don't have that, then
         // we need to resolve a user and host to compose an address from.
         if (session != null) {
-            String address = session.getProperty("mail.from");
+            final String address = session.getProperty("mail.from");
             // if we got this, we can skip out now
             if (address != null) {
                 try {
                     return new InternetAddress(address);
-                } catch (AddressException e) {
+                } catch (final AddressException e) {
                     // invalid address on the from...treat this as an error and return null.
                     return null;
                 }
@@ -425,11 +424,11 @@ public class InternetAddress extends Address implements Cloneable {
                 // if we have both a user and host, we can create a local address
                 return new InternetAddress(user + '@' + host);
             }
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
             // ignore
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             // ignore
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
         }
         return null;
@@ -443,14 +442,14 @@ public class InternetAddress extends Address implements Cloneable {
      * @param addresses the array of addresses to convert
      * @return a one-line String of comma-separated addresses
      */
-    public static String toString(Address[] addresses) {
+    public static String toString(final Address[] addresses) {
         if (addresses == null || addresses.length == 0) {
             return null;
         }
         if (addresses.length == 1) {
             return addresses[0].toString();
         } else {
-            StringBuffer buf = new StringBuffer(addresses.length * 32);
+            final StringBuffer buf = new StringBuffer(addresses.length * 32);
             buf.append(addresses[0].toString());
             for (int i = 1; i < addresses.length; i++) {
                 buf.append(", ");
@@ -471,7 +470,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @param used      the starting column
      * @return a String of comma-separated addresses with optional line breaks
      */
-    public static String toString(Address[] addresses, int used) {
+    public static String toString(final Address[] addresses, int used) {
         if (addresses == null || addresses.length == 0) {
             return null;
         }
@@ -482,9 +481,9 @@ public class InternetAddress extends Address implements Cloneable {
             }
             return s;
         } else {
-            StringBuffer buf = new StringBuffer(addresses.length * 32);
+            final StringBuffer buf = new StringBuffer(addresses.length * 32);
             for (int i = 0; i < addresses.length; i++) {
-                String s = addresses[1].toString();
+                final String s = addresses[1].toString();
                 if (i == 0) {
                     if (used + s.length() + 1 > 72) {
                         buf.append("\r\n  ");
@@ -513,7 +512,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @return an array of InternetAddresses parsed from the string
      * @throws AddressException if addresses checking fails
      */
-    public static InternetAddress[] parse(String addresses) throws AddressException {
+    public static InternetAddress[] parse(final String addresses) throws AddressException {
         return parse(addresses, true);
     }
 
@@ -525,7 +524,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @return an array of InternetAddresses parsed from the string
      * @throws AddressException if address checking fails
      */
-    public static InternetAddress[] parse(String addresses, boolean strict) throws AddressException {
+    public static InternetAddress[] parse(final String addresses, final boolean strict) throws AddressException {
         return parse(addresses, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
     }
 
@@ -537,7 +536,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @return an array of InternetAddresses parsed from the string
      * @throws AddressException if address checking fails
      */
-    public static InternetAddress[] parseHeader(String addresses, boolean strict) throws AddressException {
+    public static InternetAddress[] parseHeader(final String addresses, final boolean strict) throws AddressException {
         return parse(addresses, strict ? AddressParser.STRICT : AddressParser.PARSE_HEADER);
     }
 
@@ -551,9 +550,9 @@ public class InternetAddress extends Address implements Cloneable {
      * @throws AddressException
      *                if address checking fails
      */
-    private static InternetAddress[] parse(String addresses, int level) throws AddressException {
+    private static InternetAddress[] parse(final String addresses, final int level) throws AddressException {
         // create a parser and have it extract the list using the requested strictness leve.
-        AddressParser parser = new AddressParser(addresses, level);
+        final AddressParser parser = new AddressParser(addresses, level);
         return parser.parseAddressList();
     }
 
@@ -567,7 +566,7 @@ public class InternetAddress extends Address implements Cloneable {
     public void validate() throws AddressException {
 
         // create a parser using the strictest validation level.
-        AddressParser parser = new AddressParser(formatAddress(address), AddressParser.STRICT);
+        final AddressParser parser = new AddressParser(formatAddress(address), AddressParser.STRICT);
         parser.validateAddress();
     }
 }

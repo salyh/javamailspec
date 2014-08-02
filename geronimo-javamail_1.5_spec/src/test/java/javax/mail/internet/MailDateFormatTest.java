@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  */
 public class MailDateFormatTest extends TestCase {
     public void testMailDateFormat() throws ParseException {
-        MailDateFormat mdf = new MailDateFormat();
+        final MailDateFormat mdf = new MailDateFormat();
         Date date = mdf.parse("Wed, 27 Aug 2003 13:43:38 +0100 (BST)");
         // don't we just love the Date class?
         Calendar cal = Calendar.getInstance(new SimpleTimeZone(+1 * 60 * 60 * 1000, "BST"), Locale.getDefault());

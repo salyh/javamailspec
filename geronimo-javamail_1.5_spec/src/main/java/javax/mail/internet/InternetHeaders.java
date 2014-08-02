@@ -23,15 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.mail.Address;
 import javax.mail.Header;
@@ -95,7 +89,7 @@ public class InternetHeaders {
      * @throws MessagingException
      *             if there is a problem pasring the stream
      */
-    public InternetHeaders(InputStream in) throws MessagingException {
+    public InternetHeaders(final InputStream in) throws MessagingException {
         load(in);
     }
 
@@ -108,9 +102,9 @@ public class InternetHeaders {
      * @throws MessagingException
      *             if there is a problem pasring the stream
      */
-    public void load(InputStream in) throws MessagingException {
+    public void load(final InputStream in) throws MessagingException {
         try {
-            StringBuffer buffer = new StringBuffer(128);
+            final StringBuffer buffer = new StringBuffer(128);
             String line;
             // loop until we hit the end or a null line
             while ((line = readLine(in)) != null) {
@@ -144,7 +138,7 @@ public class InternetHeaders {
             if (buffer.length() > 0) {
                 addHeaderLine(buffer.toString());
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MessagingException("Error loading headers", e);
         }
     }
@@ -157,8 +151,8 @@ public class InternetHeaders {
      *
      * @return The string value of the line (without line separators)
      */
-    private String readLine(InputStream in) throws IOException {
-        StringBuffer buffer = new StringBuffer(128);
+    private String readLine(final InputStream in) throws IOException {
+        final StringBuffer buffer = new StringBuffer(128);
 
         int c;
 
@@ -194,11 +188,11 @@ public class InternetHeaders {
      *            the header to return
      * @return the values for that header, or null if the header is not present
      */
-    public String[] getHeader(String name) {
-        List accumulator = new ArrayList();
+    public String[] getHeader(final String name) {
+        final List accumulator = new ArrayList();
 
         for (int i = 0; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             if (header.getName().equalsIgnoreCase(name) && header.getValue() != null) {
                 accumulator.add(header.getValue());
             }
@@ -224,9 +218,9 @@ public class InternetHeaders {
      *            the delimiter used in concatenation
      * @return the header as a single String
      */
-    public String getHeader(String name, String delimiter) {
+    public String getHeader(final String name, final String delimiter) {
         // get all of the headers with this name
-        String[] matches = getHeader(name);
+        final String[] matches = getHeader(name);
 
         // no match?  return a null.
         if (matches == null) {
@@ -239,7 +233,7 @@ public class InternetHeaders {
         }
 
         // perform the concatenation
-        StringBuffer result = new StringBuffer(matches[0]);
+        final StringBuffer result = new StringBuffer(matches[0]);
 
         for (int i = 1; i < matches.length; i++) {
             result.append(delimiter);
@@ -259,10 +253,10 @@ public class InternetHeaders {
      * @param value
      *            the new value
      */
-    public void setHeader(String name, String value) {
+    public void setHeader(final String name, final String value) {
         // look for a header match
         for (int i = 0; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // found a matching header
             if (name.equalsIgnoreCase(header.getName())) {
                 // we update both the name and the value for a set so that
@@ -287,10 +281,10 @@ public class InternetHeaders {
      * @param name   The target header name.
      * @param pos    The position of the first header to examine.
      */
-    private void removeHeaders(String name, int pos) {
+    private void removeHeaders(final String name, final int pos) {
         // now go remove all other instances of this header
         for (int i = pos; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // found a matching header
             if (name.equalsIgnoreCase(header.getName())) {
                 // remove this item, and back up
@@ -309,7 +303,7 @@ public class InternetHeaders {
      * @return The index of the header in the list.  Returns -1 for a not found
      *         condition.
      */
-    private int findHeader(String name) {
+    private int findHeader(final String name) {
         return findHeader(name, 0);
     }
 
@@ -324,9 +318,9 @@ public class InternetHeaders {
      * @return The index of the first matching header.  Returns -1 if the
      *         header is not located.
      */
-    private int findHeader(String name, int start) {
+    private int findHeader(final String name, final int start) {
         for (int i = start; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // found a matching header
             if (name.equalsIgnoreCase(header.getName())) {
                 return i;
@@ -343,20 +337,20 @@ public class InternetHeaders {
      * @param value
      *            another value
      */
-    public void addHeader(String name, String value) {
-        InternetHeader newHeader = new InternetHeader(name, value);
+    public void addHeader(final String name, final String value) {
+        final InternetHeader newHeader = new InternetHeader(name, value);
 
         // The javamail spec states that "Recieved" headers need to be added in reverse order.
         // Return-Path is permitted before Received, so handle it the same way.
         if (name.equalsIgnoreCase("Received") || name.equalsIgnoreCase("Return-Path")) {
             // see if we have one of these already
-            int pos = findHeader(name);
+            final int pos = findHeader(name);
 
             // either insert before an existing header, or insert at the very beginning
             if (pos != -1) {
                 // this could be a placeholder header with a null value.  If it is, just update
                 // the value.  Otherwise, insert in front of the existing header.
-                InternetHeader oldHeader = (InternetHeader)headers.get(pos);
+                final InternetHeader oldHeader = (InternetHeader)headers.get(pos);
                 if (oldHeader.getValue() == null) {
                     oldHeader.setValue(value);
                 }
@@ -376,7 +370,7 @@ public class InternetHeaders {
 
             // either insert before an existing header, or insert at the very beginning
             if (pos != -1) {
-                InternetHeader oldHeader = (InternetHeader)headers.get(pos);
+                final InternetHeader oldHeader = (InternetHeader)headers.get(pos);
                 // if the existing header is a place holder, we can just update the value
                 if (oldHeader.getValue() == null) {
                     oldHeader.setValue(value);
@@ -414,12 +408,12 @@ public class InternetHeaders {
      * @param name
      *            the header to remove
      */
-    public void removeHeader(String name) {
+    public void removeHeader(final String name) {
         // the first occurrance of a header is just zeroed out.
-        int pos = findHeader(name);
+        final int pos = findHeader(name);
 
         if (pos != -1) {
-            InternetHeader oldHeader = (InternetHeader)headers.get(pos);
+            final InternetHeader oldHeader = (InternetHeader)headers.get(pos);
             // keep the header in the list, but with a null value
             oldHeader.setValue(null);
             // now remove all other headers with this name
@@ -434,10 +428,10 @@ public class InternetHeaders {
      * @return an Enumeration<Header> containing all headers
      */
     public Enumeration getAllHeaders() {
-        List result = new ArrayList();
+        final List result = new ArrayList();
 
         for (int i = 0; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // we only include headers with real values, no placeholders
             if (header.getValue() != null) {
                 result.add(header);
@@ -458,7 +452,7 @@ public class InternetHeaders {
      * @return True if this is a match for any name in the list, false
      *         for a complete mismatch.
      */
-    private boolean matchHeader(String name, String[] names) {
+    private boolean matchHeader(final String name, final String[] names) {
         // the list of names is not required, so treat this as if it
         // was an empty list and we didn't get a match.
         if (names == null) {
@@ -477,11 +471,11 @@ public class InternetHeaders {
     /**
      * Return all matching Header objects.
      */
-    public Enumeration getMatchingHeaders(String[] names) {
-        List result = new ArrayList();
+    public Enumeration getMatchingHeaders(final String[] names) {
+        final List result = new ArrayList();
 
         for (int i = 0; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // we only include headers with real values, no placeholders
             if (header.getValue() != null) {
                 // only add the matching ones
@@ -497,11 +491,11 @@ public class InternetHeaders {
     /**
      * Return all non matching Header objects.
      */
-    public Enumeration getNonMatchingHeaders(String[] names) {
-        List result = new ArrayList();
+    public Enumeration getNonMatchingHeaders(final String[] names) {
+        final List result = new ArrayList();
 
         for (int i = 0; i < headers.size(); i++) {
-            InternetHeader header = (InternetHeader)headers.get(i);
+            final InternetHeader header = (InternetHeader)headers.get(i);
             // we only include headers with real values, no placeholders
             if (header.getValue() != null) {
                 // only add the non-matching ones
@@ -524,21 +518,21 @@ public class InternetHeaders {
      * @param line
      *            raw RFC822 header line
      */
-    public void addHeaderLine(String line) {
+    public void addHeaderLine(final String line) {
         // null lines are a nop
         if (line.length() == 0) {
             return;
         }
 
         // we need to test the first character to see if this is a continuation whitespace
-        char ch = line.charAt(0);
+        final char ch = line.charAt(0);
 
         // tabs and spaces are special.  This is a continuation of the last header in the list.
         if (ch == ' ' || ch == '\t') {
-            int size = headers.size();
+            final int size = headers.size();
             // it's possible that we have a leading blank line.
             if (size > 0) {
-                InternetHeader header = (InternetHeader)headers.get(size - 1);
+                final InternetHeader header = (InternetHeader)headers.get(size - 1);
                 header.appendValue(line);
             }
         }
@@ -559,14 +553,14 @@ public class InternetHeaders {
     /**
      * Return all matching header lines as an Enumeration of Strings.
      */
-    public Enumeration getMatchingHeaderLines(String[] names) {
+    public Enumeration getMatchingHeaderLines(final String[] names) {
         return new HeaderLineEnumeration(getMatchingHeaders(names));
     }
 
     /**
      * Return all non-matching header lines.
      */
-    public Enumeration getNonMatchingHeaderLines(String[] names) {
+    public Enumeration getNonMatchingHeaderLines(final String[] names) {
         return new HeaderLineEnumeration(getNonMatchingHeaders(names));
     }
 
@@ -578,7 +572,7 @@ public class InternetHeaders {
      * @param name      The name to set.
      * @param addresses The list of addresses to set.
      */
-    void setHeader(String name, Address[] addresses) {
+    void setHeader(final String name, final Address[] addresses) {
         // if this is empty, then we need to replace this
         if (addresses.length == 0) {
             removeHeader(name);
@@ -589,7 +583,7 @@ public class InternetHeaders {
 
             // now add the rest as extra headers.
             for (int i = 1; i < addresses.length; i++) {
-                Address address = addresses[i];
+                final Address address = addresses[i];
                 addHeader(name, address.toString());
             }
         }
@@ -605,11 +599,11 @@ public class InternetHeaders {
      *
      * @exception IOException
      */
-    void writeTo(OutputStream out, String[] ignore) throws IOException {
+    void writeTo(final OutputStream out, final String[] ignore) throws IOException {
         if (ignore == null) {
             // write out all header lines with non-null values
             for (int i = 0; i < headers.size(); i++) {
-                InternetHeader header = (InternetHeader)headers.get(i);
+                final InternetHeader header = (InternetHeader)headers.get(i);
                 // we only include headers with real values, no placeholders
                 if (header.getValue() != null) {
                     header.writeTo(out);
@@ -619,7 +613,7 @@ public class InternetHeaders {
         else {
             // write out all matching header lines with non-null values
             for (int i = 0; i < headers.size(); i++) {
-                InternetHeader header = (InternetHeader)headers.get(i);
+                final InternetHeader header = (InternetHeader)headers.get(i);
                 // we only include headers with real values, no placeholders
                 if (header.getValue() != null) {
                     if (!matchHeader(header.getName(), ignore)) {
@@ -632,7 +626,7 @@ public class InternetHeaders {
 
     protected static final class InternetHeader extends Header {
 
-        public InternetHeader(String h) {
+        public InternetHeader(final String h) {
             // initialize with null values, which we'll update once we parse the string
             super("", "");
             int separator = h.indexOf(':');
@@ -646,7 +640,7 @@ public class InternetHeaders {
                 separator++;
 
                 while (separator < h.length()) {
-                    char ch = h.charAt(separator);
+                    final char ch = h.charAt(separator);
                     if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') {
                         break;
                     }
@@ -657,7 +651,7 @@ public class InternetHeaders {
             }
         }
 
-        public InternetHeader(String name, String value) {
+        public InternetHeader(final String name, final String value) {
             super(name, value);
         }
 
@@ -667,7 +661,7 @@ public class InternetHeaders {
          *
          * @param value  The new header value.
          */
-        void setValue(String value) {
+        void setValue(final String value) {
             this.value = value;
         }
 
@@ -677,7 +671,7 @@ public class InternetHeaders {
          *
          * @param name   The new header name
          */
-        void setName(String name) {
+        void setName(final String name) {
             this.name = name;
         }
 
@@ -686,7 +680,7 @@ public class InternetHeaders {
          *
          * @param value  The appended header value.
          */
-        void appendValue(String value) {
+        void appendValue(final String value) {
             if (this.value == null) {
                 this.value = value;
             }
@@ -695,7 +689,7 @@ public class InternetHeaders {
             }
         }
 
-        void writeTo(OutputStream out) throws IOException {
+        void writeTo(final OutputStream out) throws IOException {
             out.write(name.getBytes("ISO8859-1"));
             out.write(':');
             out.write(' ');
@@ -706,9 +700,9 @@ public class InternetHeaders {
     }
 
     private static class HeaderLineEnumeration implements Enumeration {
-        private Enumeration headers;
+        private final Enumeration headers;
 
-        public HeaderLineEnumeration(Enumeration headers) {
+        public HeaderLineEnumeration(final Enumeration headers) {
             this.headers = headers;
         }
 
@@ -717,7 +711,7 @@ public class InternetHeaders {
         }
 
         public Object nextElement() {
-            Header h = (Header) headers.nextElement();
+            final Header h = (Header) headers.nextElement();
             return h.getName() + ": " + h.getValue();
         }
     }

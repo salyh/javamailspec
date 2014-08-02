@@ -25,11 +25,11 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class HeaderTest extends TestCase {
-    public HeaderTest(String name) {
+    public HeaderTest(final String name) {
         super(name);
     }
     public void testHeader() {
-        Header header = new Header("One", "Two");
+        final Header header = new Header("One", "Two");
         assertEquals("One", header.getName());
         assertEquals("Two", header.getValue());
     }

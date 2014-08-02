@@ -25,18 +25,18 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class PasswordAuthenticationTest extends TestCase {
-    public PasswordAuthenticationTest(String name) {
+    public PasswordAuthenticationTest(final String name) {
         super(name);
     }
     public void testPA() {
-        String user = String.valueOf(System.currentTimeMillis());
-        String password = "JobbyJobbyJobby" + user;
-        PasswordAuthentication pa = new PasswordAuthentication(user, password);
+        final String user = String.valueOf(System.currentTimeMillis());
+        final String password = "JobbyJobbyJobby" + user;
+        final PasswordAuthentication pa = new PasswordAuthentication(user, password);
         assertEquals(user, pa.getUserName());
         assertEquals(password, pa.getPassword());
     }
     public void testPasswordAuthentication() {
-        PasswordAuthentication pa = new PasswordAuthentication("Alex", "xelA");
+        final PasswordAuthentication pa = new PasswordAuthentication("Alex", "xelA");
         assertEquals("Alex", pa.getUserName());
         assertEquals("xelA", pa.getPassword());
     }

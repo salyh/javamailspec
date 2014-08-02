@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.UnknownServiceException;
+
 import javax.activation.DataSource;
 import javax.mail.MessageAware;
 import javax.mail.MessageContext;
@@ -35,7 +36,7 @@ public class MimePartDataSource implements DataSource, MessageAware {
     // the part that provides the data form this data source.
     protected MimePart part;
 
-    public MimePartDataSource(MimePart part) {
+    public MimePartDataSource(final MimePart part) {
         this.part = part;
     }
 
@@ -50,7 +51,7 @@ public class MimePartDataSource implements DataSource, MessageAware {
                 throw new MessagingException("Unknown part");
             }
             return checkPartEncoding(part, stream);
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
@@ -67,7 +68,7 @@ public class MimePartDataSource implements DataSource, MessageAware {
      * @return An input stream configured for reading the 
      *         source part and decoding it into raw bytes.
      */
-    private InputStream checkPartEncoding(MimePart part, InputStream stream) throws MessagingException {
+    private InputStream checkPartEncoding(final MimePart part, final InputStream stream) throws MessagingException {
         String encoding = part.getEncoding();
         // if nothing is specified, there's nothing to do 
         if (encoding == null) {
@@ -81,15 +82,15 @@ public class MimePartDataSource implements DataSource, MessageAware {
         // now we need to check the content type to prevent 
         // MultiPart types from getting decoded, since the part is just an envelope around other 
         // parts 
-        String contentType = part.getContentType(); 
+        final String contentType = part.getContentType(); 
         if (contentType != null) {
             try {
-                ContentType type = new ContentType(contentType); 
+                final ContentType type = new ContentType(contentType); 
                 // no decoding done here 
                 if (type.match("multipart/*")) {
                     return stream; 
                 }
-            } catch (ParseException e) {
+            } catch (final ParseException e) {
                 // ignored....bad content type means we handle as a normal part 
             }
         }
@@ -105,7 +106,7 @@ public class MimePartDataSource implements DataSource, MessageAware {
     public String getContentType() {
         try {
             return part.getContentType();
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return null;
         }
     }
@@ -115,7 +116,7 @@ public class MimePartDataSource implements DataSource, MessageAware {
             if (part instanceof MimeBodyPart) {
                 return ((MimeBodyPart) part).getFileName();
             }
-        } catch (MessagingException mex) {
+        } catch (final MessagingException mex) {
             // ignore it
         }
         return "";

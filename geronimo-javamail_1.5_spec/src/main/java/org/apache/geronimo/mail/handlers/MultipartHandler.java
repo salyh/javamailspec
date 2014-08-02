@@ -19,16 +19,15 @@
 
 package org.apache.geronimo.mail.handlers;
 
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataContentHandler;
-import javax.activation.DataSource;
 import java.awt.datatransfer.DataFlavor;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeMessage;
+import javax.activation.ActivationDataFlavor;
+import javax.activation.DataContentHandler;
+import javax.activation.DataSource;
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeMultipart;
 
 public class MultipartHandler implements DataContentHandler {
     /**
@@ -45,7 +44,7 @@ public class MultipartHandler implements DataContentHandler {
      *
      * @param dataFlavor
      */
-    public MultipartHandler(ActivationDataFlavor dataFlavor) {
+    public MultipartHandler(final ActivationDataFlavor dataFlavor) {
         this.dataFlavor = dataFlavor;
     }
 
@@ -75,7 +74,7 @@ public class MultipartHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getTransferData(DataFlavor dataflavor, DataSource datasource)
+    public Object getTransferData(final DataFlavor dataflavor, final DataSource datasource)
             throws IOException {
         if (getDF().equals(dataflavor)) {
             return getContent(datasource);
@@ -90,10 +89,10 @@ public class MultipartHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getContent(DataSource datasource) throws IOException {
+    public Object getContent(final DataSource datasource) throws IOException {
         try {
             return new MimeMultipart(datasource);
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             // if there is a syntax error from the datasource parsing, the content is
             // just null.
             return null;
@@ -108,12 +107,12 @@ public class MultipartHandler implements DataContentHandler {
      * @param outputstream
      * @throws IOException
      */
-    public void writeTo(Object object, String s, OutputStream outputstream) throws IOException {
+    public void writeTo(final Object object, final String s, final OutputStream outputstream) throws IOException {
         // if this object is a MimeMultipart, then delegate to the part.
         if (object instanceof MimeMultipart) {
             try {
                 ((MimeMultipart)object).writeTo(outputstream);
-            } catch (MessagingException e) {
+            } catch (final MessagingException e) {
                 // we need to transform any exceptions into an IOException.
                 throw new IOException("Exception writing MimeMultipart: " + e.toString());
             }

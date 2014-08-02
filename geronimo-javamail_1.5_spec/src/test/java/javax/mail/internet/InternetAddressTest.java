@@ -19,13 +19,13 @@
 
 package javax.mail.internet;
 
-import junit.framework.TestCase;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.mail.Session;
+
+import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
@@ -405,17 +405,17 @@ public class InternetAddressTest extends TestCase {
             host = InetAddress.getLocalHost().getHostName();
 
             localHost = new InternetAddress(user + "@" + host);
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
             // ignore
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             // ignore
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
         }
 
         assertEquals(InternetAddress.getLocalAddress(null), localHost);
 
-        Properties props = new Properties();
+        final Properties props = new Properties();
         Session session = Session.getInstance(props, null);
 
         assertEquals(InternetAddress.getLocalAddress(session), localHost);
@@ -442,102 +442,103 @@ public class InternetAddressTest extends TestCase {
         assertEquals(InternetAddress.getLocalAddress(session), new InternetAddress("tester@incubator.apache.org"));
     }
 
-    private InternetAddress[] getGroup(String address, boolean strict) throws AddressException
+    private InternetAddress[] getGroup(final String address, final boolean strict) throws AddressException
     {
-        InternetAddress group = new InternetAddress(address);
+        final InternetAddress group = new InternetAddress(address);
         return group.getGroup(strict);
     }
 
 
+    @Override
     protected void setUp() throws Exception {
         address = new InternetAddress();
     }
 
-    private void parseHeaderTest(String address, boolean strict, String resultAddr, String personal, String toString, boolean group) throws Exception
+    private void parseHeaderTest(final String address, final boolean strict, final String resultAddr, final String personal, final String toString, final boolean group) throws Exception
     {
-        InternetAddress[] addresses = InternetAddress.parseHeader(address, strict);
+        final InternetAddress[] addresses = InternetAddress.parseHeader(address, strict);
         assertTrue(addresses.length == 1);
         validateAddress(addresses[0], resultAddr, personal, toString, group);
     }
 
-    private void parseHeaderErrorTest(String address, boolean strict) throws Exception
+    private void parseHeaderErrorTest(final String address, final boolean strict) throws Exception
     {
         try {
             InternetAddress.parseHeader(address, strict);
             fail("Expected AddressException");
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
         }
     }
 
-    private void constructorTest(String address, boolean strict, String resultAddr, String personal, String toString, boolean group) throws Exception
+    private void constructorTest(final String address, final boolean strict, final String resultAddr, final String personal, final String toString, final boolean group) throws Exception
     {
         validateAddress(new InternetAddress(address, strict), resultAddr, personal, toString, group);
     }
 
-    private void constructorDefaultTest(String address, String resultAddr, String personal, String toString, boolean group) throws Exception
+    private void constructorDefaultTest(final String address, final String resultAddr, final String personal, final String toString, final boolean group) throws Exception
     {
         validateAddress(new InternetAddress(address), resultAddr, personal, toString, group);
     }
 
-    private void constructorErrorTest(String address, boolean strict) throws Exception
+    private void constructorErrorTest(final String address, final boolean strict) throws Exception
     {
         try {
-            InternetAddress foo = new InternetAddress(address, strict);
+            final InternetAddress foo = new InternetAddress(address, strict);
             fail("Expected AddressException");
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
         }
     }
 
-    private void parseTest(String address, boolean strict, String resultAddr, String personal, String toString, boolean group) throws Exception
+    private void parseTest(final String address, final boolean strict, final String resultAddr, final String personal, final String toString, final boolean group) throws Exception
     {
-        InternetAddress[] addresses = InternetAddress.parse(address, strict);
+        final InternetAddress[] addresses = InternetAddress.parse(address, strict);
         assertTrue(addresses.length == 1);
         validateAddress(addresses[0], resultAddr, personal, toString, group);
     }
 
-    private void parseErrorTest(String address, boolean strict) throws Exception
+    private void parseErrorTest(final String address, final boolean strict) throws Exception
     {
         try {
             InternetAddress.parse(address, strict);
             fail("Expected AddressException");
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
         }
     }
 
-    private void parseDefaultTest(String address, String resultAddr, String personal, String toString, boolean group) throws Exception
+    private void parseDefaultTest(final String address, final String resultAddr, final String personal, final String toString, final boolean group) throws Exception
     {
-        InternetAddress[] addresses = InternetAddress.parse(address);
+        final InternetAddress[] addresses = InternetAddress.parse(address);
         assertTrue(addresses.length == 1);
         validateAddress(addresses[0], resultAddr, personal, toString, group);
     }
 
-    private void parseDefaultErrorTest(String address) throws Exception
+    private void parseDefaultErrorTest(final String address) throws Exception
     {
         try {
             InternetAddress.parse(address);
             fail("Expected AddressException");
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
         }
     }
 
-    private void validateTest(String address) throws Exception {
-        InternetAddress test = new InternetAddress();
+    private void validateTest(final String address) throws Exception {
+        final InternetAddress test = new InternetAddress();
         test.setAddress(address);
         test.validate();
     }
 
-    private void validateErrorTest(String address) throws Exception {
-        InternetAddress test = new InternetAddress();
+    private void validateErrorTest(final String address) throws Exception {
+        final InternetAddress test = new InternetAddress();
         test.setAddress(address);
         try {
             test.validate();
             fail("Expected AddressException");
-        } catch (AddressException e) {
+        } catch (final AddressException e) {
         }
     }
 
 
-    private void validateAddress(InternetAddress a, String address, String personal, String toString, boolean group)
+    private void validateAddress(final InternetAddress a, final String address, final String personal, final String toString, final boolean group)
     {
         assertEquals("Invalid address:", a.getAddress(), address);
         if (personal == null) {

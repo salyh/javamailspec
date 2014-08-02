@@ -49,7 +49,7 @@ public class TextHandler implements DataContentHandler {
      *
      * @param dataFlavor
      */
-    public TextHandler(ActivationDataFlavor dataFlavor) {
+    public TextHandler(final ActivationDataFlavor dataFlavor) {
         this.dataFlavor = dataFlavor;
     }
 
@@ -79,7 +79,7 @@ public class TextHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getTransferData(DataFlavor dataflavor, DataSource datasource)
+    public Object getTransferData(final DataFlavor dataflavor, final DataSource datasource)
             throws IOException {
         if (getDF().equals(dataflavor)) {
             return getContent(datasource);
@@ -94,12 +94,12 @@ public class TextHandler implements DataContentHandler {
      * @return
      * @throws IOException
      */
-    public Object getContent(DataSource datasource) throws IOException {
-        InputStream is = datasource.getInputStream();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+    public Object getContent(final DataSource datasource) throws IOException {
+        final InputStream is = datasource.getInputStream();
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         int count;
-        byte[] buffer = new byte[1000];
+        final byte[] buffer = new byte[1000];
 
         try {
             while ((count = is.read(buffer, 0, buffer.length)) > 0) {
@@ -110,7 +110,7 @@ public class TextHandler implements DataContentHandler {
         }
         try {
             return os.toString(getCharSet(datasource.getContentType()));
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             throw new UnsupportedEncodingException(e.getMessage());
         }
     }
@@ -129,16 +129,16 @@ public class TextHandler implements DataContentHandler {
      *
      * @throws IOException
      */
-    public void writeTo(Object object, String contentType, OutputStream outputstream)
+    public void writeTo(final Object object, final String contentType, final OutputStream outputstream)
             throws IOException {
         OutputStreamWriter os;
         try {
-            String charset = getCharSet(contentType);
+            final String charset = getCharSet(contentType);
             os = new OutputStreamWriter(outputstream, charset);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new UnsupportedEncodingException(ex.toString());
         }
-        String content = (String) object;
+        final String content = (String) object;
         os.write(content, 0, content.length());
         os.flush();
     }
@@ -149,8 +149,8 @@ public class TextHandler implements DataContentHandler {
      * @return
      * @throws ParseException
      */
-    protected String getCharSet(String contentType) throws ParseException {
-        ContentType type = new ContentType(contentType);
+    protected String getCharSet(final String contentType) throws ParseException {
+        final ContentType type = new ContentType(contentType);
         String charset = type.getParameter("charset");
         if (charset == null) {
             charset = "us-ascii";

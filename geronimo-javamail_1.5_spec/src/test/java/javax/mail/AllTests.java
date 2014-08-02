@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
  */
 public class AllTests {
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for javax.mail");
+        final TestSuite suite = new TestSuite("Test for javax.mail");
         //$JUnit-BEGIN$
         suite.addTest(new TestSuite(FlagsTest.class));
         suite.addTest(new TestSuite(HeaderTest.class));

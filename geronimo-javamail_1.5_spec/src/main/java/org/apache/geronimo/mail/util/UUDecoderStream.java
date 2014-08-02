@@ -50,7 +50,7 @@ public class UUDecoderStream extends FilterInputStream {
     protected boolean beginRead = false;
 
 
-    public UUDecoderStream(InputStream in) {
+    public UUDecoderStream(final InputStream in) {
         super(in);
     }
 
@@ -103,7 +103,7 @@ public class UUDecoderStream extends FilterInputStream {
         return decodedChars[decodedIndex++];
     }
 
-    private int getBytes(byte[] data, int offset, int length) throws IOException {
+    private int getBytes(final byte[] data, int offset, int length) throws IOException {
 
         int readCharacters = 0;
         while (length > 0) {
@@ -116,7 +116,7 @@ public class UUDecoderStream extends FilterInputStream {
             }
 
             // now copy some of the data from the decoded buffer to the target buffer
-            int copyCount = Math.min(decodedCount, length);
+            final int copyCount = Math.min(decodedCount, length);
             System.arraycopy(decodedChars, decodedIndex, data, offset, copyCount);
             decodedIndex += copyCount;
             decodedCount -= copyCount;
@@ -142,7 +142,7 @@ public class UUDecoderStream extends FilterInputStream {
         // we might have to skip over lines to reach the marker.  If we hit the EOF without finding
         // the begin, that's an error.
         while (true) {
-            String line = readLine();
+            final String line = readLine();
             if (line == null) {
                 throw new IOException("Missing UUEncode begin command");
             }
@@ -167,7 +167,7 @@ public class UUDecoderStream extends FilterInputStream {
     protected String readLine() throws IOException {
         decodedIndex = 0;
         // get an accumulator for the data
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
 
         // now process a character at a time.
         int ch = in.read();
@@ -216,7 +216,7 @@ public class UUDecoderStream extends FilterInputStream {
 
             // we read these as character lines.  We need to be looking for the "end" marker for the
             // end of the data.
-            String line = readLine();
+            final String line = readLine();
 
             // this should NOT be happening....
             if (line == null) {
@@ -229,12 +229,12 @@ public class UUDecoderStream extends FilterInputStream {
                 return -1;
             }
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream(MAX_CHARS_PER_LINE);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(MAX_CHARS_PER_LINE);
 
             byte [] lineBytes;
             try {
                 lineBytes = line.getBytes("US-ASCII");
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 throw new IOException("Invalid UUEncoding");
             }
 
@@ -254,22 +254,26 @@ public class UUDecoderStream extends FilterInputStream {
     // in order to function as a filter, these streams need to override the different
     // read() signature.
 
+    @Override
     public int read() throws IOException
     {
         return getByte();
     }
 
 
-    public int read(byte [] buffer, int offset, int length) throws IOException {
+    @Override
+    public int read(final byte [] buffer, final int offset, final int length) throws IOException {
         return getBytes(buffer, offset, length);
     }
 
 
+    @Override
     public boolean markSupported() {
         return false;
     }
 
 
+    @Override
     public int available() throws IOException {
         return ((in.available() / 4) * 3) + decodedCount;
     }

@@ -22,8 +22,8 @@ package javax.mail.internet;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,16 +31,20 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
+import javax.mail.EncodingAware;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.HeaderTokenizer.Token;
-import javax.swing.text.AbstractDocument.Content;
 
 import org.apache.geronimo.mail.util.ASCIIUtil;
 import org.apache.geronimo.mail.util.SessionUtil;
+
+
 
 /**
  * @version $Rev$ $Date$
@@ -52,6 +56,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
     private static final String MIME_SETDEFAULTTEXTCHARSET = "mail.mime.setdefaulttextcharset";
     private static final String MIME_SETCONTENTTYPEFILENAME = "mail.mime.setcontenttypefilename";
 
+    static final boolean cacheMultipart = SessionUtil.getBooleanProperty("mail.mime.cachemultipart", true);
 
     /**
      * The {@link DataHandler} for this Message's content.
@@ -74,7 +79,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      *
      * @since   JavaMail 1.5
      */
-    protected Object cachedContent; //FIXME implement (not used)
+    protected Object cachedContent; //TODO test
     
     
     protected byte content[];
@@ -93,22 +98,22 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         headers = new InternetHeaders();
     }
 
-    public MimeBodyPart(InputStream in) throws MessagingException {
+    public MimeBodyPart(final InputStream in) throws MessagingException {
         headers = new InternetHeaders(in);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final byte[] buffer = new byte[1024];
         int count;
         try {
             while((count = in.read(buffer, 0, 1024)) > 0) {
                 baos.write(buffer, 0, count);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MessagingException(e.toString(),e);
         }
         content = baos.toByteArray();
     }
 
-    public MimeBodyPart(InternetHeaders headers, byte[] content) throws MessagingException {
+    public MimeBodyPart(final InternetHeaders headers, final byte[] content) throws MessagingException {
         this.headers = headers;
         this.content = content;
     }
@@ -128,11 +133,11 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         }
         if (contentStream != null) {
             try {
-                int size = contentStream.available();
+                final int size = contentStream.available();
                 if (size > 0) {
                     return size;
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
             }
         }
         return -1;
@@ -159,7 +164,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @return If this is a type match on the primary and secondare portion of the types.
      * @exception MessagingException
      */
-    public boolean isMimeType(String type) throws MessagingException {
+    public boolean isMimeType(final String type) throws MessagingException {
         return new ContentType(getContentType()).match(type);
     }
 
@@ -172,7 +177,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception MessagingException
      */
     public String getDisposition() throws MessagingException {
-        String disp = getSingleHeader("Content-Disposition");
+        final String disp = getSingleHeader("Content-Disposition");
         if (disp != null) {
             return new ContentDisposition(disp).getDisposition();
         }
@@ -188,15 +193,15 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      *
      * @exception MessagingException
      */
-    public void setDisposition(String disposition) throws MessagingException {
+    public void setDisposition(final String disposition) throws MessagingException {
         if (disposition == null) {
             removeHeader("Content-Disposition");
         }
         else {
             // the disposition has parameters, which we'll attempt to preserve in any existing header.
-            String currentHeader = getSingleHeader("Content-Disposition");
+            final String currentHeader = getSingleHeader("Content-Disposition");
             if (currentHeader != null) {
-                ContentDisposition content = new ContentDisposition(currentHeader);
+                final ContentDisposition content = new ContentDisposition(currentHeader);
                 content.setDisposition(disposition);
                 setHeader("Content-Disposition", content.toString());
             }
@@ -216,13 +221,13 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      */
     public String getEncoding() throws MessagingException {
         // this might require some parsing to sort out.
-        String encoding = getSingleHeader("Content-Transfer-Encoding");
+        final String encoding = getSingleHeader("Content-Transfer-Encoding");
         if (encoding != null) {
             // we need to parse this into ATOMs and other constituent parts.  We want the first
             // ATOM token on the string.
-            HeaderTokenizer tokenizer = new HeaderTokenizer(encoding, HeaderTokenizer.MIME);
+            final HeaderTokenizer tokenizer = new HeaderTokenizer(encoding, HeaderTokenizer.MIME);
 
-            Token token = tokenizer.next();
+            final Token token = tokenizer.next();
             while (token.getType() != Token.EOF) {
                 // if this is an ATOM type, return it.
                 if (token.getType() == Token.ATOM) {
@@ -249,7 +254,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return getSingleHeader("Content-ID");
     }
 
-    public void setContentID(String cid) throws MessagingException {
+    public void setContentID(final String cid) throws MessagingException {
         setOrRemoveHeader("Content-ID", cid);
     }
 
@@ -257,7 +262,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return getSingleHeader("Content-MD5");
     }
 
-    public void setContentMD5(String md5) throws MessagingException {
+    public void setContentMD5(final String md5) throws MessagingException {
         setHeader("Content-MD5", md5);
     }
 
@@ -265,13 +270,13 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return getHeader("Content-Language");
     }
 
-    public void setContentLanguage(String[] languages) throws MessagingException {
+    public void setContentLanguage(final String[] languages) throws MessagingException {
         if (languages == null) {
             removeHeader("Content-Language");
         } else if (languages.length == 1) {
             setHeader("Content-Language", languages[0]);
         } else {
-            StringBuffer buf = new StringBuffer(languages.length * 20);
+            final StringBuffer buf = new StringBuffer(languages.length * 20);
             buf.append(languages[0]);
             for (int i = 1; i < languages.length; i++) {
                 buf.append(',').append(languages[i]);
@@ -281,12 +286,12 @@ public class MimeBodyPart extends BodyPart implements MimePart {
     }
 
     public String getDescription() throws MessagingException {
-        String description = getSingleHeader("Content-Description");
+        final String description = getSingleHeader("Content-Description");
         if (description != null) {
             try {
                 // this could be both folded and encoded.  Return this to usable form.
                 return MimeUtility.decodeText(MimeUtility.unfold(description));
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 // ignore
             }
         }
@@ -294,18 +299,18 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return description;
     }
 
-    public void setDescription(String description) throws MessagingException {
+    public void setDescription(final String description) throws MessagingException {
         setDescription(description, null);
     }
 
-    public void setDescription(String description, String charset) throws MessagingException {
+    public void setDescription(final String description, final String charset) throws MessagingException {
         if (description == null) {
             removeHeader("Content-Description");
         }
         else {
             try {
                 setHeader("Content-Description", MimeUtility.fold(21, MimeUtility.encodeText(description, charset, null)));
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 throw new MessagingException(e.getMessage(), e);
             }
         }
@@ -313,7 +318,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 
     public String getFileName() throws MessagingException {
         // see if there is a disposition.  If there is, parse off the filename parameter.
-        String disposition = getSingleHeader("Content-Disposition");
+        final String disposition = getSingleHeader("Content-Disposition");
         String filename = null;
 
         if (disposition != null) {
@@ -323,11 +328,11 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         // if there's no filename on the disposition, there might be a name parameter on a
         // Content-Type header.
         if (filename == null) {
-            String type = getSingleHeader("Content-Type");
+            final String type = getSingleHeader("Content-Type");
             if (type != null) {
                 try {
                     filename = new ContentType(type).getParameter("name");
-                } catch (ParseException e) {
+                } catch (final ParseException e) {
                 }
             }
         }
@@ -335,7 +340,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         if (filename != null && SessionUtil.getBooleanProperty(MIME_DECODEFILENAME, false)) {
             try {
                 filename = MimeUtility.decodeText(filename);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 throw new MessagingException("Unable to decode filename", e);
             }
         }
@@ -350,7 +355,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         if (name != null && SessionUtil.getBooleanProperty(MIME_ENCODEFILENAME, false)) {
             try {
                 name = MimeUtility.encodeText(name);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 throw new MessagingException("Unable to encode filename", e);
             }
         }
@@ -363,7 +368,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         }
 
         // now create a disposition object and set the parameter.
-        ContentDisposition contentDisposition = new ContentDisposition(disposition);
+        final ContentDisposition contentDisposition = new ContentDisposition(disposition);
         contentDisposition.setParameter("filename", name);
 
         // serialize this back out and reset.
@@ -372,7 +377,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         // The Sun implementation appears to update the Content-type name parameter too, based on
         // another system property
         if (SessionUtil.getBooleanProperty(MIME_SETCONTENTTYPEFILENAME, true)) {
-            ContentType type = new ContentType(getContentType());
+            final ContentType type = new ContentType(getContentType());
             type.setParameter("name", name);
             setHeader("Content-Type", type.toString());
         }
@@ -404,22 +409,38 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         }
         return dh;
     }
-
+    
     public Object getContent() throws MessagingException, IOException {
-        return getDataHandler().getContent();
+        
+        if (cachedContent != null) {
+            return cachedContent;
+        }
+        
+        Object c = getDataHandler().getContent();
+        
+        if (MimeBodyPart.cacheMultipart && (c instanceof Multipart || c instanceof Message) && (content != null || contentStream != null)) {
+            cachedContent = c;
+ 
+            if (c instanceof MimeMultipart) {
+                ((MimeMultipart) c).parse();
+            }
+        }
+        
+        return c;
     }
 
-    public void setDataHandler(DataHandler handler) throws MessagingException {
+    public void setDataHandler(final DataHandler handler) throws MessagingException {
         dh = handler;
         // if we have a handler override, then we need to invalidate any content
         // headers that define the types.  This information will be derived from the
         // data heander unless subsequently overridden.
         removeHeader("Content-Type");
         removeHeader("Content-Transfer-Encoding");
+        cachedContent = null;
 
     }
 
-    public void setContent(Object content, String type) throws MessagingException {
+    public void setContent(final Object content, final String type) throws MessagingException {
         // Multipart content needs to be handled separately.
         if (content instanceof Multipart) {
             setContent((Multipart)content);
@@ -430,17 +451,17 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 
     }
 
-    public void setText(String text) throws MessagingException {
+    public void setText(final String text) throws MessagingException {
         setText(text, null);
     }
 
-    public void setText(String text, String charset) throws MessagingException {
+    public void setText(final String text, final String charset) throws MessagingException {
         // the default subtype is plain text.
         setText(text, charset, "plain");
     }
 
 
-    public void setText(String text, String charset, String subtype) throws MessagingException {
+    public void setText(final String text, String charset, final String subtype) throws MessagingException {
         // we need to sort out the character set if one is not provided.
         if (charset == null) {
             // if we have non us-ascii characters here, we need to adjust this.
@@ -454,31 +475,31 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         setContent(text, "text/plain; charset=" + MimeUtility.quote(charset, HeaderTokenizer.MIME));
     }
 
-    public void setContent(Multipart part) throws MessagingException {
+    public void setContent(final Multipart part) throws MessagingException {
         setDataHandler(new DataHandler(part, part.getContentType()));
         part.setParent(this);
     }
 
-    public void writeTo(OutputStream out) throws IOException, MessagingException {
+    public void writeTo(final OutputStream out) throws IOException, MessagingException {
         headers.writeTo(out, null);
         // add the separater between the headers and the data portion.
         out.write('\r');
         out.write('\n');
         // we need to process this using the transfer encoding type
-        OutputStream encodingStream = MimeUtility.encode(out, getEncoding());
+        final OutputStream encodingStream = MimeUtility.encode(out, getEncoding());
         getDataHandler().writeTo(encodingStream);
         encodingStream.flush();
     }
 
-    public String[] getHeader(String name) throws MessagingException {
+    public String[] getHeader(final String name) throws MessagingException {
         return headers.getHeader(name);
     }
 
-    public String getHeader(String name, String delimiter) throws MessagingException {
+    public String getHeader(final String name, final String delimiter) throws MessagingException {
         return headers.getHeader(name, delimiter);
     }
 
-    public void setHeader(String name, String value) throws MessagingException {
+    public void setHeader(final String name, final String value) throws MessagingException {
         headers.setHeader(name, value);
     }
 
@@ -492,7 +513,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      *
      * @exception MessagingException
      */
-    private void setOrRemoveHeader(String name, String value) throws MessagingException {
+    private void setOrRemoveHeader(final String name, final String value) throws MessagingException {
         if (value == null) {
             headers.removeHeader(name);
         }
@@ -501,11 +522,11 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         }
     }
 
-    public void addHeader(String name, String value) throws MessagingException {
+    public void addHeader(final String name, final String value) throws MessagingException {
         headers.addHeader(name, value);
     }
 
-    public void removeHeader(String name) throws MessagingException {
+    public void removeHeader(final String name) throws MessagingException {
         headers.removeHeader(name);
     }
 
@@ -513,15 +534,15 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return headers.getAllHeaders();
     }
 
-    public Enumeration getMatchingHeaders(String[] name) throws MessagingException {
+    public Enumeration getMatchingHeaders(final String[] name) throws MessagingException {
         return headers.getMatchingHeaders(name);
     }
 
-    public Enumeration getNonMatchingHeaders(String[] name) throws MessagingException {
+    public Enumeration getNonMatchingHeaders(final String[] name) throws MessagingException {
         return headers.getNonMatchingHeaders(name);
     }
 
-    public void addHeaderLine(String line) throws MessagingException {
+    public void addHeaderLine(final String line) throws MessagingException {
         headers.addHeaderLine(line);
     }
 
@@ -529,36 +550,36 @@ public class MimeBodyPart extends BodyPart implements MimePart {
         return headers.getAllHeaderLines();
     }
 
-    public Enumeration getMatchingHeaderLines(String[] names) throws MessagingException {
+    public Enumeration getMatchingHeaderLines(final String[] names) throws MessagingException {
         return headers.getMatchingHeaderLines(names);
     }
 
-    public Enumeration getNonMatchingHeaderLines(String[] names) throws MessagingException {
+    public Enumeration getNonMatchingHeaderLines(final String[] names) throws MessagingException {
         return headers.getNonMatchingHeaderLines(names);
     }
 
     protected void updateHeaders() throws MessagingException {
-        DataHandler handler = getDataHandler();
+        final DataHandler handler = getDataHandler();
 
         try {
             // figure out the content type.  If not set, we'll need to figure this out.
             String type = dh.getContentType();
             // parse this content type out so we can do matches/compares.
-            ContentType content = new ContentType(type);
+            final ContentType contentType = new ContentType(type);
             
             // we might need to reconcile the content type and our explicitly set type
-            String explicitType = getSingleHeader("Content-Type"); 
+            final String explicitType = getSingleHeader("Content-Type"); 
             // is this a multipart content?
-            if (content.match("multipart/*")) {
+            if (contentType.match("multipart/*")) {
                 // the content is suppose to be a MimeMultipart.  Ping it to update it's headers as well.
                 try {
-                    MimeMultipart part = (MimeMultipart)handler.getContent();
+                    final MimeMultipart part = (MimeMultipart)handler.getContent();
                     part.updateHeaders();
-                } catch (ClassCastException e) {
+                } catch (final ClassCastException e) {
                     throw new MessagingException("Message content is not MimeMultipart", e);
                 }
             }
-            else if (!content.match("message/rfc822")) {
+            else if (!contentType.match("message/rfc822")) {
                 // simple part, we need to update the header type information
                 // if no encoding is set yet, figure this out from the data handler.
                 if (getSingleHeader("Content-Transfer-Encoding") == null) {
@@ -569,23 +590,23 @@ public class MimeBodyPart extends BodyPart implements MimePart {
                 if (explicitType == null) {
                     if (SessionUtil.getBooleanProperty(MIME_SETDEFAULTTEXTCHARSET, true)) {
                         // is this a text type?  Figure out the encoding and make sure it is set.
-                        if (content.match("text/*")) {
+                        if (contentType.match("text/*")) {
                             // the charset should be specified as a parameter on the MIME type.  If not there,
                             // try to figure one out.
-                            if (content.getParameter("charset") == null) {
+                            if (contentType.getParameter("charset") == null) {
 
-                                String encoding = getEncoding();
+                                final String encoding = getEncoding();
                                 // if we're sending this as 7-bit ASCII, our character set need to be
                                 // compatible.
                                 if (encoding != null && encoding.equalsIgnoreCase("7bit")) {
-                                    content.setParameter("charset", "us-ascii");
+                                    contentType.setParameter("charset", "us-ascii");
                                 }
                                 else {
                                     // get the global default.
-                                    content.setParameter("charset", MimeUtility.getDefaultMIMECharset());
+                                    contentType.setParameter("charset", MimeUtility.getDefaultMIMECharset());
                                 }
                                 // replace the datasource provided type 
-                                type = content.toString(); 
+                                type = contentType.toString(); 
                             }
                         }
                     }
@@ -596,30 +617,45 @@ public class MimeBodyPart extends BodyPart implements MimePart {
             if (explicitType == null) {
                 // get the disposition header, and if it is there, copy the filename parameter into the
                 // name parameter of the type.
-                String disp = getHeader("Content-Disposition", null);
+                final String disp = getHeader("Content-Disposition", null);
                 if (disp != null) {
                     // parse up the string value of the disposition
-                    ContentDisposition disposition = new ContentDisposition(disp);
+                    final ContentDisposition disposition = new ContentDisposition(disp);
                     // now check for a filename value
-                    String filename = disposition.getParameter("filename");
+                    final String filename = disposition.getParameter("filename");
                     // copy and rename the parameter, if it exists.
                     if (filename != null) {
-                        content.setParameter("name", filename);
+                        contentType.setParameter("name", filename);
                         // and update the string version 
-                        type = content.toString(); 
+                        type = contentType.toString(); 
                     }
                 }
                 // set the header with the updated content type information.
                 setHeader("Content-Type", type);
             }
+            
+            
+            if (cachedContent != null) {
+                dh = new DataHandler(cachedContent, getContentType());
+                cachedContent = null;
+                content = null;
+                if (contentStream != null) {
+                    try {
+                        contentStream.close();
+                    } catch (IOException ioex) {
+                        //np-op
+                    }
+                }
+                contentStream = null;
+            }
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MessagingException("Error updating message headers", e);
         }
     }
 
-    private String getSingleHeader(String name) throws MessagingException {
-        String[] values = getHeader(name);
+    private String getSingleHeader(final String name) throws MessagingException {
+        final String[] values = getHeader(name);
         if (values == null || values.length == 0) {
             return null;
         } else {
@@ -641,17 +677,17 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception   MessagingException  message related errors
      * @since       JavaMail 1.4
      */
-    public void attachFile(File file) throws IOException, MessagingException {
-        //FIXME 10. MimeBodyPart.attachFile should set the disposition to ATTACHMENT (5692)
-       
-
-        /*An oversight when these methods were originally added.  Clearly attachments
-        should set the disposition to ATTACHMENT.*/
-        
-        
-    	FileDataSource dataSource = new FileDataSource(file);
+    public void attachFile(final File file) throws IOException, MessagingException {
+                
+    	final FileDataSource dataSource = new FileDataSource(file);
         setDataHandler(new DataHandler(dataSource));
         setFileName(dataSource.getName());
+        
+        /* Since JavaMail 1.5:
+         An oversight when these methods were originally added.
+         Clearly attachments should set the disposition to ATTACHMENT.
+         */
+        setDisposition(ATTACHMENT);
     }
 
 
@@ -667,15 +703,8 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception   MessagingException  message related errors
      * @since       JavaMail 1.4
      */
-    public void attachFile(String file) throws IOException, MessagingException {
-        
-        //FIXME 10. MimeBodyPart.attachFile should set the disposition to ATTACHMENT (5692)
-        
+    public void attachFile(final String file) throws IOException, MessagingException {
 
-        /*An oversight when these methods were originally added.  Clearly attachments
-        should set the disposition to ATTACHMENT.*/
-        
-        // just create a File object and attach.
         attachFile(new File(file));
     }
     
@@ -698,9 +727,18 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception   MessagingException  message related errors
      * @since       JavaMail 1.5
      */
-    public void attachFile(File file, String contentType, String encoding)
+    public void attachFile(final File file, final String contentType, final String encoding)
                 throws IOException, MessagingException {
-        //FIXME implement
+     
+        final FileDataSource dataSource = new EncodingAwareFileDataSource(file,contentType, encoding);
+        setDataHandler(new DataHandler(dataSource));
+        setFileName(dataSource.getName());
+               
+        /* Since JavaMail 1.5:
+         An oversight when these methods were originally added.
+         Clearly attachments should set the disposition to ATTACHMENT.
+         */
+        setDisposition(ATTACHMENT);
     }
 
     /**
@@ -720,9 +758,10 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception   MessagingException  message related errors
      * @since       JavaMail 1.5
      */
-    public void attachFile(String file, String contentType, String encoding)
+    public void attachFile(final String file, final String contentType, final String encoding)
                 throws IOException, MessagingException {
-      //FIXME implement
+        
+        attachFile(new File(file), contentType, encoding);
     }
 
 
@@ -734,12 +773,12 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception IOException
      * @exception MessagingException
      */
-    public void saveFile(File file) throws IOException, MessagingException {
-    	OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+    public void saveFile(final File file) throws IOException, MessagingException {
+    	final OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         // we need to read the data in to write it out (sigh).
-        InputStream in = getInputStream();
+        final InputStream in = getInputStream();
         try {
-            byte[] buffer = new byte[8192];
+            final byte[] buffer = new byte[8192];
 	        int length;
 	        while ((length = in.read(buffer)) > 0) {
          		out.write(buffer, 0, length);
@@ -765,7 +804,28 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception IOException
      * @exception MessagingException
      */
-    public void saveFile(String file) throws IOException, MessagingException {
+    public void saveFile(final String file) throws IOException, MessagingException {
         saveFile(new File(file));
+    }
+    
+    private static class EncodingAwareFileDataSource extends FileDataSource implements EncodingAware {
+        private String contentType;
+        private String encoding;
+
+        public EncodingAwareFileDataSource(File file, String contentType, String encoding) {
+            super(file);
+            this.contentType = contentType;
+            this.encoding = encoding;
+        }
+
+        @Override
+        public String getContentType() {
+            return contentType == null ? super.getContentType() : contentType;
+        }
+
+        //this will be evaluated in MimeUtility.getEncoding(DataSource)
+        public String getEncoding() {
+            return encoding;
+        }
     }
 }

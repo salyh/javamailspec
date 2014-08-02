@@ -34,7 +34,7 @@ public abstract class AddressStringTerm extends StringTerm {
      * Constructor.
      * @param pattern the pattern to be compared
      */
-    protected AddressStringTerm(String pattern) {
+    protected AddressStringTerm(final String pattern) {
         super(pattern);
     }
 
@@ -45,7 +45,7 @@ public abstract class AddressStringTerm extends StringTerm {
      * @param address
      * @return
      */
-    protected boolean match(Address address) {
+    protected boolean match(final Address address) {
         return match(address.toString());
     }
 }

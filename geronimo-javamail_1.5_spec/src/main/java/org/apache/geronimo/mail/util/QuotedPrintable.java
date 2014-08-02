@@ -21,7 +21,6 @@ package org.apache.geronimo.mail.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 public class QuotedPrintable {
@@ -36,7 +35,7 @@ public class QuotedPrintable {
      * @return a byte array containing the Q-P encoded data.
      */
     public static byte[] encode(
-        byte[]    data)
+        final byte[]    data)
     {
         return encode(data, 0, data.length);
     }
@@ -47,19 +46,19 @@ public class QuotedPrintable {
      * @return a byte array containing the Q-P encoded data.
      */
     public static byte[] encode(
-        byte[]    data,
-        int       off,
-        int       length)
+        final byte[]    data,
+        final int       off,
+        final int       length)
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
 
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
         try
         {
             encoder.encode(data, off, length, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception encoding Q-P encoded string: " + e);
         }
@@ -73,11 +72,11 @@ public class QuotedPrintable {
      * @return the number of bytes produced.
      */
     public static int encode(
-        byte[]         data,
-        OutputStream   out)
+        final byte[]         data,
+        final OutputStream   out)
         throws IOException
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
 
         return encoder.encode(data, 0, data.length, out);
     }
@@ -88,13 +87,13 @@ public class QuotedPrintable {
      * @return the number of bytes produced.
      */
     public static int encode(
-        byte[]         data,
-        int            off,
-        int            length,
-        OutputStream   out)
+        final byte[]         data,
+        final int            off,
+        final int            length,
+        final OutputStream   out)
         throws IOException
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
         return encoder.encode(data, 0, data.length, out);
     }
 
@@ -104,16 +103,16 @@ public class QuotedPrintable {
      * @return a byte array representing the decoded data.
      */
     public static byte[] decode(
-        byte[]    data)
+        final byte[]    data)
     {
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
         try
         {
             encoder.decode(data, 0, data.length, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception decoding Q-P encoded string: " + e);
         }
@@ -127,16 +126,16 @@ public class QuotedPrintable {
      * @return a byte array representing the decoded data.
      */
     public static byte[] decode(
-        String    data)
+        final String    data)
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
         try
         {
             encoder.decode(data, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception decoding Q-P encoded string: " + e);
         }
@@ -150,11 +149,11 @@ public class QuotedPrintable {
      * @return the number of bytes produced.
      */
     public static int decode(
-        String          data,
-        OutputStream    out)
+        final String          data,
+        final OutputStream    out)
         throws IOException
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
         return encoder.decode(data, out);
     }
 
@@ -168,9 +167,9 @@ public class QuotedPrintable {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public static int decode(byte [] data, OutputStream out) throws IOException
+    public static int decode(final byte [] data, final OutputStream out) throws IOException
     {
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder();
         return encoder.decode(data, 0, data.length, out);
     }
 }

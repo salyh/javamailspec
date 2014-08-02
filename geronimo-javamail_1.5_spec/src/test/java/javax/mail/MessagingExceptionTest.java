@@ -30,10 +30,11 @@ public class MessagingExceptionTest extends TestCase {
     private MessagingException c;
     private MessagingException b;
     private MessagingException a;
-    public MessagingExceptionTest(String name) {
+    public MessagingExceptionTest(final String name) {
         super(name);
     }
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         
@@ -70,10 +71,10 @@ public class MessagingExceptionTest extends TestCase {
         assertEquals(d, c.getNextException());
         assertEquals(d, c.getCause());
         
-        String message = a.getMessage();
-        int ap = message.indexOf("A");
-        int bp = message.indexOf("B");
-        int cp = message.indexOf("C");
+        final String message = a.getMessage();
+        final int ap = message.indexOf("A");
+        final int bp = message.indexOf("B");
+        final int cp = message.indexOf("C");
         assertTrue("A does not contain 'A'", ap != -1);
         assertTrue("B does not contain 'B'", bp != -1);
         assertTrue("C does not contain 'C'", cp != -1);
@@ -90,7 +91,7 @@ public class MessagingExceptionTest extends TestCase {
     }
     
     public void testMessagingExceptionStringException() {
-        MessagingException x = new MessagingException("X", a);
+        final MessagingException x = new MessagingException("X", a);
         assertEquals("X (javax.mail.MessagingException: A)", x.getMessage());
         assertEquals(a, x.getNextException());
         assertEquals(a, x.getCause());

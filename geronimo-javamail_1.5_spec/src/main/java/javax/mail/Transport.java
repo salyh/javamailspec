@@ -24,7 +24,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
+
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 
@@ -44,7 +46,7 @@ public abstract class Transport extends Service {
      * @param message the message to send
      * @throws MessagingException if there was a problem sending the message
      */
-    public static void send(Message message) throws MessagingException {
+    public static void send(final Message message) throws MessagingException {
         send(message, message.getAllRecipients());
     }
 
@@ -59,15 +61,25 @@ public abstract class Transport extends Service {
      * @param addresses the addesses to send to
      * @throws MessagingException if there was a problem sending the message
      */
-    public static void send(Message message, Address[] addresses) throws MessagingException {
-        Session session = message.session;
-        Map msgsByTransport = new HashMap();
+    public static void send(final Message message, final Address[] addresses) throws MessagingException {
+        sendInternal(message, addresses, null, null);
+    }
+    
+    
+    private static void sendInternal(final Message message, final Address[] addresses, final String user, final String password) throws MessagingException {
+        
+        if (addresses == null || addresses.length == 0) {
+            throw new SendFailedException("No recipient addresses");
+        }
+        
+        final Session session = message.session;
+        final Map<Transport, List<Address>> msgsByTransport = new HashMap<Transport, List<Address>>();
         for (int i = 0; i < addresses.length; i++) {
-            Address address = addresses[i];
-            Transport transport = session.getTransport(address);
-            List addrs = (List) msgsByTransport.get(transport);
+            final Address address = addresses[i];
+            final Transport transport = session.getTransport(address);
+            List<Address> addrs = (List<Address>) msgsByTransport.get(transport);
             if (addrs == null) {
-                addrs = new ArrayList();
+                addrs = new ArrayList<Address>();
                 msgsByTransport.put(transport, addrs);
             }
             addrs.add(address);
@@ -80,23 +92,27 @@ public abstract class Transport extends Service {
         // also means unwrapping the information in any SendFailedExceptions we receive and building
         // composite failed list.
         MessagingException chainedException = null;
-        ArrayList sentAddresses = new ArrayList();
-        ArrayList unsentAddresses = new ArrayList();
-        ArrayList invalidAddresses = new ArrayList();
+        final List<Address> sentAddresses = new ArrayList<Address>();
+        final List<Address> unsentAddresses = new ArrayList<Address>();
+        final List<Address> invalidAddresses = new ArrayList<Address>();
 
 
-        for (Iterator i = msgsByTransport.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
-            Transport transport = (Transport) entry.getKey();
-            List addrs = (List) entry.getValue();
+        for (final Iterator<Entry<Transport, List<Address>>> i = msgsByTransport.entrySet().iterator(); i.hasNext();) {
+            final Entry<Transport, List<Address>> entry = i.next();
+            final Transport transport = (Transport) entry.getKey();
+            final List<Address> addrs = (List<Address>) entry.getValue();
             try {
                 // we MUST connect to the transport before attempting to send.
-                transport.connect();
+                if(user != null) {
+                    transport.connect(user, password);
+                } else {
+                    transport.connect();
+                }
                 transport.sendMessage(message, (Address[]) addrs.toArray(new Address[addrs.size()]));
                 // if we have to throw an exception because of another failure, these addresses need to
                 // be in the valid list.  Since we succeeded here, we can add these now.
                 sentAddresses.addAll(addrs);
-            } catch (SendFailedException e) {
+            } catch (final SendFailedException e) {
                 // a true send failure.  The exception contains a wealth of information about
                 // the failures, including a potential chain of exceptions explaining what went wrong.  We're
                 // going to send a new one of these, so we need to merge the information.
@@ -131,7 +147,7 @@ public abstract class Transport extends Service {
                     }
                 }
 
-            } catch (MessagingException e) {
+            } catch (final MessagingException e) {
                 // add this to our exception chain
                 if (chainedException == null) {
                     chainedException = e;
@@ -156,9 +172,9 @@ public abstract class Transport extends Service {
             }
 
             // create our lists for notification and exception reporting from this point on.
-            Address[] sent = (Address[])sentAddresses.toArray(new Address[0]);
-            Address[] unsent = (Address[])unsentAddresses.toArray(new Address[0]);
-            Address[] invalid = (Address[])invalidAddresses.toArray(new Address[0]);
+            final Address[] sent = (Address[])sentAddresses.toArray(new Address[0]);
+            final Address[] unsent = (Address[])unsentAddresses.toArray(new Address[0]);
+            final Address[] invalid = (Address[])invalidAddresses.toArray(new Address[0]);
 
             throw new SendFailedException("Send failure", chainedException, sent, unsent, invalid);
         }
@@ -171,8 +187,6 @@ public abstract class Transport extends Service {
      * Message method getAllRecipients).
      * The send method calls the saveChanges
      * method on the message before sending it. 
-
-
      *
      * Use the specified user name and password to authenticate to
      * the mail server.
@@ -188,9 +202,10 @@ public abstract class Transport extends Service {
      * @see     javax.mail.SendFailedException
      * @since       JavaMail 1.5
      */
-    public static void send(Message msg,
-        String user, String password) throws MessagingException {
-        //FIXME implement
+    public static void send(final Message msg,
+        final String user, final String password) throws MessagingException {
+        
+        send(msg, msg.getAllRecipients(), user, password);
     }
 
     /**
@@ -214,13 +229,12 @@ public abstract class Transport extends Service {
      * @see     javax.mail.SendFailedException
      * @since       JavaMail 1.5
      */
-    public static void send(Message msg, Address[] addresses,
-        String user, String password) throws MessagingException {
-        //FIXME implement
+    public static void send(final Message msg, final Address[] addresses,
+        final String user, final String password) throws MessagingException {
+        
+        sendInternal(msg, addresses, user, password);
+    
     }
-    
-    
-    
     
     
     /**
@@ -229,7 +243,7 @@ public abstract class Transport extends Service {
      * @param session the Session this transport is for
      * @param name    the location this transport is for
      */
-    public Transport(Session session, URLName name) {
+    public Transport(final Session session, final URLName name) {
         super(session, name);
     }
 
@@ -249,17 +263,17 @@ public abstract class Transport extends Service {
      */
     public abstract void sendMessage(Message message, Address[] addresses) throws MessagingException;
 
-    private Vector transportListeners = new Vector();
+    private final Vector<TransportListener> transportListeners = new Vector<TransportListener>();
 
-    public void addTransportListener(TransportListener listener) {
+    public void addTransportListener(final TransportListener listener) {
         transportListeners.add(listener);
     }
 
-    public void removeTransportListener(TransportListener listener) {
+    public void removeTransportListener(final TransportListener listener) {
         transportListeners.remove(listener);
     }
 
-    protected void notifyTransportListeners(int type, Address[] validSent, Address[] validUnsent, Address[] invalid, Message message) {
+    protected void notifyTransportListeners(final int type, final Address[] validSent, final Address[] validUnsent, final Address[] invalid, final Message message) {
         queueEvent(new TransportEvent(this, type, validSent, validUnsent, invalid, message), transportListeners);
     }
 }                                                                                            

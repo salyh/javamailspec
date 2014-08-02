@@ -40,7 +40,7 @@ public class Header {
      * @param name  the name of this header
      * @param value the value of this header
      */
-    public Header(String name, String value) {
+    public Header(final String name, final String value) {
         this.name = name;
         this.value = value;
     }

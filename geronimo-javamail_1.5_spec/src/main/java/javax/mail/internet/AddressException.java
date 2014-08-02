@@ -33,15 +33,15 @@ public class AddressException extends ParseException {
         this(null);
     }
 
-    public AddressException(String message) {
+    public AddressException(final String message) {
         this(message, null);
     }
 
-    public AddressException(String message, String ref) {
+    public AddressException(final String message, final String ref) {
         this(message, null, -1);
     }
 
-    public AddressException(String message, String ref, int pos) {
+    public AddressException(final String message, final String ref, final int pos) {
         super(message);
         this.ref = ref;
         this.pos = pos;
@@ -55,6 +55,7 @@ public class AddressException extends ParseException {
         return pos;
     }
 
+    @Override
     public String toString() {
         return super.toString() + " (" + ref + "," + pos + ")";
     }

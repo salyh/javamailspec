@@ -25,7 +25,7 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class FolderEventTest extends TestCase {
-    public FolderEventTest(String name) {
+    public FolderEventTest(final String name) {
         super(name);
     }
     public void testEvent() {
@@ -33,29 +33,29 @@ public class FolderEventTest extends TestCase {
         doEventTests(FolderEvent.RENAMED);
         doEventTests(FolderEvent.DELETED);
     }
-    private void doEventTests(int type) {
-        FolderEvent event = new FolderEvent(this, null, type);
+    private void doEventTests(final int type) {
+        final FolderEvent event = new FolderEvent(this, null, type);
         assertEquals(this, event.getSource());
         assertEquals(type, event.getType());
-        FolderListenerTest listener = new FolderListenerTest();
+        final FolderListenerTest listener = new FolderListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     public static class FolderListenerTest implements FolderListener {
         private int state = 0;
-        public void folderCreated(FolderEvent event) {
+        public void folderCreated(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = FolderEvent.CREATED;
         }
-        public void folderDeleted(FolderEvent event) {
+        public void folderDeleted(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = FolderEvent.DELETED;
         }
-        public void folderRenamed(FolderEvent event) {
+        public void folderRenamed(final FolderEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

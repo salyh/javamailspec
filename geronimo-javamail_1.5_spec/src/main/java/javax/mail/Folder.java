@@ -94,7 +94,7 @@ public abstract class Folder {
      *
      * @param store the store that this folder is part of
      */
-    protected Folder(Store store) {
+    protected Folder(final Store store) {
         this.store = store;
     }
 
@@ -121,7 +121,7 @@ public abstract class Folder {
      * @throws MessagingException
      */
     public URLName getURLName() throws MessagingException {
-        URLName baseURL = store.getURLName(); 
+        final URLName baseURL = store.getURLName(); 
         return new URLName(baseURL.getProtocol(), baseURL.getHost(), baseURL.getPort(), 
             getFullName(), baseURL.getUsername(), null); 
     }
@@ -178,7 +178,7 @@ public abstract class Folder {
      * @return a, possibly empty, array containing subscribed Folders that matched the pattern
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Folder[] listSubscribed(String pattern) throws MessagingException {
+    public Folder[] listSubscribed(final String pattern) throws MessagingException {
         return list(pattern);
     }
 
@@ -253,7 +253,7 @@ public abstract class Folder {
      * @throws MessagingException          if there was a problem accessing the store
      * @throws MethodNotSupportedException if the Store does not support subscription
      */
-    public void setSubscribed(boolean subscribed) throws MessagingException {
+    public void setSubscribed(final boolean subscribed) throws MessagingException {
         throw new MethodNotSupportedException();
     }
 
@@ -432,11 +432,11 @@ public abstract class Folder {
         return getCount(Flags.Flag.DELETED, true);
     }
 
-    private int getCount(Flag flag, boolean value) throws MessagingException {
+    private int getCount(final Flag flag, final boolean value) throws MessagingException {
         if (!isOpen()) {
             return -1;
         }
-        Message[] messages = getMessages();
+        final Message[] messages = getMessages();
         int total = 0;
         for (int i = 0; i < messages.length; i++) {
             if (messages[i].getFlags().contains(flag) == value) {
@@ -467,8 +467,8 @@ public abstract class Folder {
      * @return an array of messages from start to end inclusive
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Message[] getMessages(int start, int end) throws MessagingException {
-        Message[] result = new Message[end - start + 1];
+    public Message[] getMessages(int start, final int end) throws MessagingException {
+        final Message[] result = new Message[end - start + 1];
         for (int i = 0; i < result.length; i++) {
             result[i] = getMessage(start++);
         }
@@ -482,8 +482,8 @@ public abstract class Folder {
      * @return the specified messages
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Message[] getMessages(int ids[]) throws MessagingException {
-        Message[] result = new Message[ids.length];
+    public Message[] getMessages(final int ids[]) throws MessagingException {
+        final Message[] result = new Message[ids.length];
         for (int i = 0; i < ids.length; i++) {
             result[i] = getMessage(ids[i]);
         }
@@ -521,7 +521,7 @@ public abstract class Folder {
      * @throws MessagingException if there was a problem accessing the store
      * @see FetchProfile
      */
-    public void fetch(Message[] messages, FetchProfile profile) throws MessagingException {
+    public void fetch(final Message[] messages, final FetchProfile profile) throws MessagingException {
         return;
     }
 
@@ -536,9 +536,9 @@ public abstract class Folder {
      * @param value    the value the flags should be set to
      * @throws MessagingException if there was a problem accessing the store
      */
-    public void setFlags(Message[] messages, Flags flags, boolean value) throws MessagingException {
+    public void setFlags(final Message[] messages, final Flags flags, final boolean value) throws MessagingException {
         for (int i = 0; i < messages.length; i++) {
-            Message message = messages[i];
+            final Message message = messages[i];
             message.setFlags(flags, value);
         }
     }
@@ -555,9 +555,9 @@ public abstract class Folder {
      * @param value the value the flags should be set end
      * @throws MessagingException if there was a problem accessing the store
      */
-    public void setFlags(int start, int end, Flags flags, boolean value) throws MessagingException {
+    public void setFlags(final int start, final int end, final Flags flags, final boolean value) throws MessagingException {
         for (int i = start; i <= end; i++) {
-            Message message = getMessage(i);
+            final Message message = getMessage(i);
             message.setFlags(flags, value);
         }
     }
@@ -573,9 +573,9 @@ public abstract class Folder {
      * @param value the value the flags should be set end
      * @throws MessagingException if there was a problem accessing the store
      */
-    public void setFlags(int ids[], Flags flags, boolean value) throws MessagingException {
+    public void setFlags(final int ids[], final Flags flags, final boolean value) throws MessagingException {
         for (int i = 0; i < ids.length; i++) {
-            Message message = getMessage(ids[i]);
+            final Message message = getMessage(ids[i]);
             message.setFlags(flags, value);
         }
     }
@@ -588,7 +588,7 @@ public abstract class Folder {
      * @param folder the folder to copy to
      * @throws MessagingException if there was a problem accessing the store
      */
-    public void copyMessages(Message[] messages, Folder folder) throws MessagingException {
+    public void copyMessages(final Message[] messages, final Folder folder) throws MessagingException {
         folder.appendMessages(messages);
     }
 
@@ -613,7 +613,7 @@ public abstract class Folder {
      * @return an array containing messages that match the criteria
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Message[] search(SearchTerm term) throws MessagingException {
+    public Message[] search(final SearchTerm term) throws MessagingException {
         return search(term, getMessages());
     }
 
@@ -629,10 +629,10 @@ public abstract class Folder {
      * @return an array containing messages that match the criteria
      * @throws MessagingException if there was a problem accessing the store
      */
-    public Message[] search(SearchTerm term, Message[] messages) throws MessagingException {
-        List result = new ArrayList(messages.length);
+    public Message[] search(final SearchTerm term, final Message[] messages) throws MessagingException {
+        final List result = new ArrayList(messages.length);
         for (int i = 0; i < messages.length; i++) {
-            Message message = messages[i];
+            final Message message = messages[i];
             if (message.match(term)) {
                 result.add(message);
             }
@@ -640,65 +640,66 @@ public abstract class Folder {
         return (Message[]) result.toArray(new Message[result.size()]);
     }
 
-    public void addConnectionListener(ConnectionListener listener) {
+    public void addConnectionListener(final ConnectionListener listener) {
         connectionListeners.add(listener);
     }
 
-    public void removeConnectionListener(ConnectionListener listener) {
+    public void removeConnectionListener(final ConnectionListener listener) {
         connectionListeners.remove(listener);
     }
 
-    protected void notifyConnectionListeners(int type) {
+    protected void notifyConnectionListeners(final int type) {
         queueEvent(new ConnectionEvent(this, type), connectionListeners);
     }
 
-    public void addFolderListener(FolderListener listener) {
+    public void addFolderListener(final FolderListener listener) {
         folderListeners.add(listener);
     }
 
-    public void removeFolderListener(FolderListener listener) {
+    public void removeFolderListener(final FolderListener listener) {
         folderListeners.remove(listener);
     }
 
-    protected void notifyFolderListeners(int type) {
+    protected void notifyFolderListeners(final int type) {
         queueEvent(new FolderEvent(this, this, type), folderListeners);
     }
 
-    protected void notifyFolderRenamedListeners(Folder newFolder) {
+    protected void notifyFolderRenamedListeners(final Folder newFolder) {
         queueEvent(new FolderEvent(this, this, newFolder, FolderEvent.RENAMED), folderListeners);
     }
 
-    public void addMessageCountListener(MessageCountListener listener) {
+    public void addMessageCountListener(final MessageCountListener listener) {
         messageCountListeners.add(listener);
     }
 
-    public void removeMessageCountListener(MessageCountListener listener) {
+    public void removeMessageCountListener(final MessageCountListener listener) {
         messageCountListeners.remove(listener);
     }
 
-    protected void notifyMessageAddedListeners(Message[] messages) {
+    protected void notifyMessageAddedListeners(final Message[] messages) {
         queueEvent(new MessageCountEvent(this, MessageCountEvent.ADDED, false, messages), messageChangedListeners);
     }
 
-    protected void notifyMessageRemovedListeners(boolean removed, Message[] messages) {
+    protected void notifyMessageRemovedListeners(final boolean removed, final Message[] messages) {
         queueEvent(new MessageCountEvent(this, MessageCountEvent.REMOVED, removed, messages), messageChangedListeners);
     }
 
-    public void addMessageChangedListener(MessageChangedListener listener) {
+    public void addMessageChangedListener(final MessageChangedListener listener) {
         messageChangedListeners.add(listener);
     }
 
-    public void removeMessageChangedListener(MessageChangedListener listener) {
+    public void removeMessageChangedListener(final MessageChangedListener listener) {
         messageChangedListeners.remove(listener);
     }
 
-    protected void notifyMessageChangedListeners(int type, Message message) {
+    protected void notifyMessageChangedListeners(final int type, final Message message) {
         queueEvent(new MessageChangedEvent(this, type, message), messageChangedListeners);
     }
 
     /**
      * Unregisters all listeners.
      */
+    @Override
     protected void finalize() throws Throwable {
         // shut our queue down, if needed. 
         if (queue != null) {
@@ -717,8 +718,9 @@ public abstract class Folder {
      * Returns the full name of this folder; if null, returns the value from the superclass.
      * @return a string form of this folder
      */
+    @Override
     public String toString() {
-        String name = getFullName();
+        final String name = getFullName();
         return name == null ? super.toString() : name;
     }
     
@@ -730,7 +732,7 @@ public abstract class Folder {
      * @param event     The event to dispatch.
      * @param listeners The listener list.
      */
-    private synchronized void queueEvent(MailEvent event, ArrayList listeners) {
+    private synchronized void queueEvent(final MailEvent event, final ArrayList listeners) {
         // if there are no listeners to dispatch this to, don't put it on the queue. 
         // This allows us to delay creating the queue (and its new thread) until 
         // we 

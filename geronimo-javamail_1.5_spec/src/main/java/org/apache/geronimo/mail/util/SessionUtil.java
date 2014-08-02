@@ -19,8 +19,6 @@
 
 package org.apache.geronimo.mail.util;
 
-import java.security.Security;
-
 import javax.mail.Session;
 
 /**
@@ -37,7 +35,7 @@ public class SessionUtil {
      *
      * @return The property value (returns null if the property has not been set).
      */
-    static public String getProperty(Session session, String name) {
+    static public String getProperty(final Session session, final String name) {
         // occasionally, we get called with a null session if an object is not attached to
         // a session.  In that case, treat this like an unknown parameter.
         if (session == null) {
@@ -59,8 +57,8 @@ public class SessionUtil {
      *
      * @return The property value (returns defaultValue if the property has not been set).
      */
-    static public String getProperty(Session session, String name, String defaultValue) {
-        String result = getProperty(session, name);
+    static public String getProperty(final Session session, final String name, final String defaultValue) {
+        final String result = getProperty(session, name);
         if (result == null) {
             return defaultValue;
         }
@@ -78,8 +76,8 @@ public class SessionUtil {
      * @return True if the property value is "true".  Returns false for any
      *         other value (including null).
      */
-    static public boolean isPropertyTrue(Session session, String name) {
-        String property = getProperty(session, name);
+    static public boolean isPropertyTrue(final Session session, final String name) {
+        final String property = getProperty(session, name);
         if (property != null) {
             return property.equals("true");
         }
@@ -96,8 +94,8 @@ public class SessionUtil {
      * @return True if the property value is "false".  Returns false for
      *         other value (including null).
      */
-    static public boolean isPropertyFalse(Session session, String name) {
-        String property = getProperty(session, name);
+    static public boolean isPropertyFalse(final Session session, final String name) {
+        final String property = getProperty(session, name);
         if (property != null) {
             return property.equals("false");
         }
@@ -115,13 +113,13 @@ public class SessionUtil {
      *
      * @return The property value converted to an int.
      */
-    static public int getIntProperty(Session session, String name, int defaultValue) {
-        String result = getProperty(session, name);
+    static public int getIntProperty(final Session session, final String name, final int defaultValue) {
+        final String result = getProperty(session, name);
         if (result != null) {
             try {
                 // convert into an int value.
                 return Integer.parseInt(result);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
             }
         }
         // return default value if it doesn't exist is isn't convertable.
@@ -140,8 +138,8 @@ public class SessionUtil {
      *
      * @return The property value converted to a boolean.
      */
-    static public boolean getBooleanProperty(Session session, String name, boolean defaultValue) {
-        String result = getProperty(session, name);
+    static public boolean getBooleanProperty(final Session session, final String name, final boolean defaultValue) {
+        final String result = getProperty(session, name);
         if (result != null) {
             return Boolean.valueOf(result).booleanValue();
         }
@@ -160,13 +158,13 @@ public class SessionUtil {
      *
      * @return The property value converted to a boolean.
      */
-    static public boolean getBooleanProperty(String name, boolean defaultValue) {
+    static public boolean getBooleanProperty(final String name, final boolean defaultValue) {
         try {
-            String result = System.getProperty(name);
+            final String result = System.getProperty(name);
             if (result != null) {
                 return Boolean.valueOf(result).booleanValue();
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // we can't access the property, so for all intents, it doesn't exist.
         }
         // return default value if it doesn't exist is isn't convertable.
@@ -184,13 +182,13 @@ public class SessionUtil {
      *
      * @return The property value
      */
-    static public String getProperty(String name, String defaultValue) {
+    static public String getProperty(final String name, final String defaultValue) {
         try {
-            String result = System.getProperty(name);
+            final String result = System.getProperty(name);
             if (result != null) {
                 return result;
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // we can't access the property, so for all intents, it doesn't exist.
         }
         // return default value if it doesn't exist is isn't convertable.
@@ -206,10 +204,10 @@ public class SessionUtil {
      *
      * @return The property value
      */
-    static public String getProperty(String name) {
+    static public String getProperty(final String name) {
         try {
             return System.getProperty(name);
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // we can't access the property, so for all intents, it doesn't exist.
         }
         // return null if we got an exception.

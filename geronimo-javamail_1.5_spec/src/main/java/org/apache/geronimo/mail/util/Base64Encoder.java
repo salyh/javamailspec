@@ -69,14 +69,14 @@ public class Base64Encoder
      * @return the number of bytes produced.
      */
     public int encode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
-        int modulus = length % 3;
-        int dataLength = (length - modulus);
+        final int modulus = length % 3;
+        final int dataLength = (length - modulus);
         int a1, a2, a3;
 
         for (int i = off; i < off + dataLength; i += 3)
@@ -130,7 +130,7 @@ public class Base64Encoder
     }
 
     private boolean ignore(
-        char    c)
+        final char    c)
     {
         return (c == '\n' || c =='\r' || c == '\t' || c == ' ');
     }
@@ -142,13 +142,13 @@ public class Base64Encoder
      * @return the number of bytes produced.
      */
     public int decode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
+        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 
@@ -165,7 +165,7 @@ public class Base64Encoder
         }
 
         int  i = off;
-        int  finish = end - 4;
+        final int  finish = end - 4;
 
         while (i < finish)
         {
@@ -248,11 +248,11 @@ public class Base64Encoder
      * @return the number of bytes produced.
      */
     public int decode(
-        String                data,
-        OutputStream    out)
+        final String                data,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
+        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        length = 0;
 
@@ -269,7 +269,7 @@ public class Base64Encoder
         }
 
         int    i = 0;
-        int   finish = end - 4;
+        final int   finish = end - 4;
 
         while (i < finish)
         {
@@ -347,9 +347,9 @@ public class Base64Encoder
      *
      * @return the number of bytes produced.
      */
-    public int decode(byte[] data, int off, int length, byte[] out) throws IOException
+    public int decode(final byte[] data, final int off, final int length, final byte[] out) throws IOException
     {
-        byte[]    bytes;
+        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 
@@ -366,7 +366,7 @@ public class Base64Encoder
         }
 
         int  i = off;
-        int  finish = end - 4;
+        final int  finish = end - 4;
 
         while (i < finish)
         {
@@ -442,7 +442,7 @@ public class Base64Encoder
      *
      * @return true if this is valid in Base64 encoded data, false otherwise.
      */
-    public boolean isValidBase64(int ch) {
+    public boolean isValidBase64(final int ch) {
         // 'A' has the value 0 in the decoding table, so we need a special one for that
         return ch == padding || ch == 'A' || decodingTable[ch] != 0;
     }
@@ -459,14 +459,14 @@ public class Base64Encoder
      *
      * @exception IOException
      */
-    public void encodeWord(InputStream in, String charset, OutputStream out, boolean fold) throws IOException
+    public void encodeWord(final InputStream in, final String charset, final OutputStream out, final boolean fold) throws IOException
     {
-        PrintStream writer = new PrintStream(out);
+        final PrintStream writer = new PrintStream(out);
 
         // encoded words are restricted to 76 bytes, including the control adornments.
-        int limit = 75 - 7 - charset.length();
+        final int limit = 75 - 7 - charset.length();
         boolean firstLine = true;
-        StringBuffer encodedString = new StringBuffer(76);
+        final StringBuffer encodedString = new StringBuffer(76);
 
         while (true) {
             // encode the next segment.
@@ -516,7 +516,7 @@ public class Base64Encoder
      *
      * @exception IOException
      */
-    public void encodeWord(byte[] data, StringBuffer out, String charset) throws IOException
+    public void encodeWord(final byte[] data, final StringBuffer out, final String charset) throws IOException
     {
         // append the word header 
         out.append("=?");
@@ -533,10 +533,10 @@ public class Base64Encoder
      *
      * @return the number of bytes produced.
      */
-    public void encodeWordData(byte[] data, StringBuffer out) 
+    public void encodeWordData(final byte[] data, final StringBuffer out) 
     {
-        int modulus = data.length % 3;
-        int dataLength = (data.length - modulus);
+        final int modulus = data.length % 3;
+        final int dataLength = (data.length - modulus);
         int a1, a2, a3;
 
         for (int i = 0; i < dataLength; i += 3)
@@ -593,19 +593,19 @@ public class Base64Encoder
      *
      * @return the number of bytes produced.
      */
-    public void encode(InputStream in, StringBuffer out, int limit) throws IOException
+    public void encode(final InputStream in, final StringBuffer out, final int limit) throws IOException
     {
         int count = limit / 4;
-        byte [] inBuffer = new byte[3];
+        final byte [] inBuffer = new byte[3];
 
         while (count-- > 0) {
 
-            int readCount = in.read(inBuffer);
+            final int readCount = in.read(inBuffer);
             // did we get a full triplet?  that's an easy encoding.
             if (readCount == 3) {
-                int  a1 = inBuffer[0] & 0xff;
-                int  a2 = inBuffer[1] & 0xff;
-                int  a3 = inBuffer[2] & 0xff;
+                final int  a1 = inBuffer[0] & 0xff;
+                final int  a2 = inBuffer[1] & 0xff;
+                final int  a3 = inBuffer[2] & 0xff;
                 
                 out.append((char)encodingTable[(a1 >>> 2) & 0x3f]);
                 out.append((char)encodingTable[((a1 << 4) | (a2 >>> 4)) & 0x3f]);
@@ -618,7 +618,7 @@ public class Base64Encoder
                 return;
             }
             else if (readCount == 1) {
-                int  a1 = inBuffer[0] & 0xff;
+                final int  a1 = inBuffer[0] & 0xff;
                 out.append((char)encodingTable[(a1 >>> 2) & 0x3f]);
                 out.append((char)encodingTable[(a1 << 4) & 0x3f]);
                 out.append((char)padding);
@@ -626,8 +626,8 @@ public class Base64Encoder
                 return;
             }
             else if (readCount == 2) {
-                int  a1 = inBuffer[0] & 0xff;
-                int  a2 = inBuffer[1] & 0xff;
+                final int  a1 = inBuffer[0] & 0xff;
+                final int  a2 = inBuffer[1] & 0xff;
 
                 out.append((char)encodingTable[(a1 >>> 2) & 0x3f]);
                 out.append((char)encodingTable[((a1 << 4) | (a2 >>> 4)) & 0x3f]);
@@ -650,7 +650,7 @@ public class Base64Encoder
      * 
      * @return The size of the byte data in encoded form. 
      */
-    public int estimateEncodedLength(byte[] data) 
+    public int estimateEncodedLength(final byte[] data) 
     {
         return ((data.length + 2) / 3) * 4; 
     }

@@ -40,13 +40,15 @@ public abstract class ComparisonTerm extends SearchTerm {
     public ComparisonTerm() {
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (!(other instanceof ComparisonTerm)) {
             return false; 
         }
         return comparison == ((ComparisonTerm)other).comparison;
     }
 
+    @Override
     public int hashCode() {
         return comparison; 
     }

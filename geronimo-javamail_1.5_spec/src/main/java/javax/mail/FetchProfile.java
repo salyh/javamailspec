@@ -58,7 +58,7 @@ public class FetchProfile {
 
         /**
          * Item for fetching information about message flags.
-         * Generall corresponds to the X-Flags header.
+         * General corresponds to the X-Flags header.
          */
         public static final Item FLAGS = new Item("FLAGS");
         
@@ -73,7 +73,7 @@ public class FetchProfile {
          */
         public static final Item SIZE = new Item("SIZE");
 
-        protected Item(String name) {
+        protected Item(final String name) {
             // hmmm, name is passed in but we are not allowed to provide accessors
             // or to override equals/hashCode so what use is it?
         }
@@ -88,7 +88,7 @@ public class FetchProfile {
      *
      * @param item the profile to add
      */
-    public void add(Item item) {
+    public void add(final Item item) {
         items.add(item);
     }
 
@@ -96,7 +96,7 @@ public class FetchProfile {
      * Add a specific header.
      * @param header the header whose value should be prefetched
      */
-    public void add(String header) {
+    public void add(final String header) {
         headers.add(header);
     }
 
@@ -105,7 +105,7 @@ public class FetchProfile {
      * @param item the profile to check for
      * @return true if the profile item is already included
      */
-    public boolean contains(Item item) {
+    public boolean contains(final Item item) {
         return items.contains(item);
     }
 
@@ -114,7 +114,7 @@ public class FetchProfile {
      * @param header the header to check for
      * @return true if the header is already included
      */
-    public boolean contains(String header) {
+    public boolean contains(final String header) {
         return headers.contains(header);
     }
 

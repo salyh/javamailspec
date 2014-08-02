@@ -20,8 +20,8 @@
 package org.apache.geronimo.mail.util;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Set of utility classes for handling common encoding-related
@@ -38,7 +38,7 @@ public class ASCIIUtil {
      * @return true if this is a valid 7-bit ASCII encoding, false if it
      *         contains any non-US ASCII characters.
      */
-    static public boolean isAscii(String s) {
+    static public boolean isAscii(final String s) {
         for (int i = 0; i < s.length(); i++) {
             if (!isAscii(s.charAt(i))) {
                 return false;
@@ -58,7 +58,7 @@ public class ASCIIUtil {
      * @return true if this character meets the "ascii-ness" criteria, false
      *         otherwise.
      */
-    static public boolean isAscii(int ch) {
+    static public boolean isAscii(final int ch) {
         // these are explicitly considered valid.
         if (ch == '\r' || ch == '\n' || ch == '\t') {
             return true;
@@ -82,10 +82,10 @@ public class ASCIIUtil {
      *
      * @exception IOException
      */
-    public static String getTextTransferEncoding(InputStream content) throws IOException {
+    public static String getTextTransferEncoding(final InputStream content) throws IOException {
 
         // for efficiency, we'll read in blocks.
-        BufferedInputStream in = new BufferedInputStream(content, 4096);
+        final BufferedInputStream in = new BufferedInputStream(content, 4096);
 
         int span = 0;            // span of characters without a line break.
         boolean containsLongLines = false;
@@ -93,7 +93,7 @@ public class ASCIIUtil {
         int nonAsciiChars = 0;
 
         while (true) {
-            int ch = in.read();
+            final int ch = in.read();
             // if we hit an EOF here, go decide what type we've actually found.
             if (ch == -1) {
                 break;
@@ -155,13 +155,13 @@ public class ASCIIUtil {
      *
      * @param content     A string for the content we're examining.
      */
-    public static String getTextTransferEncoding(String content) {
+    public static String getTextTransferEncoding(final String content) {
 
         int asciiChars = 0;
         int nonAsciiChars = 0;
 
         for (int i = 0; i < content.length(); i++) {
-            int ch = content.charAt(i);
+            final int ch = content.charAt(i);
 
             // non-ascii character, we have to transfer this in binary.
             if (!isAscii(ch)) {
@@ -203,16 +203,16 @@ public class ASCIIUtil {
      *
      * @exception IOException
      */
-    public static String getBinaryTransferEncoding(InputStream content) throws IOException {
+    public static String getBinaryTransferEncoding(final InputStream content) throws IOException {
 
         // for efficiency, we'll read in blocks.
-        BufferedInputStream in = new BufferedInputStream(content, 4096);
+        final BufferedInputStream in = new BufferedInputStream(content, 4096);
 
         int previousChar = 0;
         int span = 0;            // span of characters without a line break.
 
         while (true) {
-            int ch = in.read();
+            final int ch = in.read();
             // if we hit an EOF here, we've only found valid text so far, so we can transfer this as
             // 7-bit ascii.
             if (ch == -1) {

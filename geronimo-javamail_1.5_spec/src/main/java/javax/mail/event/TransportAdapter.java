@@ -26,12 +26,12 @@ package javax.mail.event;
  * @version $Rev$ $Date$
  */
 public abstract class TransportAdapter implements TransportListener {
-    public void messageDelivered(TransportEvent event) {
+    public void messageDelivered(final TransportEvent event) {
     }
 
-    public void messageNotDelivered(TransportEvent event) {
+    public void messageNotDelivered(final TransportEvent event) {
     }
 
-    public void messagePartiallyDelivered(TransportEvent event) {
+    public void messagePartiallyDelivered(final TransportEvent event) {
     }
 }

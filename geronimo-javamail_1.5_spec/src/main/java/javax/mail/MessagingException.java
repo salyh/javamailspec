@@ -33,11 +33,11 @@ public class MessagingException extends Exception {
         super();
     }
 
-    public MessagingException(String message) {
+    public MessagingException(final String message) {
         super(message);
     }
 
-    public MessagingException(String message, Exception cause) {
+    public MessagingException(final String message, final Exception cause) {
         super(message, cause);
         next = cause;
     }
@@ -46,7 +46,7 @@ public class MessagingException extends Exception {
         return next;
     }
 
-    public synchronized boolean setNextException(Exception cause) {
+    public synchronized boolean setNextException(final Exception cause) {
         if (next == null) {
             next = cause;
             return true;
@@ -57,8 +57,9 @@ public class MessagingException extends Exception {
         }
     }
 
+    @Override
     public String getMessage() {
-        Exception next = getNextException();
+        final Exception next = getNextException();
         if (next == null) {
             return super.getMessage();
         } else {
@@ -75,6 +76,7 @@ public class MessagingException extends Exception {
      * MessagingException uses the nextException to provide a legacy chained throwable.
      * override the getCause method to return the nextException.
      */
+    @Override
     public synchronized  Throwable getCause() {
         return next;
     }

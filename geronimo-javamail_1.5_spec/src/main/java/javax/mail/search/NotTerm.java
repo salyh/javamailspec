@@ -30,9 +30,9 @@ public final class NotTerm extends SearchTerm {
 	
 	private static final long serialVersionUID = 7152293214217310216L;
 	
-    private SearchTerm term;
+    private final SearchTerm term;
 
-    public NotTerm(SearchTerm term) {
+    public NotTerm(final SearchTerm term) {
         this.term = term;
     }
 
@@ -40,16 +40,19 @@ public final class NotTerm extends SearchTerm {
         return term;
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         return !term.match(message);
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof NotTerm == false) return false;
         return term.equals(((NotTerm) other).term);
     }
 
+    @Override
     public int hashCode() {
         return term.hashCode();
     }

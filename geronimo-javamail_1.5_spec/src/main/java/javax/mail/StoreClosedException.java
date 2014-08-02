@@ -28,12 +28,12 @@ public class StoreClosedException extends MessagingException {
 	
     private transient Store _store;
 
-    public StoreClosedException(Store store) {
+    public StoreClosedException(final Store store) {
         super();
         _store = store;
     }
 
-    public StoreClosedException(Store store, String message) {
+    public StoreClosedException(final Store store, final String message) {
         super(message);
         _store = store;
     }
@@ -48,7 +48,7 @@ public class StoreClosedException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public StoreClosedException(Store store, String message, Exception e) {
+    public StoreClosedException(final Store store, final String message, final Exception e) {
         super(message, e);
         _store = store;
     }

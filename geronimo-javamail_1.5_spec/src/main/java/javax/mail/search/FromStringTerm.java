@@ -30,13 +30,14 @@ public final class FromStringTerm extends AddressStringTerm {
 	
 	private static final long serialVersionUID = 5801127523826772788L;
 	
-    public FromStringTerm(String string) {
+    public FromStringTerm(final String string) {
         super(string);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            Address from[] = message.getFrom();
+            final Address from[] = message.getFrom();
             if (from == null) {
                 return false; 
             }
@@ -47,7 +48,7 @@ public final class FromStringTerm extends AddressStringTerm {
                 }
             }
             return false;
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }

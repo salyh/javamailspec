@@ -29,25 +29,25 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class ByteArrayDataSourceTest extends TestCase {
-    public ByteArrayDataSourceTest(String arg0) {
+    public ByteArrayDataSourceTest(final String arg0) {
         super(arg0);
     }
 
     public void testByteArray() throws Exception {
         doDataSourceTest(new ByteArrayDataSource("0123456789", "text/plain"), "text/plain");
         doDataSourceTest(new ByteArrayDataSource("0123456789".getBytes(), "text/xml"), "text/xml");
-        ByteArrayInputStream in = new ByteArrayInputStream("0123456789".getBytes());
+        final ByteArrayInputStream in = new ByteArrayInputStream("0123456789".getBytes());
 
         doDataSourceTest(new ByteArrayDataSource(in, "text/html"), "text/html");
 
         try {
-            ByteArrayDataSource source = new ByteArrayDataSource("01234567890", "text/plain");
+            final ByteArrayDataSource source = new ByteArrayDataSource("01234567890", "text/plain");
             source.getOutputStream();
             fail();
-        } catch (IOException e) {
+        } catch (final IOException e) {
         }
 
-        ByteArrayDataSource source = new ByteArrayDataSource("01234567890", "text/plain");
+        final ByteArrayDataSource source = new ByteArrayDataSource("01234567890", "text/plain");
         assertEquals(source.getName(), "");
 
         source.setName("fred");
@@ -55,13 +55,13 @@ public class ByteArrayDataSourceTest extends TestCase {
     }
 
 
-    private void doDataSourceTest(ByteArrayDataSource source, String type) throws Exception {
+    private void doDataSourceTest(final ByteArrayDataSource source, final String type) throws Exception {
         assertEquals(type, source.getContentType());
 
-        InputStream in = source.getInputStream();
-        byte[] bytes = new byte[10];
+        final InputStream in = source.getInputStream();
+        final byte[] bytes = new byte[10];
 
-        int count = in.read(bytes);
+        final int count = in.read(bytes);
 
         assertEquals(count, bytes.length);
         assertEquals("0123456789", new String(bytes));

@@ -19,9 +19,9 @@
 
 package org.apache.geronimo.mail.util;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FilterInputStream;
 
 /**
  * An implementation of a FilterInputStream that decodes the
@@ -55,7 +55,7 @@ public class Base64DecoderStream extends FilterInputStream {
     protected int decodedIndex = 0;
 
 
-    public Base64DecoderStream(InputStream in) {
+    public Base64DecoderStream(final InputStream in) {
         super(in);
         // make sure we get the ignore errors flag
         ignoreErrors = SessionUtil.getBooleanProperty(MAIL_BASE64_IGNOREERRORS, false);
@@ -90,7 +90,7 @@ public class Base64DecoderStream extends FilterInputStream {
         decodedIndex = 0;
 
         // fill up a data buffer with input data
-        int readCharacters = fillEncodedBuffer();
+        final int readCharacters = fillEncodedBuffer();
 
         if (readCharacters > 0) {
             decodedCount =  decoder.decode(encodedChars, 0, readCharacters, decodedChars);
@@ -116,7 +116,7 @@ public class Base64DecoderStream extends FilterInputStream {
         return decodedChars[decodedIndex++] & 0xff;
     }
 
-    private int getBytes(byte[] data, int offset, int length) throws IOException {
+    private int getBytes(final byte[] data, int offset, int length) throws IOException {
 
         int readCharacters = 0;
         while (length > 0) {
@@ -129,7 +129,7 @@ public class Base64DecoderStream extends FilterInputStream {
             }
 
             // now copy some of the data from the decoded buffer to the target buffer
-            int copyCount = Math.min(decodedCount, length);
+            final int copyCount = Math.min(decodedCount, length);
             System.arraycopy(decodedChars, decodedIndex, data, offset, copyCount);
             decodedIndex += copyCount;
             decodedCount -= copyCount;
@@ -156,7 +156,7 @@ public class Base64DecoderStream extends FilterInputStream {
 
         while (true) {
             // get the next character from the stream
-            int ch = in.read();
+            final int ch = in.read();
             // did we hit an EOF condition?
             if (ch == -1) {
                 // now check to see if this is normal, or potentially an error
@@ -189,22 +189,26 @@ public class Base64DecoderStream extends FilterInputStream {
     // in order to function as a filter, these streams need to override the different
     // read() signature.
 
+    @Override
     public int read() throws IOException
     {
         return getByte();
     }
 
 
-    public int read(byte [] buffer, int offset, int length) throws IOException {
+    @Override
+    public int read(final byte [] buffer, final int offset, final int length) throws IOException {
         return getBytes(buffer, offset, length);
     }
 
 
+    @Override
     public boolean markSupported() {
         return false;
     }
 
 
+    @Override
     public int available() throws IOException {
         return ((in.available() / 4) * 3) + decodedCount;
     }

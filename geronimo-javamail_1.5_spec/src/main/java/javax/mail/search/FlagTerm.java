@@ -35,17 +35,17 @@ public final class FlagTerm extends SearchTerm {
     /**
      * If true, test that all flags are set; if false, test that all flags are clear.
      */
-    private boolean set;
+    private final boolean set;
     /**
      * The flags to test.
      */
-   private Flags flags;
+   private final Flags flags;
 
     /**
      * @param flags the flags to test
      * @param set test for set or clear; {@link #set}
      */
-    public FlagTerm(Flags flags, boolean set) {
+    public FlagTerm(final Flags flags, final boolean set) {
         this.set = set;
         this.flags = flags;
     }
@@ -58,41 +58,44 @@ public final class FlagTerm extends SearchTerm {
         return set;
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            Flags msgFlags = message.getFlags();
+            final Flags msgFlags = message.getFlags();
             if (set) {
                 return msgFlags.contains(flags);
             } else {
                 // yuk - I wish we could get at the internal state of the Flags
-                Flags.Flag[] system = flags.getSystemFlags();
+                final Flags.Flag[] system = flags.getSystemFlags();
                 for (int i = 0; i < system.length; i++) {
-                    Flags.Flag flag = system[i];
+                    final Flags.Flag flag = system[i];
                     if (msgFlags.contains(flag)) {
                         return false;
                     }
                 }
-                String[] user = flags.getUserFlags();
+                final String[] user = flags.getUserFlags();
                 for (int i = 0; i < user.length; i++) {
-                    String flag = user[i];
+                    final String flag = user[i];
                     if (msgFlags.contains(flag)) {
                         return false;
                     }
                 }
                 return true;
             }
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof FlagTerm == false) return false;
         final FlagTerm otherFlags = (FlagTerm) other;
         return otherFlags.set == this.set && otherFlags.flags.equals(flags);
     }
 
+    @Override
     public int hashCode() {
         return set ? flags.hashCode() : ~flags.hashCode();
     }

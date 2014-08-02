@@ -47,7 +47,7 @@ public class Provider {
     private final String vendor;
     private final String version;
 
-    public Provider(Type type, String protocol, String className, String vendor, String version) {
+    public Provider(final Type type, final String protocol, final String className, final String vendor, final String version) {
         this.protocol = protocol;
         this.className = className;
         this.type = type;
@@ -75,6 +75,7 @@ public class Provider {
         return version;
     }
 
+    @Override
     public String toString() {
         return "protocol="
                 + protocol

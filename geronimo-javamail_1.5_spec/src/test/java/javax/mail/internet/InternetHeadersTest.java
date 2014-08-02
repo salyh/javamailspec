@@ -32,13 +32,14 @@ public class InternetHeadersTest extends TestCase {
     private InternetHeaders headers;
 
     public void testLoadSingleHeader() throws MessagingException {
-        String stream = "content-type: text/plain\r\n\r\n";
+        final String stream = "content-type: text/plain\r\n\r\n";
         headers.load(new ByteArrayInputStream(stream.getBytes()));
-        String[] header = headers.getHeader("content-type");
+        final String[] header = headers.getHeader("content-type");
         assertNotNull(header);
         assertEquals("text/plain", header[0]);
     }
 
+    @Override
     protected void setUp() throws Exception {
         headers = new InternetHeaders();
     }

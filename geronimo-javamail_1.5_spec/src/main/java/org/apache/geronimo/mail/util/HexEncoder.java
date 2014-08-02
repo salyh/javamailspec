@@ -62,15 +62,15 @@ public class HexEncoder
      * @return the number of bytes produced.
      */
     public int encode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
         for (int i = off; i < (off + length); i++)
         {
-            int    v = data[i] & 0xff;
+            final int    v = data[i] & 0xff;
 
             out.write(encodingTable[(v >>> 4)]);
             out.write(encodingTable[v & 0xf]);
@@ -80,7 +80,7 @@ public class HexEncoder
     }
 
     private boolean ignore(
-        char    c)
+        final char    c)
     {
         return (c == '\n' || c =='\r' || c == '\t' || c == ' ');
     }
@@ -92,13 +92,13 @@ public class HexEncoder
      * @return the number of bytes produced.
      */
     public int decode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
+        final byte[]    bytes;
         byte    b1, b2;
         int        outLen = 0;
 
@@ -146,12 +146,13 @@ public class HexEncoder
      * @return the number of bytes produced.
      */
     public int decode(
-        String                data,
-        OutputStream    out)
+        final String                data,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
-        byte    b1, b2, b3, b4;
+        final byte[]    bytes;
+        byte    b1, b2;
+        final byte b3, b4;
         int        length = 0;
 
         int        end = data.length();

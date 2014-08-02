@@ -75,7 +75,7 @@ public class RFC2231Encoder implements Encoder
         this(null);
     }
 
-    public RFC2231Encoder(String specials)
+    public RFC2231Encoder(final String specials)
     {
         if (specials != null) {
             this.specials = DEFAULT_SPECIALS + specials;
@@ -89,12 +89,12 @@ public class RFC2231Encoder implements Encoder
      *
      * @return the number of bytes produced.
      */
-    public int encode(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public int encode(final byte[] data, final int off, final int length, final OutputStream out) throws IOException {
 
         int bytesWritten = 0;
         for (int i = off; i < (off + length); i++)
         {
-            int ch = data[i] & 0xff;
+            final int ch = data[i] & 0xff;
             // character tha must be encoded?  Prefix with a '%' and encode in hex.
             if (ch <= 32 || ch >= 127 || specials.indexOf(ch) != -1) {
                 out.write((byte)'%');
@@ -118,18 +118,18 @@ public class RFC2231Encoder implements Encoder
      *
      * @return the number of bytes produced.
      */
-    public int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public int decode(final byte[] data, final int off, final int length, final OutputStream out) throws IOException {
         int        outLen = 0;
-        int        end = off + length;
+        final int        end = off + length;
 
         int i = off;
         while (i < end)
         {
-            byte v = data[i++];
+            final byte v = data[i++];
             // a percent is a hex character marker, need to decode a hex value.
             if (v == '%') {
-                byte b1 = decodingTable[data[i++]];
-                byte b2 = decodingTable[data[i++]];
+                final byte b1 = decodingTable[data[i++]];
+                final byte b2 = decodingTable[data[i++]];
                 out.write((b1 << 4) | b2);
             }
             else {
@@ -148,18 +148,18 @@ public class RFC2231Encoder implements Encoder
      *
      * @return the number of bytes produced.
      */
-    public int decode(String data, OutputStream out) throws IOException
+    public int decode(final String data, final OutputStream out) throws IOException
     {
         int        length = 0;
-        int        end = data.length();
+        final int        end = data.length();
 
         int i = 0;
         while (i < end)
         {
-            char v = data.charAt(i++);
+            final char v = data.charAt(i++);
             if (v == '%') {
-                byte b1 = decodingTable[data.charAt(i++)];
-                byte b2 = decodingTable[data.charAt(i++)];
+                final byte b1 = decodingTable[data.charAt(i++)];
+                final byte b2 = decodingTable[data.charAt(i++)];
 
                 out.write((b1 << 4) | b2);
             }
@@ -183,19 +183,19 @@ public class RFC2231Encoder implements Encoder
      *
      * @return The encoded string.
      */
-    public String encode(String charset, String language, String data) throws IOException {
+    public String encode(final String charset, final String language, final String data) throws IOException {
 
         byte[] bytes = null;
         try {
             // the charset we're adding is the MIME-defined name.  We need the java version
             // in order to extract the bytes.
             bytes = data.getBytes(MimeUtility.javaCharset(charset));
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             // we have a translation problem here.
             return null;
         }
 
-        StringBuffer result = new StringBuffer();
+        final StringBuffer result = new StringBuffer();
 
         // append the character set, if we have it.
         if (charset != null) {
@@ -212,7 +212,7 @@ public class RFC2231Encoder implements Encoder
         result.append("'");
 
         // wrap an output stream around our buffer for the decoding
-        OutputStream out = new StringBufferOutputStream(result);
+        final OutputStream out = new StringBufferOutputStream(result);
 
         // encode the data stream
         encode(bytes, 0, bytes.length, out);
@@ -231,30 +231,30 @@ public class RFC2231Encoder implements Encoder
      * @exception IOException
      * @exception UnsupportedEncodingException
      */
-    public String decode(String data) throws IOException, UnsupportedEncodingException {
+    public String decode(final String data) throws IOException, UnsupportedEncodingException {
         // get the end of the language field
-        int charsetEnd = data.indexOf('\'');
+        final int charsetEnd = data.indexOf('\'');
         // uh oh, might not be there
         if (charsetEnd == -1) {
             throw new IOException("Missing charset in RFC2231 encoded value");
         }
 
-        String charset = data.substring(0, charsetEnd);
+        final String charset = data.substring(0, charsetEnd);
 
         // now pull out the language the same way
-        int languageEnd = data.indexOf('\'', charsetEnd + 1);
+        final int languageEnd = data.indexOf('\'', charsetEnd + 1);
         if (languageEnd == -1) {
             throw new IOException("Missing language in RFC2231 encoded value");
         }
 
-        String language = data.substring(charsetEnd + 1, languageEnd);
+        final String language = data.substring(charsetEnd + 1, languageEnd);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream(data.length());
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length());
 
         // decode the data
         decode(data.substring(languageEnd + 1), out);
 
-        byte[] bytes = out.toByteArray();
+        final byte[] bytes = out.toByteArray();
         // build a new string from this using the java version of the encoded charset.
         return new String(bytes, 0, bytes.length, MimeUtility.javaCharset(charset));
     }

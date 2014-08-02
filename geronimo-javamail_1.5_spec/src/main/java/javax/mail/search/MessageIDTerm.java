@@ -30,28 +30,30 @@ public final class MessageIDTerm extends StringTerm {
 	
 	private static final long serialVersionUID = -2121096296454691963L;
 	
-    public MessageIDTerm(String id) {
+    public MessageIDTerm(final String id) {
         super(id);
     }
 
-    public boolean match(Message message) {
+    @Override
+    public boolean match(final Message message) {
         try {
-            String values[] = message.getHeader("Message-ID");
+            final String values[] = message.getHeader("Message-ID");
             if (values != null) {
                 for (int i = 0; i < values.length; i++) {
-                    String value = values[i];
+                    final String value = values[i];
                     if (match(value)) {
                         return true;
                     }
                 }
             }
             return false;
-        } catch (MessagingException e) {
+        } catch (final MessagingException e) {
             return false;
         }
     }
     
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (!(other instanceof MessageIDTerm)) {
             return false; 
         }

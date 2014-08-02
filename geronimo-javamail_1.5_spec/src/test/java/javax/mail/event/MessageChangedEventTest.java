@@ -25,25 +25,25 @@ import junit.framework.TestCase;
  * @version $Rev$ $Date$
  */
 public class MessageChangedEventTest extends TestCase {
-    public MessageChangedEventTest(String name) {
+    public MessageChangedEventTest(final String name) {
         super(name);
     }
     public void testEvent() {
         doEventTests(MessageChangedEvent.ENVELOPE_CHANGED);
         doEventTests(MessageChangedEvent.FLAGS_CHANGED);
     }
-    private void doEventTests(int type) {
-        MessageChangedEvent event = new MessageChangedEvent(this, type, null);
+    private void doEventTests(final int type) {
+        final MessageChangedEvent event = new MessageChangedEvent(this, type, null);
         assertEquals(this, event.getSource());
         assertEquals(type, event.getMessageChangeType());
-        MessageChangedListenerTest listener = new MessageChangedListenerTest();
+        final MessageChangedListenerTest listener = new MessageChangedListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     public static class MessageChangedListenerTest
         implements MessageChangedListener {
         private int state = 0;
-        public void messageChanged(MessageChangedEvent event) {
+        public void messageChanged(final MessageChangedEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

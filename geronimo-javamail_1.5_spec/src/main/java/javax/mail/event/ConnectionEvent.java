@@ -43,7 +43,7 @@ public class ConnectionEvent extends MailEvent {
 
     protected int type;
 
-    public ConnectionEvent(Object source, int type) {
+    public ConnectionEvent(final Object source, final int type) {
         super(source);
         this.type = type;
     }
@@ -52,9 +52,10 @@ public class ConnectionEvent extends MailEvent {
         return type;
     }
 
-    public void dispatch(Object listener) {
+    @Override
+    public void dispatch(final Object listener) {
         // assume that it is the right listener type
-        ConnectionListener l = (ConnectionListener) listener;
+        final ConnectionListener l = (ConnectionListener) listener;
         switch (type) {
         case OPENED:
             l.opened(this);

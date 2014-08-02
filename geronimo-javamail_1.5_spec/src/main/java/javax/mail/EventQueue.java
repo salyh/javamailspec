@@ -78,7 +78,7 @@ class EventQueue implements Runnable {
         try {
             while (true) {
                 // get the next event 
-                PendingEvent p = dequeueEvent(); 
+                final PendingEvent p = dequeueEvent(); 
                 // an empty event on the queue means time to shut things down. 
                 if (p.event == null) {
                     return; 
@@ -87,7 +87,7 @@ class EventQueue implements Runnable {
                 // and tap the listeners on the shoulder. 
                 dispatchEvent(p.event, p.listeners); 
             }
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             // been told to stop, so we stop 
         }
     }
@@ -118,11 +118,11 @@ class EventQueue implements Runnable {
      *                  the event is queued and the dispatcher thread makes the calls to the
      *                  handlers.
      */
-    public synchronized void queueEvent(MailEvent event, List listeners) {
+    public synchronized void queueEvent(final MailEvent event, final List listeners) {
         // add an element to the list, then notify the processing thread. 
         // Note that we make a copy of the listeners list.  This ensures 
         // we're going to dispatch this to the snapshot of the listeners 
-        PendingEvent p = new PendingEvent(event, listeners);
+        final PendingEvent p = new PendingEvent(event, listeners);
         eventQueue.add(p);         
         // wake up the dispatch thread 
         notify(); 
@@ -151,12 +151,12 @@ class EventQueue implements Runnable {
      * @param event     The event to dispatch.
      * @param listeners The list of listeners this gets dispatched to.
      */
-    protected void dispatchEvent(MailEvent event, List listeners) {
+    protected void dispatchEvent(final MailEvent event, final List listeners) {
         // iterate through the listeners list calling the handlers. 
         for (int i = 0; i < listeners.size(); i++) {
             try {
                 event.dispatch(listeners.get(i)); 
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 // just eat these 
             }
         }
@@ -172,7 +172,7 @@ class EventQueue implements Runnable {
         // the list of listeners we send this to. 
         List listeners; 
             
-        PendingEvent(MailEvent event, List listeners) {    
+        PendingEvent(final MailEvent event, final List listeners) {    
             this.event = event; 
             this.listeners = listeners; 
         }

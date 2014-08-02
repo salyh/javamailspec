@@ -67,7 +67,7 @@ public class UUEncoderStream extends FilterOutputStream {
      *
      * @param out    The wrapped output stream.
      */
-    public UUEncoderStream(OutputStream out) {
+    public UUEncoderStream(final OutputStream out) {
         this(out, DEFAULT_NAME, DEFAULT_MODE);
     }
 
@@ -79,12 +79,12 @@ public class UUEncoderStream extends FilterOutputStream {
      * @param out    The wrapped output stream.
      * @param name   The filename placed on the "begin" command.
      */
-    public UUEncoderStream(OutputStream out, String name) {
+    public UUEncoderStream(final OutputStream out, final String name) {
         this(out, name, DEFAULT_MODE);
     }
 
 
-    public UUEncoderStream(OutputStream out, String name, int mode) {
+    public UUEncoderStream(final OutputStream out, final String name, final int mode) {
         super(out);
         // fill in the name and mode information.
         this.name = name;
@@ -97,7 +97,7 @@ public class UUEncoderStream extends FilterOutputStream {
             // grumble...OutputStream doesn't directly support writing String data.  We'll wrap this in
             // a PrintStream() to accomplish the task of writing the begin command.
 
-            PrintStream writer = new PrintStream(out);
+            final PrintStream writer = new PrintStream(out);
             // write out the stream with a CRLF marker
             writer.print("begin " + mode + " " + name + "\r\n");
             writer.flush();
@@ -106,7 +106,7 @@ public class UUEncoderStream extends FilterOutputStream {
     }
 
     private void writeEnd() throws IOException {
-        PrintStream writer = new PrintStream(out);
+        final PrintStream writer = new PrintStream(out);
         // write out the stream with a CRLF marker
         writer.print("\nend\r\n");
         writer.flush();
@@ -134,7 +134,8 @@ public class UUEncoderStream extends FilterOutputStream {
 
     // in order for this to work, we need to override the 3 different signatures for write
 
-    public void write(int ch) throws IOException {
+    @Override
+    public void write(final int ch) throws IOException {
         // store this in the buffer.
         buffer[bufferedBytes++] = (byte)ch;
 
@@ -144,13 +145,15 @@ public class UUEncoderStream extends FilterOutputStream {
         }
     }
 
-    public void write(byte [] data) throws IOException {
+    @Override
+    public void write(final byte [] data) throws IOException {
         write(data, 0, data.length);
     }
 
-    public void write(byte [] data, int offset, int length) throws IOException {
+    @Override
+    public void write(final byte [] data, int offset, int length) throws IOException {
         // first check to see how much space we have left in the buffer, and copy that over
-        int copyBytes = Math.min(bufferSpace(), length);
+        final int copyBytes = Math.min(bufferSpace(), length);
 
         System.arraycopy(buffer, bufferedBytes, data, offset, copyBytes);
         bufferedBytes += copyBytes;
@@ -165,7 +168,7 @@ public class UUEncoderStream extends FilterOutputStream {
         // we've flushed the leading part up to the line break.  Now if we have complete lines
         // of data left, we can have the encoder process all of these lines directly.
         if (length >= MAX_CHARS_PER_LINE) {
-            int fullLinesLength = (length / MAX_CHARS_PER_LINE) * MAX_CHARS_PER_LINE;
+            final int fullLinesLength = (length / MAX_CHARS_PER_LINE) * MAX_CHARS_PER_LINE;
             // ask the encoder to encode and write this out.
             encoder.encode(data, offset, fullLinesLength, out);
             offset += fullLinesLength;
@@ -183,6 +186,7 @@ public class UUEncoderStream extends FilterOutputStream {
         }
     }
 
+    @Override
     public void flush() throws IOException {
         // flush any unencoded characters we're holding.
         flushBuffer();
@@ -192,6 +196,7 @@ public class UUEncoderStream extends FilterOutputStream {
         out.flush();
     }
 
+    @Override
     public void close() throws IOException {
         // flush all of the streams and close the target output stream.
         flush();

@@ -29,7 +29,7 @@ public abstract class DateTerm extends ComparisonTerm {
 	private static final long serialVersionUID =  4818873430063720043L;
     protected Date date;
 
-    protected DateTerm(int comparison, Date date) {
+    protected DateTerm(final int comparison, final Date date) {
         super();
         this.comparison = comparison;
         this.date = date;
@@ -43,9 +43,9 @@ public abstract class DateTerm extends ComparisonTerm {
         return comparison;
     }
 
-    protected boolean match(Date match) {
-        long matchTime = match.getTime();
-        long mytime = date.getTime();
+    protected boolean match(final Date match) {
+        final long matchTime = match.getTime();
+        final long mytime = date.getTime();
         switch (comparison) {
         case EQ:
             return matchTime == mytime;
@@ -64,13 +64,15 @@ public abstract class DateTerm extends ComparisonTerm {
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof DateTerm == false) return false;
         final DateTerm term = (DateTerm) other;
         return this.comparison == term.comparison && this.date.equals(term.date);
     }
 
+    @Override
     public int hashCode() {
         return date.hashCode() + super.hashCode();
     }

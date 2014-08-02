@@ -19,11 +19,9 @@
 
 package org.apache.geronimo.mail.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * An implementation of a FilterOutputStream that decodes the
@@ -42,7 +40,7 @@ public class QuotedPrintableDecoderStream extends FilterInputStream {
      *
      * @param in     The InputStream this stream is filtering.
      */
-    public QuotedPrintableDecoderStream(InputStream in) {
+    public QuotedPrintableDecoderStream(final InputStream in) {
         super(in);
         decoder = new QuotedPrintableEncoder();
     }
@@ -57,6 +55,7 @@ public class QuotedPrintableDecoderStream extends FilterInputStream {
      * @return The next byte of the stream.  Returns -1 for an EOF condition.
      * @exception IOException
      */
+    @Override
     public int read() throws IOException
     {
         // just get a single byte from the decoder
@@ -74,10 +73,11 @@ public class QuotedPrintableDecoderStream extends FilterInputStream {
      * @return The number of bytes of data read.
      * @exception IOException
      */
-    public int read(byte [] buffer, int offset, int length) throws IOException {
+    @Override
+    public int read(final byte [] buffer, final int offset, final int length) throws IOException {
 
         for (int i = 0; i < length; i++) {
-            int ch = decoder.decode(in);
+            final int ch = decoder.decode(in);
             if (ch == -1) {
                 return i == 0 ? -1 : i;
             }
@@ -93,6 +93,7 @@ public class QuotedPrintableDecoderStream extends FilterInputStream {
      *
      * @return Always returns false.
      */
+    @Override
     public boolean markSupported() {
         return false;
     }
@@ -105,6 +106,7 @@ public class QuotedPrintableDecoderStream extends FilterInputStream {
      * @return Always returns -1.
      * @exception IOException
      */
+    @Override
     public int available() throws IOException {
         // this is almost impossible to determine at this point
         return -1;

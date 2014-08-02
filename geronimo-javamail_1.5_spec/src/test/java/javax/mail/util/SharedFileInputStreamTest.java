@@ -19,12 +19,8 @@
 
 package javax.mail.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-
-import javax.mail.internet.SharedInputStream;
 
 import junit.framework.TestCase;
 
@@ -36,7 +32,7 @@ public class SharedFileInputStreamTest extends TestCase {
     File basedir = new File(System.getProperty("basedir", "."));
     File testInput = new File(basedir, "src/test/resources/test.dat");
 
-    public SharedFileInputStreamTest(String arg0) {
+    public SharedFileInputStreamTest(final String arg0) {
         super(arg0);
     }
 
@@ -49,12 +45,12 @@ public class SharedFileInputStreamTest extends TestCase {
     }
 
 
-    public void doTestInput(SharedFileInputStream in) throws Exception {
+    public void doTestInput(final SharedFileInputStream in) throws Exception {
         assertEquals(in.read(), '0');
 
         assertEquals(in.getPosition(), 1);
 
-        byte[] bytes = new byte[10];
+        final byte[] bytes = new byte[10];
 
         assertEquals(in.read(bytes), 10);
         assertEquals(new String(bytes), "123456789a");
@@ -78,9 +74,9 @@ public class SharedFileInputStreamTest extends TestCase {
 
 
     public void testNewStream() throws Exception {
-        SharedFileInputStream in = new SharedFileInputStream(testInput);
+        final SharedFileInputStream in = new SharedFileInputStream(testInput);
 
-        SharedFileInputStream sub = (SharedFileInputStream)in.newStream(10, 10 + 26);
+        final SharedFileInputStream sub = (SharedFileInputStream)in.newStream(10, 10 + 26);
 
         assertEquals(sub.getPosition(), 0);
 
@@ -95,7 +91,7 @@ public class SharedFileInputStreamTest extends TestCase {
 
         assertEquals(sub.read(), -1);
 
-        SharedFileInputStream sub2 = (SharedFileInputStream)sub.newStream(5, 10);
+        final SharedFileInputStream sub2 = (SharedFileInputStream)sub.newStream(5, 10);
 
         sub.close();    // should not close in or sub2
 
@@ -115,23 +111,23 @@ public class SharedFileInputStreamTest extends TestCase {
     public void testMark() throws Exception {
         doMarkTest(new SharedFileInputStream(testInput, 10));
 
-        SharedFileInputStream in = new SharedFileInputStream(testInput, 10);
+        final SharedFileInputStream in = new SharedFileInputStream(testInput, 10);
 
-        SharedFileInputStream sub = (SharedFileInputStream)in.newStream(5, -1);
+        final SharedFileInputStream sub = (SharedFileInputStream)in.newStream(5, -1);
         doMarkTest(sub);
     }
 
 
-    private void doMarkTest(SharedFileInputStream in) throws Exception {
+    private void doMarkTest(final SharedFileInputStream in) throws Exception {
          assertTrue(in.markSupported());
 
-         byte[] buffer = new byte[60];
+         final byte[] buffer = new byte[60];
 
          in.read();
          in.read();
          in.mark(50);
 
-         int markSpot = in.read();
+         final int markSpot = in.read();
 
          in.read(buffer, 0, 20);
 
@@ -147,7 +143,7 @@ public class SharedFileInputStreamTest extends TestCase {
          try {
              in.reset();
              fail();
-         } catch (IOException e) {
+         } catch (final IOException e) {
          }
     }
 }

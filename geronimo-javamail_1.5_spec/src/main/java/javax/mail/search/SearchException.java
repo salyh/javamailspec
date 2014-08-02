@@ -32,7 +32,7 @@ public class SearchException extends MessagingException {
         super();
     }
 
-    public SearchException(String message) {
+    public SearchException(final String message) {
         super(message);
     }
 }

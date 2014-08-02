@@ -57,7 +57,7 @@ public class StoreEvent extends MailEvent {
      * @param type    the message type
      * @param message the text to be presented to the user
      */
-    public StoreEvent(Store store, int type, String message) {
+    public StoreEvent(final Store store, final int type, final String message) {
         super(store);
         this.type = type;
         this.message = message;
@@ -81,7 +81,8 @@ public class StoreEvent extends MailEvent {
         return message;
     }
 
-    public void dispatch(Object listener) {
+    @Override
+    public void dispatch(final Object listener) {
         ((StoreListener) listener).notification(this);
     }
 }

@@ -19,6 +19,7 @@
 
 package javax.mail.internet;
 
+
 // can be in the form major/minor; charset=jobby
 
 /**
@@ -33,15 +34,15 @@ public class ContentType {
         // the Sun version makes everything null here.
     }
 
-    public ContentType(String major, String minor, ParameterList list) {
+    public ContentType(final String major, final String minor, final ParameterList list) {
         _major = major;
         _minor = minor;
         _list = list;
     }
 
-    public ContentType(String type) throws ParseException {
+    public ContentType(final String type) throws ParseException {
         // get a token parser for the type information
-        HeaderTokenizer tokenizer = new HeaderTokenizer(type, HeaderTokenizer.MIME);
+        final HeaderTokenizer tokenizer = new HeaderTokenizer(type, HeaderTokenizer.MIME);
 
         // get the first token, which must be an ATOM
         HeaderTokenizer.Token token = tokenizer.next();
@@ -67,7 +68,7 @@ public class ContentType {
         _minor = token.getValue();
 
         // the remainder is parameters, which ParameterList will take care of parsing.
-        String remainder = tokenizer.getRemainder();
+        final String remainder = tokenizer.getRemainder();
         if (remainder != null) {
             _list = new ParameterList(remainder);
         }
@@ -85,7 +86,7 @@ public class ContentType {
         return _major + "/" + _minor;
     }
 
-    public String getParameter(String name) {
+    public String getParameter(final String name) {
         return (_list == null ? null : _list.get(name));
     }
 
@@ -93,22 +94,22 @@ public class ContentType {
         return _list;
     }
 
-    public void setPrimaryType(String major) {
+    public void setPrimaryType(final String major) {
         _major = major;
     }
 
-    public void setSubType(String minor) {
+    public void setSubType(final String minor) {
         _minor = minor;
     }
 
-    public void setParameter(String name, String value) {
+    public void setParameter(final String name, final String value) {
         if (_list == null) {
             _list = new ParameterList();
         }
         _list.set(name, value);
     }
 
-    public void setParameterList(ParameterList list) {
+    public void setParameterList(final ParameterList list) {
         _list = list;
     }
 
@@ -119,28 +120,32 @@ public class ContentType {
      *
      * @return  RFC2045 style string
      */
+    @Override
     public String toString() {
-        //FIXME  
-        /*
-         * The general contract of Object.toString is that it never returns null.
-The toString methods of ContentType and ContentDisposition were defined
-to return null in certain error cases.  Given the general toString contract
-it seems unlikely that anyone ever depended on these special cases, and
-it would be more useful for these classes to obey the general contract.
-These methods have been changed to return an empty string in these error
-cases.
-        */
-        
-        
+
+        /* Since JavaMail 1.5:
+        The general contract of Object.toString is that it never returns null.
+        The toString methods of ContentType and ContentDisposition were defined
+        to return null in certain error cases.  Given the general toString contract
+        it seems unlikely that anyone ever depended on these special cases, and
+        it would be more useful for these classes to obey the general contract.
+        These methods have been changed to return an empty string in these error
+        cases.
+        */      
         
         if (_major == null || _minor == null) {
-            return null;
+            return "";
         }
         
         // We need to format this as if we're doing it to set into the Content-Type
         // header.  So the parameter list gets added on as if the header name was 
         // also included. 
         String baseType = getBaseType(); 
+        
+        if ( baseType == null) {
+            return "";
+        }
+             
         if (_list != null) {
             baseType += _list.toString(baseType.length() + "Content-Type: ".length()); 
         }
@@ -148,17 +153,17 @@ cases.
         return baseType;
     }
 
-    public boolean match(ContentType other) {
+    public boolean match(final ContentType other) {
         return _major.equalsIgnoreCase(other._major)
                 && (_minor.equalsIgnoreCase(other._minor)
                 || _minor.equals("*")
                 || other._minor.equals("*"));
     }
 
-    public boolean match(String contentType) {
+    public boolean match(final String contentType) {
         try {
             return match(new ContentType(contentType));
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             return false;
         }
     }

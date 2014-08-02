@@ -18,23 +18,17 @@
  */
 package org.apache.geronimo.mail;
 
-import java.net.URL;
-
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 public class MailProviderBundleTrackerCustomizer implements BundleTrackerCustomizer {
     // our base Activator (used as a service source)
-    private Activator activator;
+    private final Activator activator;
     // the bundle hosting the activation code
-    private Bundle activationBundle;
+    private final Bundle activationBundle;
 
-    public MailProviderBundleTrackerCustomizer(Activator a, Bundle b) {
+    public MailProviderBundleTrackerCustomizer(final Activator a, final Bundle b) {
         activator = a;
         activationBundle = b;
     }
@@ -47,7 +41,7 @@ public class MailProviderBundleTrackerCustomizer implements BundleTrackerCustomi
      *
      * @return A return object.
      */
-    public Object addingBundle(Bundle bundle, BundleEvent event) {
+    public Object addingBundle(final Bundle bundle, final BundleEvent event) {
         if (bundle.equals(activationBundle)) {
             return null;
         }
@@ -56,20 +50,20 @@ public class MailProviderBundleTrackerCustomizer implements BundleTrackerCustomi
     }
 
 
-    public void modifiedBundle(Bundle bundle, BundleEvent event, Object object) {
+    public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
         // this will update for the new bundle
         MailProviderRegistry.registerBundle(bundle);
     }
 
-    public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
+    public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
         MailProviderRegistry.unregisterBundle(bundle);
     }
 
-    private void log(int level, String message) {
+    private void log(final int level, final String message) {
         activator.log(level, message);
     }
 
-    private void log(int level, String message, Throwable th) {
+    private void log(final int level, final String message, final Throwable th) {
         activator.log(level, message, th);
     }
 }

@@ -30,7 +30,7 @@ public abstract class IntegerComparisonTerm extends ComparisonTerm {
 	
     protected int number;
 
-    protected IntegerComparisonTerm(int comparison, int number) {
+    protected IntegerComparisonTerm(final int comparison, final int number) {
         super();
         this.comparison = comparison;
         this.number = number;
@@ -44,7 +44,7 @@ public abstract class IntegerComparisonTerm extends ComparisonTerm {
         return comparison;
     }
 
-    protected boolean match(int match) {
+    protected boolean match(final int match) {
         switch (comparison) {
         case EQ:
             return match == number;
@@ -63,13 +63,15 @@ public abstract class IntegerComparisonTerm extends ComparisonTerm {
         }
     }
 
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof IntegerComparisonTerm == false) return false;
         final IntegerComparisonTerm term = (IntegerComparisonTerm) other;
         return this.comparison == term.comparison && this.number == term.number;
     }
 
+    @Override
     public int hashCode() {
         return number + super.hashCode();
     }

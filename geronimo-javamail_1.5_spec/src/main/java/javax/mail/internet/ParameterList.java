@@ -20,23 +20,45 @@
 package javax.mail.internet;
 
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;// Represents lists in things like
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.geronimo.mail.util.ASCIIUtil;
 import org.apache.geronimo.mail.util.RFC2231Encoder;
 import org.apache.geronimo.mail.util.SessionUtil;
+// Represents lists in things like
 
 // Content-Type: text/plain;charset=klingon
 //
 // The ;charset=klingon is the parameter list, may have more of them with ';'
+//
+// The string could also look like
+//
+// Content-Type: text/plain;para1*=val1; para2*=val2; title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A
+//
+// And this (multisegment parameter) is also possible (since JavaMail 1.5)
+//
+// Content-Type: message/external-body; access-type=URL;
+// URL*0="ftp://";
+// URL*1="cs.utk.edu/pub/moore/bulk-mailer/bulk-mailer.tar"
+//
+// which is the same as:
+// Content-Type: message/external-body; access-type=URL;
+//     URL="ftp://cs.utk.edu/pub/moore/bulk-mailer/bulk-mailer.tar"
+/*
+ * Content-Type: application/x-stuff
+    title*0*=us-ascii'en'This%20is%20even%20more%20
+    title*1*=%2A%2A%2Afun%2A%2A%2A%20
+    title*2="isn't it!"
+ */
 
 /**
  * @version $Rev$ $Date$
@@ -48,8 +70,51 @@ public class ParameterList {
 
     private static final int HEADER_SIZE_LIMIT = 76;
 
-    private Map _parameters = new HashMap();
+    private final Map<String, ParameterValue> _parameters = new HashMap<String, ParameterValue>();
 
+    /**
+     * A set of names for multi-segment parameters that we
+     * haven't processed yet.  Normally such names are accumulated
+     * during the inital parse and processed at the end of the parse,
+     * but such names can also be set via the set method when the
+     * IMAP provider accumulates pre-parsed pieces of a parameter list.
+     * (A special call to the set method tells us when the IMAP provider
+     * is done setting parameters.)
+     *
+     * A multi-segment parameter is defined by RFC 2231.  For example,
+     * "title*0=part1; title*1=part2", which represents a parameter
+     * named "title" with value "part1part2".
+     *
+     * Note also that each segment of the value might or might not be
+     * encoded, indicated by a trailing "*" on the parameter name.
+     * If any segment is encoded, the first segment must be encoded.
+     * Only the first segment contains the charset and language
+     * information needed to decode any encoded segments.
+     *
+     * RFC 2231 introduces many possible failure modes, which we try
+     * to handle as gracefully as possible.  Generally, a failure to
+     * decode a parameter value causes the non-decoded parameter value
+     * to be used instead.  Missing segments cause all later segments
+     * to be appear as independent parameters with names that include
+     * the segment number.  For example, "title*0=part1; title*1=part2;
+     * title*3=part4" appears as two parameters named "title" and "title*3".
+     */
+    //private Set multisegmentNames = new HashSet();
+
+    /**
+     * A map containing the segments for all not-yet-processed
+     * multi-segment parameters.  The map is indexed by "name*seg".
+     * The value object is either a String or a Value object.
+     * The Value object is not decoded during the initial parse
+     * because the segments may appear in any order and until the
+     * first segment appears we don't know what charset to use to
+     * decode the encoded segments.  The segments are hex decoded
+     * in order, combined into a single byte array, and converted
+     * to a String using the specified charset in the
+     * combineMultisegmentNames method.
+     */
+    private Map<String, ParameterValue> _multiSegmentParameters = new TreeMap<String, ParameterValue>(new MultiSegmentComparator());
+    
     private boolean encodeParameters = false;
     private boolean decodeParameters = false;
     private boolean decodeParametersStrict = false;
@@ -59,11 +124,11 @@ public class ParameterList {
         getInitialProperties();
     }
 
-    public ParameterList(String list) throws ParseException {
+    public ParameterList(final String list) throws ParseException {
         // figure out how parameter handling is to be performed.
         getInitialProperties();
         // get a token parser for the type information
-        HeaderTokenizer tokenizer = new HeaderTokenizer(list, HeaderTokenizer.MIME);
+        final HeaderTokenizer tokenizer = new HeaderTokenizer(list, HeaderTokenizer.MIME);
         while (true) {
             HeaderTokenizer.Token token = tokenizer.next();
 
@@ -103,21 +168,21 @@ public class ParameterList {
                         throw new ParseException("Invalid parameter value: " + token.getValue());
                     }
 
-                    String value = token.getValue();
+                    final String value = token.getValue();
                     String decodedValue = null;
 
                     // we might have to do some additional decoding.  A name that ends with "*"
                     // is marked as being encoded, so if requested, we decode the value.
-                    if (decodeParameters && name.endsWith("*")) {
+                    if (decodeParameters && name.endsWith("*") && !isMultiSegmentName(name)) {
                         // the name needs to be pruned of the marker, and we need to decode the value.
                         name = name.substring(0, name.length() - 1);
                         // get a new decoder
-                        RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
+                        final RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
 
                         try {
                             // decode the value
                             decodedValue = decoder.decode(value);
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             // if we're doing things strictly, then raise a parsing exception for errors.
                             // otherwise, leave the value in its current state.
                             if (decodeParametersStrict) {
@@ -126,7 +191,10 @@ public class ParameterList {
                         }
                         _parameters.put(name, new ParameterValue(name, decodedValue, value));
                     }
-                    else {
+                    else if (isMultiSegmentName(name)) {
+                        //multisegment parameter
+                        _multiSegmentParameters.put(name, new ParameterValue(name, value));
+                    }else {
                         _parameters.put(name, new ParameterValue(name, value));
                     }
 
@@ -136,6 +204,31 @@ public class ParameterList {
                     throw new ParseException("Missing ';'");
 
             }
+        }
+    }
+    
+    private static boolean isMultiSegmentName(String name) {
+        
+        if(name == null || name.length() == 0) return false;
+        
+        int firstAsterixIndex = name.indexOf('*');
+        
+        if(firstAsterixIndex < 0) {
+            return false; //no asterix at all
+        }else {
+            
+            if(firstAsterixIndex == name.length()-1) {
+                //first asterix is last char, so this is an encoded name/value pair but not a multisegment one
+                return false;
+            }
+            
+            String restOfname = name.substring(firstAsterixIndex+1);
+            
+            if(Character.isDigit(restOfname.charAt(0))) {
+                return true;
+            }
+            
+            return false;
         }
     }
     
@@ -154,7 +247,52 @@ public class ParameterList {
      * @since    JavaMail 1.5
      */ 
     public void combineSegments() {
-        //FIXME implement
+        //FIXME implement combineSegments()
+        
+//        title*0*=us-ascii'en'This%20is%20even%20more%20
+//        title*1*=%2A%2A%2Afun%2A%2A%2A%20
+//        title*2="isn't it!"
+        
+          String lastName = null;
+          int lastSegmentNumber = -1;
+          StringBuilder segmentValue = new StringBuilder();
+          for (Entry<String, ParameterValue> entry: _multiSegmentParameters.entrySet()) {
+              
+              MultiSegmentEntry currentMEntry = new MultiSegmentEntry(entry.getKey());
+              
+              if(lastName == null) {
+                  lastName = currentMEntry.name;
+              }else {
+                  
+                  if(!lastName.equals(currentMEntry.name)){
+                      
+                      _parameters.put(currentMEntry.name, new ParameterValue(currentMEntry.name, segmentValue.toString()));
+                      segmentValue.setLength(0);
+                      
+                      
+                  }
+                  
+              }
+              
+              if(lastSegmentNumber == -1) {
+                  lastSegmentNumber = currentMEntry.range;
+                  
+                  if(lastSegmentNumber != 0) {
+                      
+                  }
+                  
+              }else
+              {
+                  if(lastSegmentNumber+1 != currentMEntry.range) {
+                      
+                  }
+              }
+        
+              segmentValue.append(entry.getValue().value);
+              
+          } 
+  
+        
     }
 
     /**
@@ -171,30 +309,36 @@ public class ParameterList {
         return _parameters.size();
     }
 
-    public String get(String name) {
-        ParameterValue value = (ParameterValue)_parameters.get(name.toLowerCase());
+    public String get(final String name) {
+        final ParameterValue value = _parameters.get(name.toLowerCase());
         if (value != null) {
             return value.value;
         }
         return null;
     }
 
-    public void set(String name, String value) {
+    public void set(String name, final String value) {
         name = name.toLowerCase();
-        _parameters.put(name, new ParameterValue(name, value));
+
+        if (isMultiSegmentName(name)) {
+            // multisegment parameter
+            _multiSegmentParameters.put(name, new ParameterValue(name, value));
+        } else {
+            _parameters.put(name, new ParameterValue(name, value));
+        }
     }
 
-    public void set(String name, String value, String charset) {
+    public void set(String name, final String value, final String charset) {
         name = name.toLowerCase();
         // only encode if told to and this contains non-ASCII charactes.
         if (encodeParameters && !ASCIIUtil.isAscii(value)) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             try {
-                RFC2231Encoder encoder = new RFC2231Encoder(HeaderTokenizer.MIME);
+                final RFC2231Encoder encoder = new RFC2231Encoder(HeaderTokenizer.MIME);
 
                 // extract the bytes using the given character set and encode
-                byte[] valueBytes = value.getBytes(MimeUtility.javaCharset(charset));
+                final byte[] valueBytes = value.getBytes(MimeUtility.javaCharset(charset));
 
                 // the string format is charset''data
                 out.write(charset.getBytes("ISO8859-1"));
@@ -202,19 +346,31 @@ public class ParameterList {
                 out.write('\'');
                 encoder.encode(valueBytes, 0, valueBytes.length, out);
 
-                // default in case there is an exception
-                _parameters.put(name, new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
+                
+                if (isMultiSegmentName(name)) {
+                    // multisegment parameter
+                    _multiSegmentParameters.put(name, new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
+                } else {
+                    _parameters.put(name, new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
+                }
+                
+                
                 return;
 
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // just fall through and set the value directly if there is an error
             }
         }
         // default in case there is an exception
-        _parameters.put(name, new ParameterValue(name, value));
+        if (isMultiSegmentName(name)) {
+            // multisegment parameter
+            _multiSegmentParameters.put(name, new ParameterValue(name, value));
+        } else {
+            _parameters.put(name, new ParameterValue(name, value));
+        }
     }
 
-    public void remove(String name) {
+    public void remove(final String name) {
         _parameters.remove(name);
     }
 
@@ -222,21 +378,22 @@ public class ParameterList {
         return Collections.enumeration(_parameters.keySet());
     }
 
+    @Override
     public String toString() {
         // we need to perform folding, but out starting point is 0.
         return toString(0);
     }
 
     public String toString(int used) {
-        StringBuffer stringValue = new StringBuffer();
+        final StringBuffer stringValue = new StringBuffer();
 
-        Iterator values = _parameters.values().iterator();
+        final Iterator values = _parameters.values().iterator();
 
         while (values.hasNext()) {
-            ParameterValue parm = (ParameterValue)values.next();
+            final ParameterValue parm = (ParameterValue)values.next();
             // get the values we're going to encode in here.
-            String name = parm.getEncodedName();
-            String value = parm.toString();
+            final String name = parm.getEncodedName();
+            final String value = parm.toString();
 
             // add the semicolon separator.  We also add a blank so that folding/unfolding rules can be used.
             stringValue.append("; ");
@@ -259,12 +416,12 @@ public class ParameterList {
             // we're not out of the woods yet.  It is possible that the keyword/value pair by itself might
             // be too long for a single line.  If that's the case, the we need to fold the value, if possible
             if (used + value.length() > HEADER_SIZE_LIMIT) {
-                String foldedValue = MimeUtility.fold(used, value);
+                final String foldedValue = MimeUtility.fold(used, value);
 
                 stringValue.append(foldedValue);
 
                 // now we need to sort out how much of the current line is in use.
-                int lastLineBreak = foldedValue.lastIndexOf('\n');
+                final int lastLineBreak = foldedValue.lastIndexOf('\n');
 
                 if (lastLineBreak != -1) {
                     used = foldedValue.length() - lastLineBreak + 1;
@@ -292,18 +449,19 @@ public class ParameterList {
         public String value;             // the original set value
         public String encodedValue;      // an encoded value, if encoding is requested.
 
-        public ParameterValue(String name, String value) {
+        public ParameterValue(final String name, final String value) {
             this.name = name;
             this.value = value;
             this.encodedValue = null;
         }
 
-        public ParameterValue(String name, String value, String encodedValue) {
+        public ParameterValue(final String name, final String value, final String encodedValue) {
             this.name = name;
             this.value = value;
             this.encodedValue = encodedValue;
         }
 
+        @Override
         public String toString() {
             if (encodedValue != null) {
                 return MimeUtility.quote(encodedValue, HeaderTokenizer.MIME);
@@ -317,5 +475,56 @@ public class ParameterList {
             }
             return name;
         }
+    }
+    
+    class MultiSegmentEntry {
+        final String original;
+        final String name;
+        final int range;
+        final boolean encoded;
+        
+        public MultiSegmentEntry(String original) {
+            super();
+            this.original = original;
+        
+            int firstAsterixIndex1 = original.indexOf('*');
+            encoded=original.endsWith("*");
+            int endIndex1 = encoded?original.length()-2:original.length()-1;
+            name = original.substring(0, firstAsterixIndex1);
+            range = Integer.parseInt(original.substring(firstAsterixIndex1+1, endIndex1));
+        
+        }
+        
+        
+        
+        
+    }
+    
+    class MultiSegmentComparator implements Comparator<String> {
+
+        public int compare(String o1, String o2) {
+            
+            if(o1.equals(o2)) return 0;
+           
+            int firstAsterixIndex1 = o1.indexOf('*');
+            int firstAsterixIndex2 = o2.indexOf('*');
+            String prefix1 = o1.substring(0, firstAsterixIndex1);
+            String prefix2 = o2.substring(0, firstAsterixIndex2);
+            
+            if(!prefix1.equals(prefix2)) {
+                return prefix1.compareTo(prefix2);
+            }           
+            
+            int endIndex1 = o1.endsWith("*")?o1.length()-2:o1.length()-1;           
+            int endIndex2 = o2.endsWith("*")?o2.length()-2:o2.length()-1;
+            
+            int num1 = Integer.parseInt(o1.substring(firstAsterixIndex1+1, endIndex1));
+            int num2 = Integer.parseInt(o2.substring(firstAsterixIndex2+1, endIndex2));
+            
+            return num1>num2?1:-1;
+
+            
+        }
+        
     }
 }

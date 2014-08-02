@@ -30,7 +30,7 @@ public class NoSuchProviderException extends MessagingException {
         super();
     }
 
-    public NoSuchProviderException(String message) {
+    public NoSuchProviderException(final String message) {
         super(message);
     }
     
@@ -43,7 +43,7 @@ public class NoSuchProviderException extends MessagingException {
      * @param e      The embedded exception
      * @since        JavaMail 1.5
      */
-    public NoSuchProviderException(String message, Exception e) {
+    public NoSuchProviderException(final String message, final Exception e) {
         super(message, e);
     }
 }

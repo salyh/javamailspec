@@ -49,7 +49,8 @@ public class MailDateFormat extends SimpleDateFormat {
         super("EEE, d MMM yyyy HH:mm:ss Z (z)", Locale.US);
     }
 
-    public StringBuffer format(Date date, StringBuffer buffer, FieldPosition position) {
+    @Override
+    public StringBuffer format(final Date date, final StringBuffer buffer, final FieldPosition position) {
         return super.format(date, buffer, position);
     }
 
@@ -63,11 +64,12 @@ public class MailDateFormat extends SimpleDateFormat {
      * 
      * @return The Date object with the information inside. 
      */
-    public Date parse(String string, ParsePosition position) {
-        MailDateParser parser = new MailDateParser(string, position);
+    @Override
+    public Date parse(final String string, final ParsePosition position) {
+        final MailDateParser parser = new MailDateParser(string, position);
         try {
             return parser.parse(isLenient()); 
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             e.printStackTrace(); 
             // just return a null for any parsing errors 
             return null; 
@@ -79,7 +81,8 @@ public class MailDateFormat extends SimpleDateFormat {
      * @param calendar
      * @throws UnsupportedOperationException
      */
-    public void setCalendar(Calendar calendar) {
+    @Override
+    public void setCalendar(final Calendar calendar) {
         throw new UnsupportedOperationException();
     }
 
@@ -88,7 +91,8 @@ public class MailDateFormat extends SimpleDateFormat {
      * @param format
      * @throws UnsupportedOperationException
      */
-    public void setNumberFormat(NumberFormat format) {
+    @Override
+    public void setNumberFormat(final NumberFormat format) {
         throw new UnsupportedOperationException();
     }
     
@@ -108,7 +112,7 @@ public class MailDateFormat extends SimpleDateFormat {
         // also for any parsing errors 
         ParsePosition pos; 
         
-        public MailDateParser(String source, ParsePosition pos) 
+        public MailDateParser(final String source, final ParsePosition pos) 
         {
             this.source = source; 
             this.pos = pos; 
@@ -125,27 +129,27 @@ public class MailDateFormat extends SimpleDateFormat {
          * @return A Date object based off of parsing the date string.
          * @exception ParseException
          */
-        public Date parse(boolean lenient) throws ParseException {
+        public Date parse(final boolean lenient) throws ParseException {
             // we just skip over any next date format, which means scanning ahead until we
             // find the first numeric character 
             locateNumeric(); 
             // the day can be either 1 or two digits 
-            int day = parseNumber(1, 2); 
+            final int day = parseNumber(1, 2); 
             // step over the delimiter 
             skipDateDelimiter(); 
             // parse off the month (which is in character format) 
-            int month = parseMonth(); 
+            final int month = parseMonth(); 
             // step over the delimiter 
             skipDateDelimiter(); 
             // now pull of the year, which can be either 2-digit or 4-digit 
-            int year = parseYear(); 
+            final int year = parseYear(); 
             // white space is required here 
             skipRequiredWhiteSpace(); 
             // accept a 1 or 2 digit hour 
-            int hour = parseNumber(1, 2);
+            final int hour = parseNumber(1, 2);
             skipRequiredChar(':'); 
             // the minutes must be two digit 
-            int minutes = parseNumber(2, 2);
+            final int minutes = parseNumber(2, 2);
             
             // the seconds are optional, but the ":" tells us if they are to 
             // be expected. 
@@ -156,13 +160,13 @@ public class MailDateFormat extends SimpleDateFormat {
             // skip over the white space 
             skipWhiteSpace(); 
             // and finally the timezone information 
-            int offset = parseTimeZone(); 
+            final int offset = parseTimeZone(); 
             
             // set the index of how far we've parsed this 
             pos.setIndex(current);
             
             // create a calendar for creating the date 
-            Calendar greg = new GregorianCalendar(TimeZone.getTimeZone("GMT")); 
+            final Calendar greg = new GregorianCalendar(TimeZone.getTimeZone("GMT")); 
             // we inherit the leniency rules 
             greg.setLenient(lenient);
             greg.set(year, month, day, hour, minutes, seconds); 
@@ -185,7 +189,7 @@ public class MailDateFormat extends SimpleDateFormat {
          * 
          * @exception ParseException
          */
-        private void skipRequiredChar(char ch) throws ParseException {
+        private void skipRequiredChar(final char ch) throws ParseException {
             if (current >= endOffset) {
                 parseError("Delimiter '" + ch + "' expected"); 
             }
@@ -205,7 +209,7 @@ public class MailDateFormat extends SimpleDateFormat {
          * @return true if the character was there, false otherwise.
          * @exception ParseException
          */
-        private boolean skipOptionalChar(char ch) {
+        private boolean skipOptionalChar(final char ch) {
             if (current >= endOffset) {
                 return false; 
             }
@@ -258,7 +262,7 @@ public class MailDateFormat extends SimpleDateFormat {
          * end, if necessary. 
          */
         private void skipRequiredWhiteSpace() throws ParseException {
-            int start = current; 
+            final int start = current; 
             
             while (current < endOffset) {
                 // if this is not in the white space list, then success. 
@@ -278,7 +282,7 @@ public class MailDateFormat extends SimpleDateFormat {
             }
         }
         
-        private void parseError(String message) throws ParseException {
+        private void parseError(final String message) throws ParseException {
             // we've got an error, set the index to the end. 
             pos.setErrorIndex(current);
             throw new ParseException(message, current); 
@@ -315,11 +319,11 @@ public class MailDateFormat extends SimpleDateFormat {
          * @return The parsed numeric value. 
          * @exception ParseException
          */
-        private int parseNumber(int minDigits, int maxDigits) throws ParseException {
-            int start = current; 
+        private int parseNumber(final int minDigits, final int maxDigits) throws ParseException {
+            final int start = current; 
             int accumulator = 0; 
             while (current < endOffset) {
-                char ch = source.charAt(current); 
+                final char ch = source.charAt(current); 
                 // if this is not a digit character, then quit
                 if (!Character.isDigit(ch)) {
                     break; 
@@ -329,7 +333,7 @@ public class MailDateFormat extends SimpleDateFormat {
                 current++; 
             }
             
-            int fieldLength = current - start; 
+            final int fieldLength = current - start; 
             if (fieldLength < minDigits || fieldLength > maxDigits) {
                 parseError("Invalid number field"); 
             }
@@ -373,7 +377,7 @@ public class MailDateFormat extends SimpleDateFormat {
             }
             
             int monthOffset = 0; 
-            String month = source.substring(current, current + 3).toLowerCase();
+            final String month = source.substring(current, current + 3).toLowerCase();
             
             if (month.equals("jan")) {
                 monthOffset = 0; 
@@ -455,7 +459,7 @@ public class MailDateFormat extends SimpleDateFormat {
             
             // get the first non-blank. If this is a sign character, this 
             // is a zone offset.  
-            char sign = source.charAt(current); 
+            final char sign = source.charAt(current); 
             
             if (sign == '-' || sign == '+') {
                 // need to step over the sign character 
@@ -464,7 +468,7 @@ public class MailDateFormat extends SimpleDateFormat {
                 // expressed as minutes/seconds.  I'm too lazy to write a 
                 // different parser that will bound on just a couple of characters, so 
                 // we'll grab this as a single value and adjust     
-                int zoneInfo = parseNumber(4, 4);
+                final int zoneInfo = parseNumber(4, 4);
                 
                 int offset = (zoneInfo / 100) * 60 + (zoneInfo % 100); 
                 // negate this, if we have a negativeo offset 
@@ -477,9 +481,9 @@ public class MailDateFormat extends SimpleDateFormat {
                 // need to parse this out using the obsolete zone names.  This will be 
                 // either a 3-character code (defined set), or a single character military 
                 // zone designation. 
-                int start = current; 
+                final int start = current; 
                 skipNonWhiteSpace(); 
-                String name = source.substring(start, current).toUpperCase(); 
+                final String name = source.substring(start, current).toUpperCase(); 
                 
                 if (name.length() == 1) {
                     return militaryZoneOffset(name); 
@@ -506,7 +510,7 @@ public class MailDateFormat extends SimpleDateFormat {
          * @return The standard timezone offset for the specifier.
          * @exception ParseException
          */
-        private int namedZoneOffset(String name) throws ParseException {
+        private int namedZoneOffset(final String name) throws ParseException {
             
             // NOTE:  This is "UT", NOT "UTC"
             if (name.equals("UT")) {
@@ -553,7 +557,7 @@ public class MailDateFormat extends SimpleDateFormat {
          * 
          * @return The offset corresponding to the military designation.
          */
-        private int militaryZoneOffset(String name) throws ParseException {
+        private int militaryZoneOffset(final String name) throws ParseException {
             switch (Character.toUpperCase(name.charAt(0))) {
                 case 'A':
                     return 60; 

@@ -40,8 +40,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
-import org.apache.geronimo.osgi.locator.ProviderLocator;
 import org.apache.geronimo.mail.MailProviderRegistry;
+import org.apache.geronimo.osgi.locator.ProviderLocator;
 
 /**
  * OK, so we have a final class in the API with a heck of a lot of implementation required...
@@ -61,7 +61,7 @@ public final class Session {
     private static final WeakHashMap addressMapsByClassLoader = new WeakHashMap();
     private static Session DEFAULT_SESSION;
 
-    private Map passwordAuthentications = new HashMap();
+    private final Map passwordAuthentications = new HashMap();
 
     private final Properties properties;
     private final Authenticator authenticator;
@@ -73,7 +73,7 @@ public final class Session {
     /**
      * No public constrcutor allowed.
      */
-    private Session(Properties properties, Authenticator authenticator) {
+    private Session(final Properties properties, final Authenticator authenticator) {
         this.properties = properties;
         this.authenticator = authenticator;
         debug = Boolean.valueOf(properties.getProperty("mail.debug")).booleanValue();
@@ -96,7 +96,7 @@ public final class Session {
      * @param authenticator an authenticator for callbacks to the user
      * @return a new session
      */
-    public static Session getInstance(Properties properties, Authenticator authenticator) {
+    public static Session getInstance(Properties properties, final Authenticator authenticator) {
         // if we have a properties bundle, we need a copy of the provided one
         if (properties != null) {
             properties = (Properties)properties.clone();
@@ -112,7 +112,7 @@ public final class Session {
      * @return a new session
      * @see #getInstance(java.util.Properties, Authenticator)
      */
-    public static Session getInstance(Properties properties) {
+    public static Session getInstance(final Properties properties) {
         return getInstance(properties, null);
     }
 
@@ -123,7 +123,7 @@ public final class Session {
      * @return if "default" session
      * @throws SecurityException if the does not have permission to access the default session
      */
-    public synchronized static Session getDefaultInstance(Properties properties) {
+    public synchronized static Session getDefaultInstance(final Properties properties) {
         return getDefaultInstance(properties, null);
     }
 
@@ -136,7 +136,7 @@ public final class Session {
      * @return if "default" session
      * @throws SecurityException if the does not have permission to access the default session
      */
-    public synchronized static Session getDefaultInstance(Properties properties, Authenticator authenticator) {
+    public synchronized static Session getDefaultInstance(final Properties properties, final Authenticator authenticator) {
         if (DEFAULT_SESSION == null) {
             DEFAULT_SESSION = getInstance(properties, authenticator);
         } else {
@@ -157,7 +157,7 @@ public final class Session {
      *
      * @param debug the debug setting
      */
-    public void setDebug(boolean debug) {
+    public void setDebug(final boolean debug) {
         this.debug = debug;
     }
 
@@ -176,7 +176,7 @@ public final class Session {
      *
      * @param out the stream to write debug information to
      */
-    public void setDebugOut(PrintStream out) {
+    public void setDebugOut(final PrintStream out) {
         debugOut = out == null ? System.out : out;
     }
 
@@ -201,7 +201,7 @@ public final class Session {
      * @return an array of providers
      */
     public Provider[] getProviders() {
-        ProviderInfo info = getProviderInfo();
+        final ProviderInfo info = getProviderInfo();
         return (Provider[]) info.all.toArray(new Provider[info.all.size()]);
     }
 
@@ -217,10 +217,10 @@ public final class Session {
      * @return a provider for that protocol
      * @throws NoSuchProviderException
      */
-    public Provider getProvider(String protocol) throws NoSuchProviderException {
-        ProviderInfo info = getProviderInfo();
+    public Provider getProvider(final String protocol) throws NoSuchProviderException {
+        final ProviderInfo info = getProviderInfo();
         Provider provider = null;
-        String providerName = properties.getProperty("mail." + protocol + ".class");
+        final String providerName = properties.getProperty("mail." + protocol + ".class");
         if (providerName != null) {
             provider = (Provider) info.byClassName.get(providerName);
             if (debug) {
@@ -248,8 +248,8 @@ public final class Session {
      * @param provider the new default Provider
      * @throws NoSuchProviderException
      */
-    public void setProvider(Provider provider) throws NoSuchProviderException {
-        ProviderInfo info = getProviderInfo();
+    public void setProvider(final Provider provider) throws NoSuchProviderException {
+        final ProviderInfo info = getProviderInfo();
         info.byProtocol.put(provider.getProtocol(), provider);
     }
 
@@ -260,7 +260,7 @@ public final class Session {
      * @throws NoSuchProviderException
      */
     public Store getStore() throws NoSuchProviderException {
-        String protocol = properties.getProperty("mail.store.protocol");
+        final String protocol = properties.getProperty("mail.store.protocol");
         if (protocol == null) {
             throw new NoSuchProviderException("mail.store.protocol property is not set");
         }
@@ -274,8 +274,8 @@ public final class Session {
      * @return a Store
      * @throws NoSuchProviderException if no provider is defined for the specified protocol
      */
-    public Store getStore(String protocol) throws NoSuchProviderException {
-        Provider provider = getProvider(protocol);
+    public Store getStore(final String protocol) throws NoSuchProviderException {
+        final Provider provider = getProvider(protocol);
         return getStore(provider);
     }
 
@@ -286,7 +286,7 @@ public final class Session {
      * @return a Store
      * @throws NoSuchProviderException if no provider is defined for the specified protocol
      */
-    public Store getStore(URLName url) throws NoSuchProviderException {
+    public Store getStore(final URLName url) throws NoSuchProviderException {
         return (Store) getService(getProvider(url.getProtocol()), url);
     }
 
@@ -297,7 +297,7 @@ public final class Session {
      * @return a Store
      * @throws NoSuchProviderException if there was a problem creating the Store
      */
-    public Store getStore(Provider provider) throws NoSuchProviderException {
+    public Store getStore(final Provider provider) throws NoSuchProviderException {
         if (Provider.Type.STORE != provider.getType()) {
             throw new NoSuchProviderException("Not a Store Provider: " + provider);
         }
@@ -315,8 +315,8 @@ public final class Session {
      * @throws NoSuchProviderException if there is no provider
      * @throws MessagingException      if there was a problem accessing the Store
      */
-    public Folder getFolder(URLName name) throws MessagingException {
-        Store store = getStore(name);
+    public Folder getFolder(final URLName name) throws MessagingException {
+        final Store store = getStore(name);
         return store.getFolder(name);
     }
 
@@ -328,7 +328,7 @@ public final class Session {
      * @throws NoSuchProviderException
      */
     public Transport getTransport() throws NoSuchProviderException {
-        String protocol = properties.getProperty("mail.transport.protocol");
+        final String protocol = properties.getProperty("mail.transport.protocol");
         if (protocol == null) {
             throw new NoSuchProviderException("mail.transport.protocol property is not set");
         }
@@ -342,8 +342,8 @@ public final class Session {
      * @return a Transport
      * @throws NoSuchProviderException
      */
-    public Transport getTransport(String protocol) throws NoSuchProviderException {
-        Provider provider = getProvider(protocol);
+    public Transport getTransport(final String protocol) throws NoSuchProviderException {
+        final Provider provider = getProvider(protocol);
         return getTransport(provider);
     }
 
@@ -354,7 +354,7 @@ public final class Session {
      * @return a Transport
      * @throws NoSuchProviderException
      */
-    public Transport getTransport(URLName name) throws NoSuchProviderException {
+    public Transport getTransport(final URLName name) throws NoSuchProviderException {
         return (Transport) getService(getProvider(name.getProtocol()), name);
     }
 
@@ -365,11 +365,11 @@ public final class Session {
      * @return a Transport
      * @throws NoSuchProviderException
      */
-    public Transport getTransport(Address address) throws NoSuchProviderException {
-        String type = address.getType();
+    public Transport getTransport(final Address address) throws NoSuchProviderException {
+        final String type = address.getType();
         // load the address map from the resource files.
-        Map addressMap = getAddressMap();
-        String protocolName = (String)addressMap.get(type);
+        final Map addressMap = getAddressMap();
+        final String protocolName = (String)addressMap.get(type);
         if (protocolName == null) {
             throw new NoSuchProviderException("No provider for address type " + type);
         }
@@ -383,7 +383,7 @@ public final class Session {
      * @return a Transport
      * @throws NoSuchProviderException
      */
-    public Transport getTransport(Provider provider) throws NoSuchProviderException {
+    public Transport getTransport(final Provider provider) throws NoSuchProviderException {
         return (Transport) getService(provider, null);
     }
 
@@ -393,7 +393,7 @@ public final class Session {
      * @param name          the url
      * @param authenticator the authenticator
      */
-    public void setPasswordAuthentication(URLName name, PasswordAuthentication authenticator) {
+    public void setPasswordAuthentication(final URLName name, final PasswordAuthentication authenticator) {
         if (authenticator == null) {
             passwordAuthentications.remove(name);
         } else {
@@ -407,7 +407,7 @@ public final class Session {
      * @param name the URL
      * @return any authenticator for that url, or null if none
      */
-    public PasswordAuthentication getPasswordAuthentication(URLName name) {
+    public PasswordAuthentication getPasswordAuthentication(final URLName name) {
         return (PasswordAuthentication) passwordAuthentications.get(name);
     }
 
@@ -421,7 +421,7 @@ public final class Session {
      * @param defaultUserName the default username, may be null
      * @return the authentication information collected by the authenticator; may be null
      */
-    public PasswordAuthentication requestPasswordAuthentication(InetAddress host, int port, String protocol, String prompt, String defaultUserName) {
+    public PasswordAuthentication requestPasswordAuthentication(final InetAddress host, final int port, final String protocol, final String prompt, final String defaultUserName) {
         if (authenticator == null) {
             return null;
         }
@@ -443,7 +443,7 @@ public final class Session {
      * @param property the property to get
      * @return its value, or null if not present
      */
-    public String getProperty(String property) {
+    public String getProperty(final String property) {
         return getProperties().getProperty(property);
     }
 
@@ -453,8 +453,8 @@ public final class Session {
      *
      * @param provider The new provider to add.
      */
-    public synchronized void addProvider(Provider provider) {
-        ProviderInfo info = getProviderInfo();
+    public synchronized void addProvider(final Provider provider) {
+        final ProviderInfo info = getProviderInfo();
         info.addProvider(provider);
     }
 
@@ -468,8 +468,8 @@ public final class Session {
      *                 The address type identifier.
      * @param protocol The protocol name mapping.
      */
-    public void setProtocolForAddress(String addressType, String protocol) {
-        Map addressMap = getAddressMap();
+    public void setProtocolForAddress(final String addressType, final String protocol) {
+        final Map addressMap = getAddressMap();
 
         // no protocol specified is a removal
         if (protocol == null) {
@@ -481,33 +481,33 @@ public final class Session {
     }
 
 
-    private Service getService(Provider provider, URLName name) throws NoSuchProviderException {
+    private Service getService(final Provider provider, URLName name) throws NoSuchProviderException {
         try {
             if (name == null) {
                 name = new URLName(provider.getProtocol(), null, -1, null, null, null);
             }
-            ClassLoader cl = getClassLoader();
+            final ClassLoader cl = getClassLoader();
             Class clazz = null;
             try {
                 clazz = ProviderLocator.loadClass(provider.getClassName(), this.getClass(), cl);
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 throw (NoSuchProviderException) new NoSuchProviderException("Unable to load class for provider: " + provider).initCause(e);
             }
-            Constructor ctr = clazz.getConstructor(PARAM_TYPES);
+            final Constructor ctr = clazz.getConstructor(PARAM_TYPES);
             return(Service) ctr.newInstance(new Object[]{this, name});
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             throw (NoSuchProviderException) new NoSuchProviderException("Provider class does not have a constructor(Session, URLName): " + provider).initCause(e);
-        } catch (InstantiationException e) {
+        } catch (final InstantiationException e) {
             throw (NoSuchProviderException) new NoSuchProviderException("Unable to instantiate provider class: " + provider).initCause(e);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw (NoSuchProviderException) new NoSuchProviderException("Unable to instantiate provider class: " + provider).initCause(e);
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             throw (NoSuchProviderException) new NoSuchProviderException("Exception from constructor of provider class: " + provider).initCause(e.getCause());
         }
     }
 
     private ProviderInfo getProviderInfo() {
-        ClassLoader cl = getClassLoader();
+        final ClassLoader cl = getClassLoader();
         synchronized (providersByClassLoader) {
             ProviderInfo info = (ProviderInfo) providersByClassLoader.get(cl);
             if (info == null) {
@@ -518,7 +518,7 @@ public final class Session {
     }
 
     private Map getAddressMap() {
-        ClassLoader cl = getClassLoader();
+        final ClassLoader cl = getClassLoader();
         Map addressMap = (Map)addressMapsByClassLoader.get(cl);
         if (addressMap == null) {
             addressMap = loadAddressMap(cl);
@@ -549,21 +549,21 @@ public final class Session {
         return cl;
     }
 
-    private ProviderInfo loadProviders(ClassLoader cl) {
+    private ProviderInfo loadProviders(final ClassLoader cl) {
         // we create a merged map from reading all of the potential address map entries.  The locations
         // searched are:
         //   1.   java.home/lib/javamail.address.map
         //   2. META-INF/javamail.address.map
         //   3. META-INF/javamail.default.address.map
         //
-        ProviderInfo info = new ProviderInfo();
+        final ProviderInfo info = new ProviderInfo();
 
         // NOTE:  Unlike the addressMap, we process these in the defined order.  The loading routine
         // will not overwrite entries if they already exist in the map.
 
         try {
-            File file = new File(System.getProperty("java.home"), "lib/javamail.providers");
-            InputStream is = new FileInputStream(file);
+            final File file = new File(System.getProperty("java.home"), "lib/javamail.providers");
+            final InputStream is = new FileInputStream(file);
             try {
                 loadProviders(info, is);
                 if (debug) {
@@ -572,92 +572,92 @@ public final class Session {
             } finally{
                 is.close();
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
         try {
-            Enumeration e = cl.getResources("META-INF/javamail.providers");
+            final Enumeration e = cl.getResources("META-INF/javamail.providers");
             while (e.hasMoreElements()) {
-                URL url = (URL) e.nextElement();
+                final URL url = (URL) e.nextElement();
                 if (debug) {
                     writeDebug("Loading META-INF/javamail.providers from " + url.toString());
                 }
-                InputStream is = url.openStream();
+                final InputStream is = url.openStream();
                 try {
                     loadProviders(info, is);
                 } finally{
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
         // we could be running in an OSGi environment, so there might be some globally defined
         // providers
         try {
-            Collection<URL> l = MailProviderRegistry.getProviders();
-            for (URL url : l) {
+            final Collection<URL> l = MailProviderRegistry.getProviders();
+            for (final URL url : l) {
                 if (debug) {
                     writeDebug("Loading META-INF/javamail.providers from " + url.toString());
                 }
-                InputStream is = url.openStream();
+                final InputStream is = url.openStream();
                 try {
                     loadProviders(info, is);
                 } finally{
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
         try {
-            Enumeration e = cl.getResources("META-INF/javamail.default.providers");
+            final Enumeration e = cl.getResources("META-INF/javamail.default.providers");
             while (e.hasMoreElements()) {
-                URL url = (URL) e.nextElement();
+                final URL url = (URL) e.nextElement();
                 if (debug) {
                     writeDebug("Loading javamail.default.providers from " + url.toString());
                 }
 
-                InputStream is = url.openStream();
+                final InputStream is = url.openStream();
                 try {
                     loadProviders(info, is);
                 } finally{
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
         // we could be running in an OSGi environment, so there might be some globally defined
         // providers
         try {
-            Collection<URL> l = MailProviderRegistry.getDefaultProviders();
-            for (URL url : l) {
+            final Collection<URL> l = MailProviderRegistry.getDefaultProviders();
+            for (final URL url : l) {
                 if (debug) {
                     writeDebug("Loading META-INF/javamail.providers from " + url.toString());
                 }
-                InputStream is = url.openStream();
+                final InputStream is = url.openStream();
                 try {
                     loadProviders(info, is);
                 } finally{
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
@@ -667,8 +667,8 @@ public final class Session {
         return info;
     }
 
-    private void loadProviders(ProviderInfo info, InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    private void loadProviders(final ProviderInfo info, final InputStream is) throws IOException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String line;
         while ((line = reader.readLine()) != null) {
             // Lines beginning with "#" are just comments.
@@ -676,20 +676,20 @@ public final class Session {
                 continue;
             }
 
-            StringTokenizer tok = new StringTokenizer(line, ";");
+            final StringTokenizer tok = new StringTokenizer(line, ";");
             String protocol = null;
             Provider.Type type = null;
             String className = null;
             String vendor = null;
             String version = null;
             while (tok.hasMoreTokens()) {
-                String property = tok.nextToken();
-                int index = property.indexOf('=');
+                final String property = tok.nextToken();
+                final int index = property.indexOf('=');
                 if (index == -1) {
                     continue;
                 }
-                String key = property.substring(0, index).trim().toLowerCase();
-                String value = property.substring(index+1).trim();
+                final String key = property.substring(0, index).trim().toLowerCase();
+                final String value = property.substring(index+1).trim();
                 if (protocol == null && "protocol".equals(key)) {
                     protocol = value;
                 } else if (type == null && "type".equals(key)) {
@@ -714,7 +714,7 @@ public final class Session {
             if (debug) {
                 writeDebug("DEBUG: loading new provider protocol=" + protocol + ", className=" + className + ", vendor=" + vendor + ", version=" + version);
             }
-            Provider provider = new Provider(type, protocol, className, vendor, version);
+            final Provider provider = new Provider(type, protocol, className, vendor, version);
             // add to the info list.
             info.addProvider(provider);
         }
@@ -729,7 +729,7 @@ public final class Session {
      * @return A map containing the entries associated with this classloader
      *         instance.
      */
-    private static Map loadAddressMap(ClassLoader cl) {
+    private static Map loadAddressMap(final ClassLoader cl) {
         // we create a merged map from reading all of the potential address map entries.  The locations
         // searched are:
         //   1.   java.home/lib/javamail.address.map
@@ -740,7 +740,7 @@ public final class Session {
 
         // the format of the address.map file is defined as a property file.  We can cheat and
         // just use Properties.load() to read in the files.
-        Properties addressMap = new Properties();
+        final Properties addressMap = new Properties();
 
         // add this to the tracking map.
         addressMapsByClassLoader.put(cl, addressMap);
@@ -749,10 +749,10 @@ public final class Session {
         // user defined entries to overwrite default entries if there are similarly named items.
 
         try {
-            Enumeration e = cl.getResources("META-INF/javamail.default.address.map");
+            final Enumeration e = cl.getResources("META-INF/javamail.default.address.map");
             while (e.hasMoreElements()) {
-                URL url = (URL) e.nextElement();
-                InputStream is = url.openStream();
+                final URL url = (URL) e.nextElement();
+                final InputStream is = url.openStream();
                 try {
                     // load as a property file
                     addressMap.load(is);
@@ -760,18 +760,18 @@ public final class Session {
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
 
         try {
-            Enumeration e = cl.getResources("META-INF/javamail.address.map");
+            final Enumeration e = cl.getResources("META-INF/javamail.address.map");
             while (e.hasMoreElements()) {
-                URL url = (URL) e.nextElement();
-                InputStream is = url.openStream();
+                final URL url = (URL) e.nextElement();
+                final InputStream is = url.openStream();
                 try {
                     // load as a property file
                     addressMap.load(is);
@@ -779,33 +779,33 @@ public final class Session {
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
 
         try {
-            File file = new File(System.getProperty("java.home"), "lib/javamail.address.map");
-            InputStream is = new FileInputStream(file);
+            final File file = new File(System.getProperty("java.home"), "lib/javamail.address.map");
+            final InputStream is = new FileInputStream(file);
             try {
                 // load as a property file
                 addressMap.load(is);
             } finally{
                 is.close();
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
         try {
-            Enumeration e = cl.getResources("META-INF/javamail.address.map");
+            final Enumeration e = cl.getResources("META-INF/javamail.address.map");
             while (e.hasMoreElements()) {
-                URL url = (URL) e.nextElement();
-                InputStream is = url.openStream();
+                final URL url = (URL) e.nextElement();
+                final InputStream is = url.openStream();
                 try {
                     // load as a property file
                     addressMap.load(is);
@@ -813,9 +813,9 @@ public final class Session {
                     is.close();
                 }
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             // ignore
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignore
         }
 
@@ -833,7 +833,7 @@ public final class Session {
      *
      * @param msg    The message to write out to the debug stream.
      */
-    private void writeDebug(String msg) {
+    private void writeDebug(final String msg) {
         debugOut.println(msg);
     }
 
@@ -843,14 +843,14 @@ public final class Session {
         private final Map byProtocol = new HashMap();
         private final List all = new ArrayList();
 
-        public void addProvider(Provider provider) {
-            String className = provider.getClassName();
+        public void addProvider(final Provider provider) {
+            final String className = provider.getClassName();
 
             if (!byClassName.containsKey(className)) {
                 byClassName.put(className, provider);
             }
 
-            String protocol = provider.getProtocol();
+            final String protocol = provider.getProtocol();
             if (!byProtocol.containsKey(protocol)) {
                 byProtocol.put(protocol, provider);
             }

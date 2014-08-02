@@ -28,7 +28,7 @@ import junit.framework.TestCase;
  */
 public class HeaderTokenizerTest extends TestCase {
     public void testTokenizer() throws ParseException {
-        Token t;
+        final Token t;
         HeaderTokenizer ht;
         ht =
             new HeaderTokenizer("To: \"Geronimo List\" <geronimo-dev@apache.org>, \n\r Geronimo User <geronimo-user@apache.org>");
@@ -94,15 +94,15 @@ public class HeaderTokenizerTest extends TestCase {
         checkTokenParse("(Foo \n Bar)", Token.COMMENT, "Foo \n Bar");
     }
 
-    public void checkTokenParse(String text, int type, String value) throws ParseException {
+    public void checkTokenParse(final String text, final int type, final String value) throws ParseException {
         HeaderTokenizer ht;
         ht = new HeaderTokenizer(text, HeaderTokenizer.RFC822, false);
         validateToken(ht.next(), type, value);
     }
 
 
-    public void checkParseError(String text) throws ParseException {
-        Token t;
+    public void checkParseError(final String text) throws ParseException {
+        final Token t;
         HeaderTokenizer ht;
 
         ht = new HeaderTokenizer(text);
@@ -111,26 +111,26 @@ public class HeaderTokenizerTest extends TestCase {
         doPeekError(ht);
     }
 
-    public void doNextError(HeaderTokenizer ht) {
+    public void doNextError(final HeaderTokenizer ht) {
         try {
             ht.next();
             fail("Expected ParseException");
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
         }
     }
 
-    public void doPeekError(HeaderTokenizer ht) {
+    public void doPeekError(final HeaderTokenizer ht) {
         try {
             ht.peek();
             fail("Expected ParseException");
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
         }
     }
 
 
-    public void doComment(boolean ignore) throws ParseException {
+    public void doComment(final boolean ignore) throws ParseException {
         HeaderTokenizer ht;
-        Token t;
+        final Token t;
         ht =
             new HeaderTokenizer(
                 "Apache(Geronimo)J2EE",
@@ -156,7 +156,7 @@ public class HeaderTokenizerTest extends TestCase {
         assertEquals(Token.EOF, ht.next().getType());
     }
 
-    private void validateToken(HeaderTokenizer.Token token, int type, String value) {
+    private void validateToken(final HeaderTokenizer.Token token, final int type, final String value) {
         assertEquals(token.getType(), type);
         assertEquals(token.getValue(), value);
     }

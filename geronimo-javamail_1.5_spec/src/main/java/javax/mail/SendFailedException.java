@@ -34,19 +34,19 @@ public class SendFailedException extends MessagingException {
         super();
     }
 
-    public SendFailedException(String message) {
+    public SendFailedException(final String message) {
         super(message);
     }
 
-    public SendFailedException(String message, Exception cause) {
+    public SendFailedException(final String message, final Exception cause) {
         super(message, cause);
     }
 
-    public SendFailedException(String message,
-                               Exception cause,
-                               Address[] validSent,
-                               Address[] validUnsent,
-                               Address[] invalid) {
+    public SendFailedException(final String message,
+                               final Exception cause,
+                               final Address[] validSent,
+                               final Address[] validUnsent,
+                               final Address[] invalid) {
         this(message, cause);
         this.invalid = invalid;
         this.validSent = validSent;

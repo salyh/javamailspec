@@ -59,7 +59,7 @@ public abstract class Service {
      * @param session the session from which this service was created
      * @param url the URLName of this service
      */
-    protected Service(Session session, URLName url) {
+    protected Service(final Session session, final URLName url) {
         this.session = session;
         this.url = url;
         this.debug = session.getDebug();
@@ -87,7 +87,7 @@ public abstract class Service {
      * @throws AuthenticationFailedException if authentication fails
      * @throws MessagingException for other failures
      */
-    public void connect(String host, String user, String password) throws MessagingException {
+    public void connect(final String host, final String user, final String password) throws MessagingException {
         connect(host, -1, user, password);
     }
 
@@ -101,7 +101,7 @@ public abstract class Service {
      * @throws AuthenticationFailedException if authentication fails
      * @throws MessagingException for other failures
      */
-    public void connect(String user, String password) throws MessagingException {
+    public void connect(final String user, final String password) throws MessagingException {
         connect(null, -1, user, password);
     }
 
@@ -190,7 +190,7 @@ public abstract class Service {
                         // finally, we try getting the system defined user name
                         try {
                             user = System.getProperty("user.name");
-                        } catch (SecurityException e) {
+                        } catch (final SecurityException e) {
                             // we ignore this, and just us a null username.
                         }
                     }
@@ -223,7 +223,7 @@ public abstract class Service {
             // construct a new URL, filling in any pieces that may have been explicitly specified.
             setURLName(new URLName(protocol, host, port, file, user, password));
             // now see if we have a saved password from a previous request.
-            PasswordAuthentication cachedPassword = session.getPasswordAuthentication(getURLName());
+            final PasswordAuthentication cachedPassword = session.getPasswordAuthentication(getURLName());
 
             // if we found a saved one, see if we need to get any the pieces from here.
             if (cachedPassword != null) {
@@ -250,7 +250,7 @@ public abstract class Service {
         try {
             connected = protocolConnect(host, port, user, password);
         }
-        catch (AuthenticationFailedException e) {
+        catch (final AuthenticationFailedException e) {
         }
 
         if (!connected) {
@@ -258,11 +258,11 @@ public abstract class Service {
 
             try {
                 ipAddress = InetAddress.getByName(host);
-            } catch (UnknownHostException e) {
+            } catch (final UnknownHostException e) {
             }
 
             // now ask the session to try prompting for a password.
-            PasswordAuthentication promptPassword = session.requestPasswordAuthentication(ipAddress, port, protocol, null, user);
+            final PasswordAuthentication promptPassword = session.requestPasswordAuthentication(ipAddress, port, protocol, null, user);
 
             // if we were able to obtain new information from the session, then try again using the
             // provided information .
@@ -314,7 +314,7 @@ public abstract class Service {
      * @throws MessagingException
      *                for other failures
      */
-    protected boolean protocolConnect(String host, int port, String user, String password) throws MessagingException {
+    protected boolean protocolConnect(final String host, final int port, final String user, final String password) throws MessagingException {
         return false;
     }
 
@@ -337,7 +337,7 @@ public abstract class Service {
      *
      * @param connected the connection state
      */
-    protected void setConnected(boolean connected) {
+    protected void setConnected(final boolean connected) {
         this.connected = connected;
     }
 
@@ -376,31 +376,32 @@ public abstract class Service {
      * Set the url field.
      * @param url the new value
      */
-    protected void setURLName(URLName url) {
+    protected void setURLName(final URLName url) {
         this.url = url;
     }
 
-    public void addConnectionListener(ConnectionListener listener) {
+    public void addConnectionListener(final ConnectionListener listener) {
         connectionListeners.add(listener);
     }
 
-    public void removeConnectionListener(ConnectionListener listener) {
+    public void removeConnectionListener(final ConnectionListener listener) {
         connectionListeners.remove(listener);
     }
 
-    protected void notifyConnectionListeners(int type) {
+    protected void notifyConnectionListeners(final int type) {
         queueEvent(new ConnectionEvent(this, type), connectionListeners);
     }
 
+    @Override
     public String toString() {
         // NOTE:  We call getURLName() rather than use the URL directly
         // because the get method strips out the password information.
-        URLName url = getURLName();
+        final URLName url = getURLName();
 
         return url == null ? super.toString() : url.toString();
     }
 
-    protected void queueEvent(MailEvent event, Vector listeners) {
+    protected void queueEvent(final MailEvent event, final Vector listeners) {
         // if there are no listeners to dispatch this to, don't put it on the queue.
         // This allows us to delay creating the queue (and its new thread) until
         // we
@@ -415,6 +416,7 @@ public abstract class Service {
         queue.queueEvent(event, (List)listeners.clone());
     }
 
+    @Override
     protected void finalize() throws Throwable {
         // stop our event queue if we had to create one
         if (queue != null) {

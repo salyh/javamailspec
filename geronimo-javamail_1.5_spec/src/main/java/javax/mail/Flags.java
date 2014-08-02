@@ -21,9 +21,6 @@ package javax.mail;
 
 import java.io.Serializable;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Representation of flags that may be associated with a message.
@@ -76,7 +73,7 @@ public class Flags implements Cloneable, Serializable {
 
         private final int mask;
 
-        private Flag(int mask) {
+        private Flag(final int mask) {
             this.mask = mask;
         }
     }
@@ -97,7 +94,7 @@ public class Flags implements Cloneable, Serializable {
      * Construct a Flags instance with a supplied system flag set.
      * @param flag the system flag to set
      */
-    public Flags(Flag flag) {
+    public Flags(final Flag flag) {
         system_flags = flag.mask;
         user_flags = new Hashtable();
     }
@@ -106,7 +103,7 @@ public class Flags implements Cloneable, Serializable {
      * Construct a Flags instance with a same flags set.
      * @param flags the instance to copy
      */
-    public Flags(Flags flags) {
+    public Flags(final Flags flags) {
         system_flags = flags.system_flags;
         user_flags = new Hashtable(flags.user_flags);
     }
@@ -116,7 +113,7 @@ public class Flags implements Cloneable, Serializable {
      * Question: should this automatically set the USER system flag?
      * @param name the user flag to set
      */
-    public Flags(String name) {
+    public Flags(final String name) {
         user_flags = new Hashtable();
         user_flags.put(name.toLowerCase(), name);
     }
@@ -125,7 +122,7 @@ public class Flags implements Cloneable, Serializable {
      * Set a system flag.
      * @param flag the system flag to set
      */
-    public void add(Flag flag) {
+    public void add(final Flag flag) {
         system_flags |= flag.mask;
     }
 
@@ -134,7 +131,7 @@ public class Flags implements Cloneable, Serializable {
      * Question: do we need to check compatibility of USER flags?
      * @param flags the Flags to add
      */
-    public void add(Flags flags) {
+    public void add(final Flags flags) {
         system_flags |= flags.system_flags;
         user_flags.putAll(flags.user_flags);
     }
@@ -144,7 +141,7 @@ public class Flags implements Cloneable, Serializable {
      * Question: should this fail if the USER system flag is not set?
      * @param name the user flag to set
      */
-    public void add(String name) {
+    public void add(final String name) {
         user_flags.put(name.toLowerCase(), name);
     }
 
@@ -152,6 +149,7 @@ public class Flags implements Cloneable, Serializable {
      * Return a copy of this instance.
      * @return a copy of this instance
      */
+    @Override
     public Object clone() {
         return new Flags(this);
     }
@@ -161,7 +159,7 @@ public class Flags implements Cloneable, Serializable {
      * @param flag the system flags to check for
      * @return true if the flags are set
      */
-    public boolean contains(Flag flag) {
+    public boolean contains(final Flag flag) {
         return (system_flags & flag.mask) != 0;
     }
 
@@ -170,7 +168,7 @@ public class Flags implements Cloneable, Serializable {
      * @param flags the flags to check for
      * @return true if all the supplied system and user flags are set
      */
-    public boolean contains(Flags flags) {
+    public boolean contains(final Flags flags) {
         return ((system_flags & flags.system_flags) == flags.system_flags)
                 && user_flags.keySet().containsAll(flags.user_flags.keySet());
     }
@@ -180,7 +178,7 @@ public class Flags implements Cloneable, Serializable {
      * @param name the user flag to check for
      * @return true if the flag is set
      */
-    public boolean contains(String name) {
+    public boolean contains(final String name) {
         return user_flags.containsKey(name.toLowerCase());
     }
 
@@ -190,7 +188,8 @@ public class Flags implements Cloneable, Serializable {
      * @param other the instance to compare against
      * @return true if the two instance are the same
      */
-    public boolean equals(Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (other instanceof Flags == false) return false;
         final Flags flags = (Flags) other;
@@ -201,6 +200,7 @@ public class Flags implements Cloneable, Serializable {
      * Calculate a hashCode for this instance
      * @return a hashCode for this instance
      */
+    @Override
     public int hashCode() {
         return system_flags ^ user_flags.keySet().hashCode();
     }
@@ -219,7 +219,7 @@ public class Flags implements Cloneable, Serializable {
         if ((system_flags & Flag.RECENT.mask) != 0) size += 1;
         if ((system_flags & Flag.SEEN.mask) != 0) size += 1;
         if ((system_flags & Flag.USER.mask) != 0) size += 1;
-        Flag[] result = new Flag[size];
+        final Flag[] result = new Flag[size];
         if ((system_flags & Flag.USER.mask) != 0) result[--size] = Flag.USER;
         if ((system_flags & Flag.SEEN.mask) != 0) result[--size] = Flag.SEEN;
         if ((system_flags & Flag.RECENT.mask) != 0) result[--size] = Flag.RECENT;
@@ -243,7 +243,7 @@ public class Flags implements Cloneable, Serializable {
      * Question: what happens if we unset the USER flags and user flags are set?
      * @param flag the flag to clear
      */
-    public void remove(Flag flag) {
+    public void remove(final Flag flag) {
         system_flags &= ~flag.mask;
     }
 
@@ -251,7 +251,7 @@ public class Flags implements Cloneable, Serializable {
      * Unset all flags from the supplied instance.
      * @param flags the flags to clear
      */
-    public void remove(Flags flags) {
+    public void remove(final Flags flags) {
         system_flags &= ~flags.system_flags;
         user_flags.keySet().removeAll(flags.user_flags.keySet());
     }
@@ -260,7 +260,7 @@ public class Flags implements Cloneable, Serializable {
      * Unset the supplied user flag.
      * @param name the flag to clear
      */
-    public void remove(String name) {
+    public void remove(final String name) {
         user_flags.remove(name.toLowerCase());
     }
 }

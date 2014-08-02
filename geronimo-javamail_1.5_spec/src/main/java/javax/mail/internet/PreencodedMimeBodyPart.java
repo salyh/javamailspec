@@ -31,7 +31,7 @@ import javax.mail.MessagingException;
 
 public class PreencodedMimeBodyPart extends MimeBodyPart {
     // the defined transfer encoding
-    private String transferEncoding;
+    private final String transferEncoding;
 
 
     /**
@@ -39,7 +39,7 @@ public class PreencodedMimeBodyPart extends MimeBodyPart {
      *
      * @param encoding The content encoding.
      */
-    public PreencodedMimeBodyPart(String encoding) {
+    public PreencodedMimeBodyPart(final String encoding) {
         transferEncoding = encoding;
     }
 
@@ -50,6 +50,7 @@ public class PreencodedMimeBodyPart extends MimeBodyPart {
      * @return
      * @exception MessagingException
      */
+    @Override
     public String getEncoding() throws MessagingException {
         return transferEncoding;
     }
@@ -63,7 +64,8 @@ public class PreencodedMimeBodyPart extends MimeBodyPart {
      * @exception IOException
      * @exception MessagingException
      */
-    public void writeTo(OutputStream out) throws IOException, MessagingException {
+    @Override
+    public void writeTo(final OutputStream out) throws IOException, MessagingException {
         headers.writeTo(out, null);
         // add the separater between the headers and the data portion.
         out.write('\r');
@@ -80,6 +82,7 @@ public class PreencodedMimeBodyPart extends MimeBodyPart {
      *
      * @exception MessagingException
      */
+    @Override
     protected void updateHeaders() throws MessagingException {
         super.updateHeaders();
         setHeader("Content-Transfer-Encoding", transferEncoding);

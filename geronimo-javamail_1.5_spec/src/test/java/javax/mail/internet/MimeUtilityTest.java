@@ -21,25 +21,20 @@ package javax.mail.internet;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.Session;
 import javax.mail.util.ByteArrayDataSource;
 
 import junit.framework.TestCase;
 
 public class MimeUtilityTest extends TestCase {
 
-    private byte[] encodeBytes = new byte[] { 32, 104, -61, -87, 33, 32, -61, -96, -61, -88, -61, -76, 117, 32, 33, 33, 33 };
+    private final byte[] encodeBytes = new byte[] { 32, 104, -61, -87, 33, 32, -61, -96, -61, -88, -61, -76, 117, 32, 33, 33, 33 };
 
     public void testEncodeDecode() throws Exception {
 
-        byte [] data = new byte[256];
+        final byte [] data = new byte[256];
         for (int i = 0; i < data.length; i++) {
             data[i] = (byte)i;
         }
@@ -75,22 +70,22 @@ public class MimeUtilityTest extends TestCase {
     }
 
 
-    public void doEncodingTest(byte[] data, int length, String encoding) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        OutputStream encoder = MimeUtility.encode(out, encoding);
+    public void doEncodingTest(final byte[] data, final int length, final String encoding) throws Exception {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final OutputStream encoder = MimeUtility.encode(out, encoding);
 
         encoder.write(data, 0, length);
         encoder.flush();
 
-        byte[] encodedData = out.toByteArray();
+        final byte[] encodedData = out.toByteArray();
 
-        ByteArrayInputStream in = new ByteArrayInputStream(encodedData);
+        final ByteArrayInputStream in = new ByteArrayInputStream(encodedData);
 
-        InputStream decoder = MimeUtility.decode(in, encoding);
+        final InputStream decoder = MimeUtility.decode(in, encoding);
 
-        byte[] decodedData = new byte[length];
+        final byte[] decodedData = new byte[length];
 
-        int count = decoder.read(decodedData);
+        final int count = decoder.read(decodedData);
 
         assertEquals(length, count);
 
@@ -100,9 +95,9 @@ public class MimeUtilityTest extends TestCase {
     }
 
 
-    public void doFoldTest(int used, String source, String folded) throws Exception {
-        String newFolded = MimeUtility.fold(used, source);
-        String newUnfolded = MimeUtility.unfold(newFolded);
+    public void doFoldTest(final int used, final String source, final String folded) throws Exception {
+        final String newFolded = MimeUtility.fold(used, source);
+        final String newUnfolded = MimeUtility.unfold(newFolded);
 
         assertEquals(folded, newFolded);
         assertEquals(source, newUnfolded);
@@ -112,7 +107,7 @@ public class MimeUtilityTest extends TestCase {
     public void testEncodeWord() throws Exception {
         assertEquals("abc", MimeUtility.encodeWord("abc"));
 
-        String encodeString = new String(encodeBytes, "UTF-8");
+        final String encodeString = new String(encodeBytes, "UTF-8");
         // default code page dependent, hard to directly test the encoded results
         // The following disabled because it will not succeed on all locales because the
         // code points used in the test string won't round trip properly for all code pages.
@@ -131,7 +126,7 @@ public class MimeUtilityTest extends TestCase {
     public void testEncodeText() throws Exception {
         assertEquals("abc", MimeUtility.encodeWord("abc"));
 
-        String encodeString = new String(encodeBytes, "UTF-8");
+        final String encodeString = new String(encodeBytes, "UTF-8");
         // default code page dependent, hard to directly test the encoded results
         // The following disabled because it will not succeed on all locales because the
         // code points used in the test string won't round trip properly for all code pages.
@@ -147,7 +142,7 @@ public class MimeUtilityTest extends TestCase {
         
         // this has multiple byte characters and is longer than the 76 character grouping, so this 
         // hits a lot of different boundary conditions 
-        String subject = "\u03a0\u03a1\u03a2\u03a3\u03a4\u03a5\u03a6\u03a7 \u03a8\u03a9\u03aa\u03ab \u03ac\u03ad\u03ae\u03af\u03b0 \u03b1\u03b2\u03b3\u03b4\u03b5 \u03b6\u03b7\u03b8\u03b9\u03ba \u03bb\u03bc\u03bd\u03be\u03bf\u03c0 \u03c1\u03c2\u03c3\u03c4\u03c5\u03c6\u03c7 \u03c8\u03c9\u03ca\u03cb\u03cd\u03ce \u03cf\u03d0\u03d1\u03d2";
+        final String subject = "\u03a0\u03a1\u03a2\u03a3\u03a4\u03a5\u03a6\u03a7 \u03a8\u03a9\u03aa\u03ab \u03ac\u03ad\u03ae\u03af\u03b0 \u03b1\u03b2\u03b3\u03b4\u03b5 \u03b6\u03b7\u03b8\u03b9\u03ba \u03bb\u03bc\u03bd\u03be\u03bf\u03c0 \u03c1\u03c2\u03c3\u03c4\u03c5\u03c6\u03c7 \u03c8\u03c9\u03ca\u03cb\u03cd\u03ce \u03cf\u03d0\u03d1\u03d2";
         encoded = MimeUtility.encodeText(subject, "utf-8", "Q"); 
         assertEquals(subject, MimeUtility.decodeText(encoded));
         

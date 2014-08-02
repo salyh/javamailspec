@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 /**
@@ -35,12 +36,13 @@ public class FlagsTest extends TestCase {
      * Constructor for FlagsTest.
      * @param arg0
      */
-    public FlagsTest(String name) {
+    public FlagsTest(final String name) {
         super(name);
     }
     /*
      * @see TestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         flags = new Flags();
@@ -54,7 +56,7 @@ public class FlagsTest extends TestCase {
         Collections.shuffle(flagtypes);
     }
     public void testHashCode() {
-        int before = flags.hashCode();
+        final int before = flags.hashCode();
         flags.add("Test");
         assertTrue(
             "Before: " + before + ", now " + flags.hashCode(),
@@ -67,14 +69,14 @@ public class FlagsTest extends TestCase {
     public void testAddAndRemoveFlag() {
         Iterator it = flagtypes.iterator();
         while (it.hasNext()) {
-            Flags.Flag flag = (Flags.Flag) it.next();
+            final Flags.Flag flag = (Flags.Flag) it.next();
             assertFalse(flags.contains(flag));
             flags.add(flag);
             assertTrue(flags.contains(flag));
         }
         it = flagtypes.iterator();
         while (it.hasNext()) {
-            Flags.Flag flag = (Flags.Flag) it.next();
+            final Flags.Flag flag = (Flags.Flag) it.next();
             flags.remove(flag);
             assertFalse(flags.contains(flag));
         }
@@ -93,7 +95,7 @@ public class FlagsTest extends TestCase {
      * Test for void add(Flags)
      */
     public void testAddFlags() {
-        Flags other = new Flags();
+        final Flags other = new Flags();
         other.add("Stuff");
         other.add(Flags.Flag.RECENT);
         flags.add(other);
@@ -113,7 +115,7 @@ public class FlagsTest extends TestCase {
      * Test for boolean equals(Object)
      */
     public void testEqualsObject() {
-        Flags other = new Flags();
+        final Flags other = new Flags();
         other.add("Stuff");
         other.add(Flags.Flag.RECENT);
         flags.add(other);
@@ -124,7 +126,7 @@ public class FlagsTest extends TestCase {
         flags.add("Another");
         flags.add(Flags.Flag.FLAGGED);
         flags.add(Flags.Flag.RECENT);
-        Flags.Flag[] array = flags.getSystemFlags();
+        final Flags.Flag[] array = flags.getSystemFlags();
         assertEquals(2, array.length);
         assertTrue(
             (array[0] == Flags.Flag.FLAGGED && array[1] == Flags.Flag.RECENT)
@@ -138,7 +140,7 @@ public class FlagsTest extends TestCase {
         flags.add(another);
         flags.add(Flags.Flag.FLAGGED);
         flags.add(Flags.Flag.RECENT);
-        String[] array = flags.getUserFlags();
+        final String[] array = flags.getUserFlags();
         assertEquals(2, array.length);
         assertTrue(
             (array[0] == stuff && array[1] == another)
@@ -147,7 +149,7 @@ public class FlagsTest extends TestCase {
     public void testClone() throws CloneNotSupportedException {
         flags.add("Thing");
         flags.add(Flags.Flag.RECENT);
-        Flags other = (Flags) flags.clone();
+        final Flags other = (Flags) flags.clone();
         assertTrue(other != flags);
         assertEquals(other, flags);
     }

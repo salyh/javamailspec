@@ -21,8 +21,6 @@ package javax.mail;
 
 import java.util.Properties;
 
-import javax.mail.MessagingException;
-
 import junit.framework.TestCase;
 
 /**
@@ -30,9 +28,9 @@ import junit.framework.TestCase;
  */
 public class SessionTest extends TestCase {
     public void testAddProvider() throws MessagingException {
-        Properties props = System.getProperties();
+        final Properties props = System.getProperties();
          // Get a Session object
-        Session mailSession = Session.getDefaultInstance(props, null);
+        final Session mailSession = Session.getDefaultInstance(props, null);
 
         mailSession.addProvider(new Provider(Provider.Type.TRANSPORT, "foo", NullTransport.class.getName(), "Apache", "Java 1.4 Test"));
 
@@ -49,15 +47,17 @@ public class SessionTest extends TestCase {
     }
 
     static public class NullTransport extends Transport {
-        public NullTransport(Session session, URLName urlName) {
+        public NullTransport(final Session session, final URLName urlName) {
             super(session, urlName);
         }
 
-        public void sendMessage(Message message, Address[] addresses) throws MessagingException {
+        @Override
+        public void sendMessage(final Message message, final Address[] addresses) throws MessagingException {
             // do nothing
         }
 
-        protected boolean protocolConnect(String host, int port, String user, String password) throws MessagingException {
+        @Override
+        protected boolean protocolConnect(final String host, final int port, final String user, final String password) throws MessagingException {
             return true; // always connect
         }
 
@@ -67,16 +67,19 @@ public class SessionTest extends TestCase {
         public FooAddress() {
         }
 
+        @Override
         public String getType() {
             return "foo";
         }
 
+        @Override
         public String toString() {
             return "yada";
         }
 
 
-        public boolean equals(Object other) {
+        @Override
+        public boolean equals(final Object other) {
             return true;
         }
     }

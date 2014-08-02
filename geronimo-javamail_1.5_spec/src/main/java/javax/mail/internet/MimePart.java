@@ -20,6 +20,7 @@
 package javax.mail.internet;
 
 import java.util.Enumeration;
+
 import javax.mail.MessagingException;
 import javax.mail.Part;
 

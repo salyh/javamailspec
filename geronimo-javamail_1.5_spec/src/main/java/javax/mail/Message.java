@@ -23,6 +23,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Date;
+
 import javax.mail.search.SearchTerm;
 
 /**
@@ -47,7 +48,7 @@ public abstract class Message implements Part {
         public static final RecipientType BCC = new RecipientType("Bcc");
         protected String type;
 
-        protected RecipientType(String type) {
+        protected RecipientType(final String type) {
             this.type = type;
         }
 
@@ -63,6 +64,7 @@ public abstract class Message implements Part {
             }
         }
 
+        @Override
         public String toString() {
             return type;
         }
@@ -97,7 +99,7 @@ public abstract class Message implements Part {
      * @param folder the folder that contains the message
      * @param msgnum the message index within the folder
      */
-    protected Message(Folder folder, int msgnum) {
+    protected Message(final Folder folder, final int msgnum) {
         this.folder = folder;
         this.msgnum = msgnum;
         // make sure we copy the session information from the folder.
@@ -109,7 +111,7 @@ public abstract class Message implements Part {
      *
      * @param session the session associated with this message
      */
-    protected Message(Session session) {
+    protected Message(final Session session) {
         this.session = session;
     }
 
@@ -167,14 +169,14 @@ public abstract class Message implements Part {
      * @throws MessagingException if there was a problem accessing the Store
      */
     public Address[] getAllRecipients() throws MessagingException {
-        Address[] to = getRecipients(RecipientType.TO);
-        Address[] cc = getRecipients(RecipientType.CC);
-        Address[] bcc = getRecipients(RecipientType.BCC);
+        final Address[] to = getRecipients(RecipientType.TO);
+        final Address[] cc = getRecipients(RecipientType.CC);
+        final Address[] bcc = getRecipients(RecipientType.BCC);
         if (to == null && cc == null && bcc == null) {
             return null;
         }
-        int length = (to != null ? to.length : 0) + (cc != null ? cc.length : 0) + (bcc != null ? bcc.length : 0);
-        Address[] result = new Address[length];
+        final int length = (to != null ? to.length : 0) + (cc != null ? cc.length : 0) + (bcc != null ? bcc.length : 0);
+        final Address[] result = new Address[length];
         int j = 0;
         if (to != null) {
             for (int i = 0; i < to.length; i++) {
@@ -210,7 +212,7 @@ public abstract class Message implements Part {
      * @param address the new address
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public void setRecipient(RecipientType type, Address address) throws MessagingException {
+    public void setRecipient(final RecipientType type, final Address address) throws MessagingException {
         setRecipients(type, new Address[]{address});
     }
 
@@ -230,7 +232,7 @@ public abstract class Message implements Part {
      * @param address the address to add
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public void addRecipient(RecipientType type, Address address) throws MessagingException {
+    public void addRecipient(final RecipientType type, final Address address) throws MessagingException {
         addRecipients(type, new Address[]{address});
     }
 
@@ -255,7 +257,7 @@ public abstract class Message implements Part {
      * @param addresses to which replies should be directed
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public void setReplyTo(Address[] addresses) throws MessagingException {
+    public void setReplyTo(final Address[] addresses) throws MessagingException {
         throw new MethodNotSupportedException("setReplyTo not supported");
     }
 
@@ -325,7 +327,7 @@ public abstract class Message implements Part {
      * @return true if the flags is set
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public boolean isSet(Flags.Flag flag) throws MessagingException {
+    public boolean isSet(final Flags.Flag flag) throws MessagingException {
         return getFlags().contains(flag);
     }
 
@@ -347,7 +349,7 @@ public abstract class Message implements Part {
      * @param set  the value for that flag
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public void setFlag(Flags.Flag flag, boolean set) throws MessagingException {
+    public void setFlag(final Flags.Flag flag, final boolean set) throws MessagingException {
         setFlags(new Flags(flag), set);
     }
 
@@ -370,7 +372,7 @@ public abstract class Message implements Part {
      *
      * @param number the new message number
      */
-    protected void setMessageNumber(int number) {
+    protected void setMessageNumber(final int number) {
         msgnum = number;
     }
 
@@ -399,7 +401,7 @@ public abstract class Message implements Part {
      *
      * @param expunged true if this message has been expunged
      */
-    protected void setExpunged(boolean expunged) {
+    protected void setExpunged(final boolean expunged) {
         this.expunged = expunged;
     }
 
@@ -438,7 +440,7 @@ public abstract class Message implements Part {
      * @return true if this message matches the search criteria.
      * @throws MessagingException if there was a problem accessing the Store
      */
-    public boolean match(SearchTerm term) throws MessagingException {
+    public boolean match(final SearchTerm term) throws MessagingException {
         return term.match(this);
     }
 }

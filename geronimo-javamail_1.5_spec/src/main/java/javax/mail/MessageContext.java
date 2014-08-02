@@ -32,7 +32,7 @@ public class MessageContext {
      *
      * @param part the containing part
      */
-    public MessageContext(Part part) {
+    public MessageContext(final Part part) {
         this.part = part;
     }
 
@@ -61,7 +61,7 @@ public class MessageContext {
      * @return the session associated with this context's root message
      */
     public Session getSession() {
-        Message message = getMessage();
+        final Message message = getMessage();
         if (message == null) {
             return null;
         } else {
@@ -82,7 +82,7 @@ public class MessageContext {
             if (p instanceof Message) {
                 return (Message) p;
             }
-            Multipart mp = ((BodyPart) p).getParent();
+            final Multipart mp = ((BodyPart) p).getParent();
             if (mp == null) {
                 return null;
             }

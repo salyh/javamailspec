@@ -32,7 +32,7 @@ public class ParseException extends MessagingException {
         super();
     }
 
-    public ParseException(String message) {
+    public ParseException(final String message) {
         super(message);
     }
 }

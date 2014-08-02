@@ -21,39 +21,40 @@ package javax.mail.event;
 
 import javax.mail.Store;
 import javax.mail.TestData;
+
 import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
  */
 public class StoreEventTest extends TestCase {
-    public StoreEventTest(String name) {
+    public StoreEventTest(final String name) {
         super(name);
     }
     public void testEvent() {
         doEventTests(StoreEvent.ALERT);
         doEventTests(StoreEvent.NOTICE);
         try {
-            StoreEvent event = new StoreEvent(null, -12345, "Hello World");
+            final StoreEvent event = new StoreEvent(null, -12345, "Hello World");
             fail(
                 "Expected exception due to invalid type "
                     + event.getMessageType());
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
         }
     }
-    private void doEventTests(int type) {
-        Store source = TestData.getTestStore();
-        StoreEvent event = new StoreEvent(source, type, "Hello World");
+    private void doEventTests(final int type) {
+        final Store source = TestData.getTestStore();
+        final StoreEvent event = new StoreEvent(source, type, "Hello World");
         assertEquals(source, event.getSource());
         assertEquals("Hello World", event.getMessage());
         assertEquals(type, event.getMessageType());
-        StoreListenerTest listener = new StoreListenerTest();
+        final StoreListenerTest listener = new StoreListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     public static class StoreListenerTest implements StoreListener {
         private int state = 0;
-        public void notification(StoreEvent event) {
+        public void notification(final StoreEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

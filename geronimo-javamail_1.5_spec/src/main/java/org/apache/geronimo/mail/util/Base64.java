@@ -33,7 +33,7 @@ public class Base64
      * @return a byte array containing the base 64 encoded data.
      */
     public static byte[] encode(
-        byte[]    data)
+        final byte[]    data)
     {
         // just forward to the general array encoder. 
         return encode(data, 0, data.length); 
@@ -49,17 +49,17 @@ public class Base64
      * @return a byte array containing the base 64 encoded data.
      */
     public static byte[] encode(
-        byte[]    data,
-        int       offset, 
-        int       length)
+        final byte[]    data,
+        final int       offset, 
+        final int       length)
     {
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
         try
         {
             encoder.encode(data, 0, data.length, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception encoding base64 string: " + e);
         }
@@ -73,8 +73,8 @@ public class Base64
      * @return the number of bytes produced.
      */
     public static int encode(
-        byte[]                data,
-        OutputStream    out)
+        final byte[]                data,
+        final OutputStream    out)
         throws IOException
     {
         return encoder.encode(data, 0, data.length, out);
@@ -86,10 +86,10 @@ public class Base64
      * @return the number of bytes produced.
      */
     public static int encode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
         return encoder.encode(data, off, length, out);
@@ -101,7 +101,7 @@ public class Base64
      * @return a byte array representing the decoded data.
      */
     public static byte[] decode(
-        byte[]    data)
+        final byte[]    data)
     {
         // just decode the entire array of data. 
         return decode(data, 0, data.length); 
@@ -118,17 +118,17 @@ public class Base64
      * @return a byte array representing the decoded data.
      */
     public static byte[] decode(
-        byte[]    data, 
-        int       offset, 
-        int       length)
+        final byte[]    data, 
+        final int       offset, 
+        final int       length)
     {
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
         try
         {
             encoder.decode(data, offset, length, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception decoding base64 string: " + e);
         }
@@ -142,15 +142,15 @@ public class Base64
      * @return a byte array representing the decoded data.
      */
     public static byte[] decode(
-        String    data)
+        final String    data)
     {
-        ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
 
         try
         {
             encoder.decode(data, bOut);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("exception decoding base64 string: " + e);
         }
@@ -165,8 +165,8 @@ public class Base64
      * @return the number of bytes produced.
      */
     public static int decode(
-        String                data,
-        OutputStream    out)
+        final String                data,
+        final OutputStream    out)
         throws IOException
     {
         return encoder.decode(data, out);
@@ -182,7 +182,7 @@ public class Base64
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public static int decode(byte [] data, OutputStream out) throws IOException
+    public static int decode(final byte [] data, final OutputStream out) throws IOException
     {
         return encoder.decode(data, 0, data.length, out);
     }

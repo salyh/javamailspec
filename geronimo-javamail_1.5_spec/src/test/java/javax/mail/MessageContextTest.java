@@ -19,13 +19,6 @@
 
 package javax.mail;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Enumeration;
-
-import javax.activation.DataHandler;
-import javax.mail.internet.MimeMessage;
 import junit.framework.TestCase;
 
 /**

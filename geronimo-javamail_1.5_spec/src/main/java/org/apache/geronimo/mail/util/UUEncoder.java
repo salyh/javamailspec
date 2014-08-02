@@ -44,7 +44,7 @@ public class UUEncoder implements Encoder {
      *
      * @return the number of bytes produced.
      */
-    public int encode(byte[] data, int off, int length, OutputStream out) throws IOException
+    public int encode(final byte[] data, int off, int length, final OutputStream out) throws IOException
     {
         int byteCount = 0;
 
@@ -77,7 +77,7 @@ public class UUEncoder implements Encoder {
      * @return The number of bytes written to the output stream.
      * @exception IOException
      */
-    private int encodeLine(byte[] data, int offset, int length, OutputStream out) throws IOException {
+    private int encodeLine(final byte[] data, final int offset, final int length, final OutputStream out) throws IOException {
         // write out the number of characters encoded in this line.
         out.write((byte)((length & 0x3F) + ' '));
         byte a;
@@ -100,10 +100,10 @@ public class UUEncoder implements Encoder {
                 }
             }
 
-            byte d1 = (byte)(((a >>> 2) & 0x3F) + ' ');
-            byte d2 = (byte)(((( a << 4) & 0x30) | ((b >>> 4) & 0x0F)) + ' ');
-            byte d3 = (byte)((((b << 2) & 0x3C) | ((c >>> 6) & 0x3)) + ' ');
-            byte d4 = (byte)((c & 0x3F) + ' ');
+            final byte d1 = (byte)(((a >>> 2) & 0x3F) + ' ');
+            final byte d2 = (byte)(((( a << 4) & 0x30) | ((b >>> 4) & 0x0F)) + ' ');
+            final byte d3 = (byte)((((b << 2) & 0x3C) | ((c >>> 6) & 0x3)) + ' ');
+            final byte d4 = (byte)((c & 0x3F) + ' ');
 
             out.write(d1);
             out.write(d2);
@@ -131,12 +131,12 @@ public class UUEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public int decode(byte[] data, int off, int length, OutputStream out) throws IOException
+    public int decode(final byte[] data, int off, int length, final OutputStream out) throws IOException
     {
         int bytesWritten = 0;
 
         while (length > 0) {
-            int lineOffset = off;
+            final int lineOffset = off;
 
             // scan forward looking for a EOL terminator for the next line of data.
             while (length > 0 && data[off] != '\n') {
@@ -167,7 +167,7 @@ public class UUEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    private int decodeLine(byte[] data, int off, int length, OutputStream out) throws IOException {
+    private int decodeLine(final byte[] data, int off, final int length, final OutputStream out) throws IOException {
         int count = data[off++];
 
         // obtain and validate the count
@@ -179,7 +179,7 @@ public class UUEncoder implements Encoder {
 
         // get the rounded count of characters that should have been used to encode this.  The + 1 is for the
         // length encoded at the beginning
-        int requiredLength = (((count * 8) + 5) / 6) + 1;
+        final int requiredLength = (((count * 8) + 5) / 6) + 1;
         if (length < requiredLength) {
             throw new IOException("UUEncoded data and length do not match");
         }
@@ -188,13 +188,13 @@ public class UUEncoder implements Encoder {
         // now decode the bytes.
         while (bytesWritten < count) {
             // even one byte of data requires two bytes to encode, so we should have that.
-            byte a = (byte)((data[off++] - ' ') & 0x3F);
-            byte b = (byte)((data[off++] - ' ') & 0x3F);
+            final byte a = (byte)((data[off++] - ' ') & 0x3F);
+            final byte b = (byte)((data[off++] - ' ') & 0x3F);
             byte c = 0;
             byte d = 0;
 
             // do the first byte
-            byte first = (byte)(((a << 2) & 0xFC) | ((b >>> 4) & 3));
+            final byte first = (byte)(((a << 2) & 0xFC) | ((b >>> 4) & 3));
             out.write(first);
             bytesWritten++;
 
@@ -202,14 +202,14 @@ public class UUEncoder implements Encoder {
             // a third byte from the data.
             if (bytesWritten < count) {
                 c = (byte)((data[off++] - ' ') & 0x3F);
-                byte second = (byte)(((b << 4) & 0xF0) | ((c >>> 2) & 0x0F));
+                final byte second = (byte)(((b << 4) & 0xF0) | ((c >>> 2) & 0x0F));
                 out.write(second);
                 bytesWritten++;
 
                 // need the third one?
                 if (bytesWritten < count) {
                     d = (byte)((data[off++] - ' ') & 0x3F);
-                    byte third = (byte)(((c << 6) & 0xC0) | (d & 0x3F));
+                    final byte third = (byte)(((c << 6) & 0xC0) | (d & 0x3F));
                     out.write(third);
                     bytesWritten++;
                 }
@@ -228,13 +228,13 @@ public class UUEncoder implements Encoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public int decode(String data, OutputStream out) throws IOException
+    public int decode(final String data, final OutputStream out) throws IOException
     {
         try {
             // just get the byte data and decode.
-            byte[] bytes = data.getBytes("US-ASCII");
+            final byte[] bytes = data.getBytes("US-ASCII");
             return decode(bytes, 0, bytes.length, out);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             throw new IOException("Invalid UUEncoding");
         }
     }

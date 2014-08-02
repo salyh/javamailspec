@@ -18,16 +18,11 @@
  */
 package org.apache.geronimo.mail;
 
-import java.net.URL;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.BundleTracker;
@@ -56,37 +51,37 @@ public class Activator extends org.apache.geronimo.osgi.locator.Activator {
 	}
 
     @Override
-	public synchronized void stop(BundleContext context) throws Exception {
+	public synchronized void stop(final BundleContext context) throws Exception {
 	    bt.close();
 	    lst.close();
         super.stop(context);
 	}
 
-	void log(int level, String message) {
+	void log(final int level, final String message) {
 	    synchronized (logServices) {
-	        for (LogService log : logServices) {
+	        for (final LogService log : logServices) {
 	            log.log(level, message);
 	        }
         }
 	}
 
-	void log(int level, String message, Throwable th) {
+	void log(final int level, final String message, final Throwable th) {
         synchronized (logServices) {
-            for (LogService log : logServices) {
+            for (final LogService log : logServices) {
                 log.log(level, message, th);
             }
         }
     }
 
 	private final class LogServiceTracker extends ServiceTracker {
-        private LogServiceTracker(BundleContext context, String clazz,
-                ServiceTrackerCustomizer customizer) {
+        private LogServiceTracker(final BundleContext context, final String clazz,
+                final ServiceTrackerCustomizer customizer) {
             super(context, clazz, customizer);
         }
 
         @Override
-        public Object addingService(ServiceReference reference) {
-            Object svc = super.addingService(reference);
+        public Object addingService(final ServiceReference reference) {
+            final Object svc = super.addingService(reference);
             if (svc instanceof LogService) {
                 synchronized (logServices) {
                     logServices.add((LogService) svc);
@@ -96,7 +91,7 @@ public class Activator extends org.apache.geronimo.osgi.locator.Activator {
         }
 
         @Override
-        public void removedService(ServiceReference reference, Object service) {
+        public void removedService(final ServiceReference reference, final Object service) {
             synchronized (logServices) {
                 logServices.remove(service);
             }

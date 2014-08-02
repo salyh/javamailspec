@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
  */
 public class AllEventTests {
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for javax.mail.event");
+        final TestSuite suite = new TestSuite("Test for javax.mail.event");
         //$JUnit-BEGIN$
         suite.addTest(new TestSuite(ConnectionEventTest.class));
         suite.addTest(new TestSuite(FolderEventTest.class));

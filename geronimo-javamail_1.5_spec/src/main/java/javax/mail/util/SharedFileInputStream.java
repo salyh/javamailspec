@@ -73,7 +73,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
-    public SharedFileInputStream(String file) throws IOException {
+    public SharedFileInputStream(final String file) throws IOException {
         this(file, DEFAULT_BUFFER_SIZE);
     }
 
@@ -85,7 +85,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
-    public SharedFileInputStream(File file) throws IOException {
+    public SharedFileInputStream(final File file) throws IOException {
         this(file, DEFAULT_BUFFER_SIZE);
     }
 
@@ -98,7 +98,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
-    public SharedFileInputStream(String file, int bufferSize) throws IOException {
+    public SharedFileInputStream(final String file, final int bufferSize) throws IOException {
         // I'm not sure this is correct or not.  The SharedFileInputStream spec requires this
         // be a subclass of BufferedInputStream.  The BufferedInputStream constructor takes a stream,
         // which we're not really working from at this point.  Using null seems to work so far.
@@ -115,7 +115,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
-    public SharedFileInputStream(File file, int bufferSize) throws IOException {
+    public SharedFileInputStream(final File file, final int bufferSize) throws IOException {
         // I'm not sure this is correct or not.  The SharedFileInputStream spec requires this
         // be a subclass of BufferedInputStream.  The BufferedInputStream constructor takes a stream,
         // which we're not really working from at this point.  Using null seems to work so far.
@@ -134,7 +134,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      * @param len     The length of file data in this shared instance.
      * @param bufsize The initial buffer size (same as the spawning parent.
      */
-    private SharedFileInputStream(SharedFileSource source, long start, long len, int bufsize) {
+    private SharedFileInputStream(final SharedFileSource source, final long start, final long len, final int bufsize) {
         super(null);
         this.source = source;
         in = source.open();
@@ -155,7 +155,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
-    private void init(File file, int bufferSize) throws IOException {
+    private void init(final File file, final int bufferSize) throws IOException {
         if (bufferSize <= 0) {
             throw new IllegalArgumentException("Buffer size must be positive");
         }
@@ -206,7 +206,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
                 // us room to read more data.
                 if (markpos > 0) {
                     // this is the size of the data we need to keep.
-                    int validSize = pos - markpos;
+                    final int validSize = pos - markpos;
                     // perform the shift operation.
                     System.arraycopy(buf, markpos, buf, 0, validSize);
                     // now adjust the positional markers for this shift.
@@ -218,9 +218,9 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
                 // extend this.
                 else if (buf.length < marklimit) {
                     // try to double this, but throttle to the mark limit
-                    int newSize = Math.min(buf.length * 2, marklimit);
+                    final int newSize = Math.min(buf.length * 2, marklimit);
 
-                    byte[] newBuffer = new byte[newSize];
+                    final byte[] newBuffer = new byte[newSize];
                     System.arraycopy(buf, 0, newBuffer, 0, buf.length);
 
                     // replace the old buffer.  Note that all other positional markers remain the same here.
@@ -280,12 +280,13 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *         current read position and the indicated end of the file.
      * @exception IOException
      */
+    @Override
     public synchronized int available() throws IOException {
         checkOpen();
 
         // this is backed by a file, which doesn't really block.  We can return all the way to the
         // marked data end, if necessary
-        long endMarker = start + datalen;
+        final long endMarker = start + datalen;
         return (int)(endMarker - (bufpos + pos));
     }
 
@@ -310,7 +311,8 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      * @param readlimit The limit for the distance the read position can move from
      *                  the mark position before the mark is reset.
      */
-    public synchronized void mark(int readlimit) {
+    @Override
+    public synchronized void mark(final int readlimit) {
         checkOpenRuntime();
         marklimit = readlimit;
         markpos = pos;
@@ -323,6 +325,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      * @return The read byte.  Returns -1 if an eof condition has been hit.
      * @exception IOException
      */
+    @Override
     public synchronized int read() throws IOException {
         checkOpen();
 
@@ -348,7 +351,8 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *         condition.
      * @exception IOException
      */
-    public synchronized int read(byte buffer[], int offset, int length) throws IOException {
+    @Override
+    public synchronized int read(final byte buffer[], int offset, int length) throws IOException {
         checkOpen();
 
         // asked to read nothing?  That's what we'll do.
@@ -369,8 +373,8 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
                 return -1;
             }
 
-            int available = count - pos;
-            int given = Math.min(available, length);
+            final int available = count - pos;
+            final int given = Math.min(available, length);
 
             System.arraycopy(buf, pos, buffer, offset, given);
 
@@ -393,7 +397,8 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      * @return The number of bytes actually skipped.
      * @exception IOException
      */
-    public synchronized long skip(long n) throws IOException {
+    @Override
+    public synchronized long skip(final long n) throws IOException {
         checkOpen();
 
         // nothing to skip, so don't skip
@@ -406,10 +411,10 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
             return 0;
         }
 
-        long available = count - pos;
+        final long available = count - pos;
 
         // the skipped contract allows skipping within the current buffer bounds, so cap it there.
-        long skipped = available < n ? available : n;
+        final long skipped = available < n ? available : n;
         pos += skipped;
         return skipped;
     }
@@ -419,6 +424,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
+    @Override
     public synchronized void reset() throws IOException {
         checkOpen();
         if (markpos < 0) {
@@ -434,6 +440,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @return Always returns true.
      */
+    @Override
     public boolean markSupported() {
         return true;
     }
@@ -445,6 +452,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      *
      * @exception IOException
      */
+    @Override
     public void close() throws IOException {
         // already closed?  This is not an error
         if (in == null) {
@@ -470,7 +478,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
      * @return A new SharedFileInputStream object sharing the same source
      *         input file.
      */
-    public InputStream newStream(long offset, long end) {
+    public InputStream newStream(final long offset, long end) {
         checkOpenRuntime();
 
         if (offset < 0) {
@@ -523,7 +531,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
         // the shared instance count for this file (open instances)
         public int instanceCount = 0;
 
-        public SharedFileSource(File file) throws IOException {
+        public SharedFileSource(final File file) throws IOException {
             source = new RandomAccessFile(file, "r");
         }
 
@@ -563,7 +571,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
          * @return The number of bytes actually read.
          * @exception IOException
          */
-        public synchronized int read(long position, byte[] buf, int offset, int length) throws IOException {
+        public synchronized int read(final long position, final byte[] buf, final int offset, final int length) throws IOException {
             // seek to the read location start.  Note this is a shared file, so this assumes all of the methods
             // doing buffer fills will be synchronized.
             source.seek(position);
@@ -576,6 +584,7 @@ public class SharedFileInputStream extends BufferedInputStream implements Shared
          *
          * @exception Throwable
          */
+        @Override
         protected void finalize() throws Throwable {
             super.finalize();
             if (instanceCount > 0) {

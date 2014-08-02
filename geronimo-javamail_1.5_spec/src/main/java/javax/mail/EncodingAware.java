@@ -24,7 +24,6 @@ package javax.mail;
 
  *
  * @since   JavaMail 1.5
- * @author  Bill Shannon
  */
 
 public interface EncodingAware {

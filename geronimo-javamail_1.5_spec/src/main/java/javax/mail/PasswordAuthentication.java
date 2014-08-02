@@ -28,7 +28,7 @@ public final class PasswordAuthentication {
     private final String user;
     private final String password;
 
-    public PasswordAuthentication(String user, String password) {
+    public PasswordAuthentication(final String user, final String password) {
         this.user = user;
         this.password = password;
     }

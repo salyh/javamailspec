@@ -55,17 +55,17 @@ public class XTextEncoder
      * @return the number of bytes produced.
      */
     public int encode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
         int bytesWritten = 0;
 
         for (int i = off; i < (off + length); i++)
         {
-            int    v = data[i] & 0xff;
+            final int    v = data[i] & 0xff;
             // character tha must be encoded?  Prefix with a '+' and encode in hex.
             if (v < 33 || v > 126 || v == '+' || v == '+') {
                 out.write((byte)'+');
@@ -90,22 +90,22 @@ public class XTextEncoder
      * @return the number of bytes produced.
      */
     public int decode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
+        final byte[]                data,
+        final int                    off,
+        final int                    length,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
+        final byte[]    bytes;
         byte    b1, b2;
         int        outLen = 0;
 
-        int        end = off + length;
+        final int        end = off + length;
 
         int i = off;
         while (i < end)
         {
-            byte v = data[i++];
+            final byte v = data[i++];
             // a plus is a hex character marker, need to decode a hex value.
             if (v == '+') {
                 b1 = decodingTable[data[i++]];
@@ -129,20 +129,21 @@ public class XTextEncoder
      * @return the number of bytes produced.
      */
     public int decode(
-        String                data,
-        OutputStream    out)
+        final String                data,
+        final OutputStream    out)
         throws IOException
     {
-        byte[]    bytes;
-        byte    b1, b2, b3, b4;
+        final byte[]    bytes;
+        byte    b1, b2;
+        final byte b3, b4;
         int        length = 0;
 
-        int        end = data.length();
+        final int        end = data.length();
 
         int i = 0;
         while (i < end)
         {
-            char v = data.charAt(i++);
+            final char v = data.charAt(i++);
             if (v == '+') {
                 b1 = decodingTable[data.charAt(i++)];
                 b2 = decodingTable[data.charAt(i++)];

@@ -19,16 +19,16 @@
 
 package javax.mail.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.activation.DataSource;
 import javax.mail.internet.ContentType;
-import javax.mail.internet.ParseException;
 import javax.mail.internet.MimeUtility;
+import javax.mail.internet.ParseException;
 
 
 /**
@@ -38,9 +38,9 @@ import javax.mail.internet.MimeUtility;
  */
 public class ByteArrayDataSource implements DataSource {
     // the data source
-    private byte[] source;
+    private final byte[] source;
     // the content MIME type
-    private String contentType;
+    private final String contentType;
     // the name information (defaults to a null string)
     private String name = "";
 
@@ -53,11 +53,11 @@ public class ByteArrayDataSource implements DataSource {
      *
      * @exception IOException
      */
-    public ByteArrayDataSource(InputStream in, String type) throws IOException {
-        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+    public ByteArrayDataSource(final InputStream in, final String type) throws IOException {
+        final ByteArrayOutputStream sink = new ByteArrayOutputStream();
 
         // ok, how I wish you could just pipe an input stream into an output stream :-)
-        byte[] buffer = new byte[8192];
+        final byte[] buffer = new byte[8192];
         int bytesRead;
 
         while ((bytesRead = in.read(buffer)) > 0) {
@@ -75,7 +75,7 @@ public class ByteArrayDataSource implements DataSource {
      * @param data   The source byte array (not copied).
      * @param type   The content MIME-type.
      */
-    public ByteArrayDataSource(byte[] data, String type) {
+    public ByteArrayDataSource(final byte[] data, final String type) {
         source = data;
         contentType = type;
     }
@@ -91,14 +91,14 @@ public class ByteArrayDataSource implements DataSource {
      *
      * @exception IOException
      */
-    public ByteArrayDataSource(String data, String type) throws IOException {
+    public ByteArrayDataSource(final String data, final String type) throws IOException {
         String charset = null;
         try {
             // the charset can be encoded in the content type, which we parse using
             // the ContentType class.
-            ContentType content = new ContentType(type);
+            final ContentType content = new ContentType(type);
             charset = content.getParameter("charset");
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             // ignored...just use the default if this fails
         }
         if (charset == null) {
@@ -166,7 +166,7 @@ public class ByteArrayDataSource implements DataSource {
      *
      * @param name   The new name.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 }

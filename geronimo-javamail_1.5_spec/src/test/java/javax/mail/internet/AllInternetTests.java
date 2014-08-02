@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
  */
 public class AllInternetTests {
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for javax.mail.internet");
+        final TestSuite suite = new TestSuite("Test for javax.mail.internet");
         //$JUnit-BEGIN$
         suite.addTest(new TestSuite(ContentTypeTest.class));
         suite.addTest(new TestSuite(ParameterListTest.class));

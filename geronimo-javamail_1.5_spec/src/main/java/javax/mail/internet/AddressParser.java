@@ -20,7 +20,6 @@
 package javax.mail.internet;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,15 +53,15 @@ class AddressParser {
 
 
     // the string we're parsing
-    private String addresses;
+    private final String addresses;
     // the current parsing position
     private int    position;
     // the end position of the string
     private int    end;
     // the strictness flag
-    private int validationLevel;
+    private final int validationLevel;
 
-    public AddressParser(String addresses, int validation) {
+    public AddressParser(final String addresses, final int validation) {
         this.addresses = addresses;
         validationLevel = validation;
     }
@@ -78,10 +77,10 @@ class AddressParser {
     public InternetAddress[] parseAddressList() throws AddressException
     {
         // get the address as a set of tokens we can process.
-        TokenStream tokens = tokenizeAddress();
+        final TokenStream tokens = tokenizeAddress();
 
         // get an array list accumulator.
-        ArrayList addressList = new ArrayList();
+        final ArrayList addressList = new ArrayList();
 
         // we process sections of the token stream until we run out of tokens.
         while (true) {
@@ -91,7 +90,7 @@ class AddressParser {
             addressList.addAll(parseSingleAddress(tokens, false));
             // This token should be either a "," delimiter or a stream terminator.  If we're
             // at the end, time to get out.
-            AddressToken token = tokens.nextToken();
+            final AddressToken token = tokens.nextToken();
             if (token.type == END_OF_TOKENS) {
                 break;
             }
@@ -110,12 +109,12 @@ class AddressParser {
     public InternetAddress parseAddress() throws AddressException
     {
         // get the address as a set of tokens we can process.
-        TokenStream tokens = tokenizeAddress();
+        final TokenStream tokens = tokenizeAddress();
 
         // parse off a single address.  Address lists can have null elements,
         // so this might return a null value.  The null value does not get added
         // to the address accumulator.
-        List addressList = parseSingleAddress(tokens, false);
+        final List addressList = parseSingleAddress(tokens, false);
         // we must get exactly one address back from this.
         if (addressList.isEmpty()) {
             throw new AddressException("Null address", addresses, 0);
@@ -126,7 +125,7 @@ class AddressParser {
         }
 
         // This token must be a stream stream terminator, or we have an error.
-        AddressToken token = tokens.nextToken();
+        final AddressToken token = tokens.nextToken();
         if (token.type != END_OF_TOKENS) {
             illegalAddress("Illegal Address", token);
         }
@@ -145,12 +144,12 @@ class AddressParser {
     public void validateAddress() throws AddressException
     {
         // get the address as a set of tokens we can process.
-        TokenStream tokens = tokenizeAddress();
+        final TokenStream tokens = tokenizeAddress();
 
         // parse off a single address.  Address lists can have null elements,
         // so this might return a null value.  The null value does not get added
         // to the address accumulator.
-        List addressList = parseSingleAddress(tokens, false);
+        final List addressList = parseSingleAddress(tokens, false);
         if (addressList.isEmpty()) {
             throw new AddressException("Null address", addresses, 0);
         }
@@ -160,7 +159,7 @@ class AddressParser {
             throw new AddressException("Illegal Address", addresses, 0);
         }
 
-        InternetAddress address = (InternetAddress)addressList.get(0);
+        final InternetAddress address = (InternetAddress)addressList.get(0);
 
         // validation occurs on an address that's already been split into personal and address
         // data.
@@ -168,7 +167,7 @@ class AddressParser {
             throw new AddressException("Illegal Address", addresses, 0);
         }
         // This token must be a stream stream terminator, or we have an error.
-        AddressToken token = tokens.nextToken();
+        final AddressToken token = tokens.nextToken();
         if (token.type != END_OF_TOKENS) {
             illegalAddress("Illegal Address", token);
         }
@@ -184,10 +183,10 @@ class AddressParser {
     public InternetAddress[] extractGroupList() throws AddressException
     {
         // get the address as a set of tokens we can process.
-        TokenStream tokens = tokenizeAddress();
+        final TokenStream tokens = tokenizeAddress();
 
         // get an array list accumulator.
-        ArrayList addresses = new ArrayList();
+        final ArrayList addresses = new ArrayList();
 
         AddressToken token = tokens.nextToken();
 
@@ -233,9 +232,9 @@ class AddressParser {
      *         address in a list.
      * @exception AddressException
      */
-    private List parseSingleAddress(TokenStream tokens, boolean inGroup) throws AddressException
+    private List parseSingleAddress(final TokenStream tokens, final boolean inGroup) throws AddressException
     {
-        List parsedAddresses = new ArrayList();
+        final List parsedAddresses = new ArrayList();
 
         // index markers for personal information
         AddressToken personalStart = null;
@@ -261,14 +260,14 @@ class AddressParser {
         // get the next token from the queue and save this.  We're going to scan ahead a bit to
         // figure out what type of address we're looking at, then reset to do the actually parsing
         // once we've figured out a form.
-        AddressToken first = tokens.nextToken();
+        final AddressToken first = tokens.nextToken();
         // push it back on before starting processing.
         tokens.pushToken(first);
 
         // scan ahead for a trigger token that tells us what we've got.
         while (addressType == UNKNOWN) {
 
-            AddressToken token = tokens.nextToken();
+            final AddressToken token = tokens.nextToken();
             switch (token.type) {
                 // skip these for now...after we've processed everything and found that this is a simple
                 // address form, then we'll check for a leading comment token in the first position and use
@@ -409,7 +408,7 @@ class AddressParser {
 
         // if we have personal data, then convert it to a string value.
         if (personalStart != null) {
-            TokenStream personalTokens = tokens.section(personalStart, personalEnd);
+            final TokenStream personalTokens = tokens.section(personalStart, personalEnd);
             personal = personalToString(personalTokens);
         }
         // if we have a simple address, then check the first token to see if it's a comment.  For simple addresses,
@@ -420,7 +419,7 @@ class AddressParser {
             }
         }
 
-        TokenStream addressTokens = tokens.section(addressStart, addressEnd);
+        final TokenStream addressTokens = tokens.section(addressStart, addressEnd);
 
         // if this is one of the strictly RFC822 types, then we always validate the address.  If this is a
         // a simple address, then we only validate if strict parsing rules are in effect or we've been asked
@@ -448,14 +447,14 @@ class AddressParser {
             // we might have traversed this already when we validated, so reset the
             // position before using this again.
             addressTokens.reset();
-            String address = addressToString(addressTokens);
+            final String address = addressToString(addressTokens);
 
             // get the parsed out sections as string values.
-            InternetAddress result = new InternetAddress();
+            final InternetAddress result = new InternetAddress();
             result.setAddress(address);
             try {
                 result.setPersonal(personal);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
             }
             // even though we have a single address, we return this as an array.  Simple addresses
             // can be produce an array of items, so we need to return everything.
@@ -467,9 +466,9 @@ class AddressParser {
 
             TokenStream nextAddress = addressTokens.getBlankDelimitedToken();
             while (nextAddress != null) {
-                String address = addressToString(nextAddress);
+                final String address = addressToString(nextAddress);
                 // get the parsed out sections as string values.
-                InternetAddress result = new InternetAddress();
+                final InternetAddress result = new InternetAddress();
                 result.setAddress(address);
                 parsedAddresses.add(result);
                 nextAddress = addressTokens.getBlankDelimitedToken();
@@ -490,7 +489,7 @@ class AddressParser {
      * @return The last token of the route address (the one preceeding the
      *         terminating '>'.
      */
-    private AddressToken scanRouteAddress(TokenStream tokens, boolean inGroup) throws AddressException {
+    private AddressToken scanRouteAddress(final TokenStream tokens, final boolean inGroup) throws AddressException {
         // get the first token and ensure we have something between the "<" and ">".
         AddressToken token = tokens.nextRealToken();
         // the last processed non-whitespace token, which is the actual address end once the
@@ -581,7 +580,7 @@ class AddressParser {
      *
      * @return The last token of the group address (the terminating ':").
      */
-    private AddressToken scanGroupAddress(TokenStream tokens) throws AddressException {
+    private AddressToken scanGroupAddress(final TokenStream tokens) throws AddressException {
         // A group does not require that there be anything between the ':' and ';".  This is
         // just a group with an empty list.
         AddressToken token = tokens.nextRealToken();
@@ -614,7 +613,7 @@ class AddressParser {
                 // now for the illegal ones in this context.
                 case SEMICOLON:
                     // verify there's nothing illegal after this.
-                    AddressToken next = tokens.nextRealToken();
+                    final AddressToken next = tokens.nextRealToken();
                     if (next.type != COMMA && next.type != END_OF_TOKENS) {
                         illegalAddress("Illegal address", token);
                     }
@@ -640,13 +639,13 @@ class AddressParser {
     private TokenStream tokenizeAddress() throws AddressException {
 
         // get a list for the set of tokens
-        TokenStream tokens = new TokenStream();
+        final TokenStream tokens = new TokenStream();
 
         end = addresses.length();    // our parsing end marker
 
         // now scan along the string looking for the special characters in an internet address.
         while (moreCharacters()) {
-            char ch = currentChar();
+            final char ch = currentChar();
 
             switch (ch) {
                 // start of a comment bit...ignore everything until we hit a closing paren.
@@ -718,7 +717,7 @@ class AddressParser {
                     // step over any space characters, leaving us positioned either at the end
                     // or the first
                     while (moreCharacters()) {
-                        char nextChar = currentChar();
+                        final char nextChar = currentChar();
                         if (nextChar == ' ' || nextChar == '\t' || nextChar == '\r' || nextChar == '\n') {
                             nextChar();
                         }
@@ -778,16 +777,16 @@ class AddressParser {
      *
      * @param tokens The TokenStream where the parsed out token is added.
      */
-    private void scanQuotedLiteral(TokenStream tokens) throws AddressException {
-        StringBuffer value = new StringBuffer();
+    private void scanQuotedLiteral(final TokenStream tokens) throws AddressException {
+        final StringBuffer value = new StringBuffer();
 
         // save the start position for the token.
-        int startPosition = position;
+        final int startPosition = position;
         // step over the quote delimiter.
         nextChar();
 
         while (moreCharacters()) {
-            char ch = currentChar();
+            final char ch = currentChar();
 
             // is this an escape char?
             if (ch == '\\') {
@@ -826,15 +825,15 @@ class AddressParser {
      *
      * @param tokens The TokenStream where the parsed out token is added.
      */
-    private void scanDomainLiteral(TokenStream tokens) throws AddressException {
-        StringBuffer value = new StringBuffer();
+    private void scanDomainLiteral(final TokenStream tokens) throws AddressException {
+        final StringBuffer value = new StringBuffer();
 
-        int startPosition = position;
+        final int startPosition = position;
         // step over the quote delimiter.
         nextChar();
 
         while (moreCharacters()) {
-            char ch = currentChar();
+            final char ch = currentChar();
 
             // is this an escape char?
             if (ch == '\\') {
@@ -881,12 +880,12 @@ class AddressParser {
      *
      * @param tokens The TokenStream where the parsed out token is added.
      */
-    private void scanAtom(TokenStream tokens) throws AddressException {
-        int start = position;
+    private void scanAtom(final TokenStream tokens) throws AddressException {
+        final int start = position;
         nextChar();
         while (moreCharacters()) {
 
-            char ch = currentChar();
+            final char ch = currentChar();
             if (isAtom(ch)) {
                 nextChar();
             }
@@ -906,10 +905,10 @@ class AddressParser {
      *
      * @param tokens The TokenStream where the parsed out token is added.
      */
-    private void scanComment(TokenStream tokens) throws AddressException {
-        StringBuffer value = new StringBuffer();
+    private void scanComment(final TokenStream tokens) throws AddressException {
+        final StringBuffer value = new StringBuffer();
 
-        int startPosition = position;
+        final int startPosition = position;
         // step past the start character
         nextChar();
 
@@ -918,7 +917,7 @@ class AddressParser {
 
         // scan while we have more characters.
         while (moreCharacters()) {
-            char ch = currentChar();
+            final char ch = currentChar();
             // escape character?
             if (ch == '\\') {
                 // step over this...if escaped, we must have at least one more character
@@ -974,7 +973,7 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void validateGroup(TokenStream tokens) throws AddressException {
+    private void validateGroup(final TokenStream tokens) throws AddressException {
         // we know already this is an address in the form "phrase:group;".  Now we need to validate the
         // elements.
 
@@ -1032,8 +1031,8 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void validateGroupMailbox(TokenStream tokens) throws AddressException {
-        AddressToken first = tokens.nextRealToken();
+    private void validateGroupMailbox(final TokenStream tokens) throws AddressException {
+        final AddressToken first = tokens.nextRealToken();
         // is this just a null address in the list?  then push the terminator back and return.
         if (first.type == COMMA || first.type == SEMICOLON) {
             tokens.pushToken(first);
@@ -1096,7 +1095,7 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void invalidToken(AddressToken token) throws AddressException {
+    private void invalidToken(final AddressToken token) throws AddressException {
         illegalAddress("Unexpected '" + token.type + "'", token);
     }
 
@@ -1109,7 +1108,7 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void syntaxError(String message, int position) throws AddressException
+    private void syntaxError(final String message, final int position) throws AddressException
     {
         throw new AddressException(message, addresses, position);
     }
@@ -1122,7 +1121,7 @@ class AddressParser {
      * @param token   The token causing the error.  This tokens position is used
      *                in the exception information.
      */
-    private void illegalAddress(String message, AddressToken token) throws AddressException {
+    private void illegalAddress(final String message, final AddressToken token) throws AddressException {
         throw new AddressException(message, addresses, token.position);
     }
 
@@ -1135,7 +1134,7 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void validatePhrase(TokenStream tokens, boolean required) throws AddressException {
+    private void validatePhrase(final TokenStream tokens, final boolean required) throws AddressException {
         // we need to have at least one WORD token in the phrase...everything is optional
         // after that.
         AddressToken token = tokens.nextRealToken();
@@ -1164,7 +1163,7 @@ class AddressParser {
      *
      * @exception AddressException
      */
-    private void validateRouteAddr(TokenStream tokens, boolean ingroup) throws AddressException {
+    private void validateRouteAddr(final TokenStream tokens, final boolean ingroup) throws AddressException {
         // get the next real token.
         AddressToken token = tokens.nextRealToken();
         // if this is an at sign, then we have a list of domains to parse.
@@ -1205,7 +1204,7 @@ class AddressParser {
      *
      * @param tokens The stream of tokens representing the address.
      */
-    private void validateSimpleAddress(TokenStream tokens) throws AddressException {
+    private void validateSimpleAddress(final TokenStream tokens) throws AddressException {
 
         // the validation routines occur after addresses have been split into
         // personal and address forms.  Therefore, our validation begins directly
@@ -1213,7 +1212,7 @@ class AddressParser {
         validateAddressSpec(tokens);
 
         // get the next token and see if there is something here...anything but the terminator is an error
-        AddressToken token = tokens.nextRealToken();
+        final AddressToken token = tokens.nextRealToken();
         if (token.type != END_OF_TOKENS) {
             illegalAddress("Illegal Address", token);
         }
@@ -1227,12 +1226,12 @@ class AddressParser {
      *
      * @param tokens
      */
-    private void validateAddressSpec(TokenStream tokens) throws AddressException {
+    private void validateAddressSpec(final TokenStream tokens) throws AddressException {
         // all addresses, even the simple ones, must have at least a local part.
         validateLocalPart(tokens);
 
         // now see if we have a domain portion to look at.
-        AddressToken token = tokens.nextRealToken();
+        final AddressToken token = tokens.nextRealToken();
         if (token.type == AT_SIGN) {
             validateDomain(tokens);
         }
@@ -1250,9 +1249,9 @@ class AddressParser {
      *
      * @param tokens The token stream holding the address information.
      */
-    private void validateRoute(TokenStream tokens) throws AddressException {
+    private void validateRoute(final TokenStream tokens) throws AddressException {
         while (true) {
-            AddressToken token = tokens.nextRealToken();
+            final AddressToken token = tokens.nextRealToken();
             // if this is the first part of the list, go parse off a domain
             if (token.type == AT_SIGN) {
                 validateDomain(tokens);
@@ -1277,7 +1276,7 @@ class AddressParser {
      * Parse the local part of an address spec.  The local part
      * is a series of "words" separated by ".".
      */
-    private void validateLocalPart(TokenStream tokens) throws AddressException {
+    private void validateLocalPart(final TokenStream tokens) throws AddressException {
         while (true) {
             // get the token.
             AddressToken token = tokens.nextRealToken();
@@ -1304,7 +1303,7 @@ class AddressParser {
      * Parse a domain name of the form sub-domain *("." sub-domain).
      * a sub-domain is either an atom or a domain-literal.
      */
-    private void validateDomain(TokenStream tokens) throws AddressException {
+    private void validateDomain(final TokenStream tokens) throws AddressException {
         while (true) {
             // get the token.
             AddressToken token = tokens.nextRealToken();
@@ -1365,7 +1364,7 @@ class AddressParser {
      *
      * @param phrase An array list of phrase tokens (which may be empty).
      */
-    private String personalToString(TokenStream tokens) {
+    private String personalToString(final TokenStream tokens) {
 
         // no tokens in the stream?  This is a null value.
         AddressToken token = tokens.nextToken();
@@ -1374,7 +1373,7 @@ class AddressParser {
             return null;
         }
 
-        AddressToken next = tokens.nextToken();
+        final AddressToken next = tokens.nextToken();
 
         // single element phrases get special treatment.
         if (next.type == END_OF_TOKENS) {
@@ -1387,7 +1386,7 @@ class AddressParser {
         tokens.pushToken(token);
 
         // have at least two tokens,
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
 
         // get the first token.  After the first, we add these as blank delimited values.
         token = tokens.nextToken();
@@ -1414,8 +1413,8 @@ class AddressParser {
      *
      * @return The string value of the tokens.
      */
-    private String addressToString(TokenStream tokens) {
-        StringBuffer buffer = new StringBuffer();
+    private String addressToString(final TokenStream tokens) {
+        final StringBuffer buffer = new StringBuffer();
 
         // this flag controls whether we insert a blank delimiter between tokens as
         // we advance through the list.  Blanks are only inserted between consequtive value tokens.
@@ -1482,7 +1481,7 @@ class AddressParser {
      * @param token  The token we're adding.
      * @param buffer The target string buffer.
      */
-    private void addTokenValue(AddressToken token, StringBuffer buffer) {
+    private void addTokenValue(final AddressToken token, final StringBuffer buffer) {
         // atom values can be added directly.
         if (token.type == ATOM) {
             buffer.append(token.value);
@@ -1523,7 +1522,7 @@ class AddressParser {
     private static final byte FLG_CONTROL = 2;
     private static final byte FLG_SPACE = 4;
 
-    private static boolean isSpace(char ch) {
+    private static boolean isSpace(final char ch) {
         if (ch > '\u007f') {
             return false;
         } else {
@@ -1540,7 +1539,7 @@ class AddressParser {
      * @return true if this character is allowed in atoms, false for any
      *         control characters, special characters, or blanks.
      */
-    public static boolean isAtom(char ch) {
+    public static boolean isAtom(final char ch) {
         if (ch > '\u007f') {
             return false;
         }
@@ -1561,7 +1560,7 @@ class AddressParser {
      *
      * @return true if any of the characters is found, false otherwise.
      */
-    public static boolean containsCharacters(String s, String chars)
+    public static boolean containsCharacters(final String s, final String chars)
     {
         for (int i = 0; i < s.length(); i++) {
             if (chars.indexOf(s.charAt(i)) >= 0) {
@@ -1582,10 +1581,10 @@ class AddressParser {
      * @return True if the string contains only blanks or allowed atom
      *         characters.
      */
-    public static boolean containsSpecials(String s)
+    public static boolean containsSpecials(final String s)
     {
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
             // must be either a blank or an allowed atom char.
             if (ch == ' ' || isAtom(ch)) {
                 continue;
@@ -1608,10 +1607,10 @@ class AddressParser {
      * @return True if the string contains only blanks or allowed atom
      *         characters.
      */
-    public static boolean isAtom(String s)
+    public static boolean isAtom(final String s)
     {
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
             // must be an allowed atom character
             if (!isAtom(ch)) {
                 return false;
@@ -1631,7 +1630,7 @@ class AddressParser {
      *
      * @return A version of the string as a valid RFC822 quoted literal.
      */
-    public static String quoteString(String s) {
+    public static String quoteString(final String s) {
 
         // only backslash and double quote require escaping.  If the string does not
         // contain any of these, then we can just slap on some quotes and go.
@@ -1640,7 +1639,7 @@ class AddressParser {
             if (!containsSpecials(s)) {
                 return s;
             }
-            StringBuffer buffer = new StringBuffer(s.length() + 2);
+            final StringBuffer buffer = new StringBuffer(s.length() + 2);
             buffer.append('"');
             buffer.append(s);
             buffer.append('"');
@@ -1649,12 +1648,12 @@ class AddressParser {
 
         // get a buffer sufficiently large for the string, two quote characters, and a "reasonable"
         // number of escaped values.
-        StringBuffer buffer = new StringBuffer(s.length() + 10);
+        final StringBuffer buffer = new StringBuffer(s.length() + 10);
         buffer.append('"');
 
         // now check all of the characters.
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
             // character requiring escaping?
             if (ch == '\\' || ch == '"') {
                 // add an extra backslash
@@ -1677,11 +1676,11 @@ class AddressParser {
      *
      * @return A version of the string as a valid RFC822 quoted literal.
      */
-    public static String formatQuotedString(String s) {
+    public static String formatQuotedString(final String s) {
         // only backslash and double quote require escaping.  If the string does not
         // contain any of these, then we can just slap on some quotes and go.
         if (s.indexOf('\\') == -1 && s.indexOf('"') == -1) {
-            StringBuffer buffer = new StringBuffer(s.length() + 2);
+            final StringBuffer buffer = new StringBuffer(s.length() + 2);
             buffer.append('"');
             buffer.append(s);
             buffer.append('"');
@@ -1690,12 +1689,12 @@ class AddressParser {
 
         // get a buffer sufficiently large for the string, two quote characters, and a "reasonable"
         // number of escaped values.
-        StringBuffer buffer = new StringBuffer(s.length() + 10);
+        final StringBuffer buffer = new StringBuffer(s.length() + 10);
         buffer.append('"');
 
         // now check all of the characters.
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+            final char ch = s.charAt(i);
             // character requiring escaping?
             if (ch == '\\' || ch == '"') {
                 // add an extra backslash
@@ -1710,7 +1709,7 @@ class AddressParser {
 
     public class TokenStream {
         // the set of tokens in the parsed address list, as determined by RFC822 syntax rules.
-        private List tokens;
+        private final List tokens;
 
         // the current token position
         int currentToken = 0;
@@ -1733,7 +1732,7 @@ class AddressParser {
          *
          * @param tokens An existing token list.
          */
-        public TokenStream(List tokens) {
+        public TokenStream(final List tokens) {
             this.tokens = tokens;
             tokens.add(new AddressToken(END_OF_TOKENS, -1));
         }
@@ -1743,7 +1742,7 @@ class AddressParser {
          *
          * @param t      The new token to add to the list.
          */
-        public void addToken(AddressToken token) {
+        public void addToken(final AddressToken token) {
             tokens.add(token);
         }
 
@@ -1797,7 +1796,7 @@ class AddressParser {
          *
          * @param token  The token to push.
          */
-        public void pushToken(AddressToken token) {
+        public void pushToken(final AddressToken token) {
             // just reset the cursor to the token's index position.
             currentToken = tokenIndex(token);
         }
@@ -1810,7 +1809,7 @@ class AddressParser {
          *
          * @return The next token in the list.
          */
-        public AddressToken nextToken(AddressToken token) {
+        public AddressToken nextToken(final AddressToken token) {
             return (AddressToken)tokens.get(tokenIndex(token) + 1);
         }
 
@@ -1822,7 +1821,7 @@ class AddressParser {
          *
          * @return The token prior to the index token in the list.
          */
-        public AddressToken previousToken(AddressToken token) {
+        public AddressToken previousToken(final AddressToken token) {
             return (AddressToken)tokens.get(tokenIndex(token) - 1);
         }
 
@@ -1832,7 +1831,7 @@ class AddressParser {
          *
          * @param index  The target index.
          */
-        public AddressToken getToken(int index)
+        public AddressToken getToken(final int index)
         {
             return (AddressToken)tokens.get(index);
         }
@@ -1846,7 +1845,7 @@ class AddressParser {
          * @return The index of the token within the stream.  Returns -1 if this
          *         token is somehow not in the stream.
          */
-        public int tokenIndex(AddressToken token) {
+        public int tokenIndex(final AddressToken token) {
             return tokens.indexOf(token);
         }
 
@@ -1860,14 +1859,14 @@ class AddressParser {
          *
          * @return A new TokenStream object for processing this section of tokens.
          */
-        public TokenStream section(AddressToken start, AddressToken end) {
-            int startIndex = tokenIndex(start);
-            int endIndex = tokenIndex(end);
+        public TokenStream section(final AddressToken start, final AddressToken end) {
+            final int startIndex = tokenIndex(start);
+            final int endIndex = tokenIndex(end);
 
             // List.subList() returns a list backed by the original list.  Since we need to add a
             // terminator token to this list when we take the sublist, we need to manually copy the
             // references so we don't end up munging the original list.
-            ArrayList list = new ArrayList(endIndex - startIndex + 2);
+            final ArrayList list = new ArrayList(endIndex - startIndex + 2);
 
             for (int i = startIndex; i <= endIndex; i++) {
                 list.add(tokens.get(i));
@@ -1910,7 +1909,7 @@ class AddressParser {
         public TokenStream getBlankDelimitedToken()
         {
             // get the next non-whitespace token.
-            AddressToken first = getNonBlank();
+            final AddressToken first = getNonBlank();
             // if this is the end, we return null.
             if (first.type == END_OF_TOKENS) {
                 return null;
@@ -1971,20 +1970,21 @@ class AddressParser {
         // position of the token within the address string.
         int position;
 
-        AddressToken(int type, int position)
+        AddressToken(final int type, final int position)
         {
             this.type = type;
             this.value = null;
             this.position = position;
         }
 
-        AddressToken(String value, int type, int position)
+        AddressToken(final String value, final int type, final int position)
         {
             this.type = type;
             this.value = value;
             this.position = position;
         }
 
+        @Override
         public String toString()
         {
             if (type == END_OF_TOKENS) {

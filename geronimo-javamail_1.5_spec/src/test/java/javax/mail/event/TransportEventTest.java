@@ -26,13 +26,14 @@ import javax.mail.TestData;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+
 import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
  */
 public class TransportEventTest extends TestCase {
-    public TransportEventTest(String name) {
+    public TransportEventTest(final String name) {
         super(name);
     }
     public void testEvent() throws AddressException {
@@ -40,35 +41,35 @@ public class TransportEventTest extends TestCase {
         doEventTests(TransportEvent.MESSAGE_PARTIALLY_DELIVERED);
         doEventTests(TransportEvent.MESSAGE_NOT_DELIVERED);
     }
-    private void doEventTests(int type) throws AddressException {
-        Folder folder = TestData.getTestFolder();
-        Message message = TestData.getMessage();
-        Transport transport = TestData.getTestTransport();
-        Address[] sent = new Address[] { new InternetAddress("alex@here.com")};
-        Address[] empty = new Address[0];
-        TransportEvent event =
+    private void doEventTests(final int type) throws AddressException {
+        final Folder folder = TestData.getTestFolder();
+        final Message message = TestData.getMessage();
+        final Transport transport = TestData.getTestTransport();
+        final Address[] sent = new Address[] { new InternetAddress("alex@here.com")};
+        final Address[] empty = new Address[0];
+        final TransportEvent event =
             new TransportEvent(transport, type, sent, empty, empty, message);
         assertEquals(transport, event.getSource());
         assertEquals(type, event.getType());
-        TransportListenerTest listener = new TransportListenerTest();
+        final TransportListenerTest listener = new TransportListenerTest();
         event.dispatch(listener);
         assertEquals("Unexpcted method dispatched", type, listener.getState());
     }
     public static class TransportListenerTest implements TransportListener {
         private int state = 0;
-        public void messageDelivered(TransportEvent event) {
+        public void messageDelivered(final TransportEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = TransportEvent.MESSAGE_DELIVERED;
         }
-        public void messagePartiallyDelivered(TransportEvent event) {
+        public void messagePartiallyDelivered(final TransportEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }
             state = TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
         }
-        public void messageNotDelivered(TransportEvent event) {
+        public void messageNotDelivered(final TransportEvent event) {
             if (state != 0) {
                 fail("Recycled Listener");
             }

@@ -54,10 +54,10 @@ public abstract class Multipart {
      * @param mds the data source
      * @throws MessagingException
      */
-    protected void setMultipartDataSource(MultipartDataSource mds) throws MessagingException {
+    protected void setMultipartDataSource(final MultipartDataSource mds) throws MessagingException {
         parts.clear();
         contentType = mds.getContentType();
-        int size = mds.getCount();
+        final int size = mds.getCount();
         for (int i = 0; i < size; i++) {
             parts.add(mds.getBodyPart(i));
         }
@@ -89,7 +89,7 @@ public abstract class Multipart {
      * @return the part
      * @throws MessagingException
      */
-    public BodyPart getBodyPart(int index) throws MessagingException {
+    public BodyPart getBodyPart(final int index) throws MessagingException {
         return (BodyPart) parts.get(index);
     }
 
@@ -100,7 +100,7 @@ public abstract class Multipart {
      * @return true if the part was removed
      * @throws MessagingException
      */
-    public boolean removeBodyPart(BodyPart part) throws MessagingException {
+    public boolean removeBodyPart(final BodyPart part) throws MessagingException {
         return parts.remove(part);
     }
 
@@ -110,7 +110,7 @@ public abstract class Multipart {
      * @param index the part to remove
      * @throws MessagingException
      */
-    public void removeBodyPart(int index) throws MessagingException {
+    public void removeBodyPart(final int index) throws MessagingException {
         parts.remove(index);
     }
 
@@ -120,7 +120,7 @@ public abstract class Multipart {
      * @param part the part to add
      * @throws MessagingException
      */
-    public void addBodyPart(BodyPart part) throws MessagingException {
+    public void addBodyPart(final BodyPart part) throws MessagingException {
         parts.add(part);
     }
 
@@ -131,7 +131,7 @@ public abstract class Multipart {
      * @param pos  the index of the new part
      * @throws MessagingException
      */
-    public void addBodyPart(BodyPart part, int pos) throws MessagingException {
+    public void addBodyPart(final BodyPart part, final int pos) throws MessagingException {
         parts.add(pos, part);
     }
 
@@ -159,7 +159,7 @@ public abstract class Multipart {
      *
      * @param part this object's parent
      */
-    public void setParent(Part part) {
+    public void setParent(final Part part) {
         parent = part;
     }
 
