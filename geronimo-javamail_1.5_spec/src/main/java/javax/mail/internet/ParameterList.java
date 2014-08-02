@@ -113,7 +113,7 @@ public class ParameterList {
      * to a String using the specified charset in the
      * combineMultisegmentNames method.
      */
-    private Map<String, ParameterValue> _multiSegmentParameters = new TreeMap<String, ParameterValue>(new MultiSegmentComparator());
+    private Map<MultiSegmentEntry, ParameterValue> _multiSegmentParameters = new TreeMap<MultiSegmentEntry, ParameterValue>();
     
     private boolean encodeParameters = false;
     private boolean decodeParameters = false;
@@ -132,79 +132,84 @@ public class ParameterList {
         while (true) {
             HeaderTokenizer.Token token = tokenizer.next();
 
-            switch (token.getType()) {
+            if (token.getType() == HeaderTokenizer.Token.EOF) {
                 // the EOF token terminates parsing.
-                case HeaderTokenizer.Token.EOF:
-                    return;
-
-                // each new parameter is separated by a semicolon, including the first, which separates
+                break;
+            } else if (token.getType() == ';') {
+                // each new parameter is separated by a semicolon, including the
+                // first, which separates
                 // the parameters from the main part of the header.
-                case ';':
-                    // the next token needs to be a parameter name
-                    token = tokenizer.next();
-                    // allow a trailing semicolon on the parameters.
-                    if (token.getType() == HeaderTokenizer.Token.EOF) {
-                        return;
-                    }
 
-                    if (token.getType() != HeaderTokenizer.Token.ATOM) {
-                        throw new ParseException("Invalid parameter name: " + token.getValue());
-                    }
-
-                    // get the parameter name as a lower case version for better mapping.
-                    String name = token.getValue().toLowerCase();
-
-                    token = tokenizer.next();
-
-                    // parameters are name=value, so we must have the "=" here.
-                    if (token.getType() != '=') {
-                        throw new ParseException("Missing '='");
-                    }
-
-                    // now the value, which may be an atom or a literal
-                    token = tokenizer.next();
-
-                    if (token.getType() != HeaderTokenizer.Token.ATOM && token.getType() != HeaderTokenizer.Token.QUOTEDSTRING) {
-                        throw new ParseException("Invalid parameter value: " + token.getValue());
-                    }
-
-                    final String value = token.getValue();
-                    String decodedValue = null;
-
-                    // we might have to do some additional decoding.  A name that ends with "*"
-                    // is marked as being encoded, so if requested, we decode the value.
-                    if (decodeParameters && name.endsWith("*") && !isMultiSegmentName(name)) {
-                        // the name needs to be pruned of the marker, and we need to decode the value.
-                        name = name.substring(0, name.length() - 1);
-                        // get a new decoder
-                        final RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
-
-                        try {
-                            // decode the value
-                            decodedValue = decoder.decode(value);
-                        } catch (final Exception e) {
-                            // if we're doing things strictly, then raise a parsing exception for errors.
-                            // otherwise, leave the value in its current state.
-                            if (decodeParametersStrict) {
-                                throw new ParseException("Invalid RFC2231 encoded parameter");
-                            }
-                        }
-                        _parameters.put(name, new ParameterValue(name, decodedValue, value));
-                    }
-                    else if (isMultiSegmentName(name)) {
-                        //multisegment parameter
-                        _multiSegmentParameters.put(name, new ParameterValue(name, value));
-                    }else {
-                        _parameters.put(name, new ParameterValue(name, value));
-                    }
-
+                // the next token needs to be a parameter name
+                token = tokenizer.next();
+                // allow a trailing semicolon on the parameters.
+                if (token.getType() == HeaderTokenizer.Token.EOF) {
                     break;
+                }
 
-                default:
-                    throw new ParseException("Missing ';'");
+                if (token.getType() != HeaderTokenizer.Token.ATOM) {
+                    throw new ParseException("Invalid parameter name: " + token.getValue());
+                }
 
+                // get the parameter name as a lower case version for better
+                // mapping.
+                String name = token.getValue().toLowerCase();
+
+                token = tokenizer.next();
+
+                // parameters are name=value, so we must have the "=" here.
+                if (token.getType() != '=') {
+                    throw new ParseException("Missing '='");
+                }
+
+                // now the value, which may be an atom or a literal
+                token = tokenizer.next();
+
+                if (token.getType() != HeaderTokenizer.Token.ATOM && token.getType() != HeaderTokenizer.Token.QUOTEDSTRING) {
+                    throw new ParseException("Invalid parameter value: " + token.getValue());
+                }
+
+                final String value = token.getValue();
+                String decodedValue = null;
+
+                // we might have to do some additional decoding. A name that
+                // ends with "*"
+                // is marked as being encoded, so if requested, we decode the
+                // value.
+                if (decodeParameters && name.endsWith("*") && !isMultiSegmentName(name)) {
+                    // the name needs to be pruned of the marker, and we need to
+                    // decode the value.
+                    name = name.substring(0, name.length() - 1);
+                    // get a new decoder
+                    final RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
+
+                    try {
+                        // decode the value
+                        decodedValue = decoder.decode(value);
+                    } catch (final Exception e) {
+                        // if we're doing things strictly, then raise a parsing
+                        // exception for errors.
+                        // otherwise, leave the value in its current state.
+                        if (decodeParametersStrict) {
+                            throw new ParseException("Invalid RFC2231 encoded parameter");
+                        }
+                    }
+                    _parameters.put(name, new ParameterValue(name, decodedValue, value));
+                } else if (isMultiSegmentName(name)) {
+                    // multisegment parameter
+                    _multiSegmentParameters.put(new MultiSegmentEntry(name), new ParameterValue(name, value));
+                } else {
+                    _parameters.put(name, new ParameterValue(name, value));
+                }
+
+            } else {
+
+                throw new ParseException("Missing ';'");
             }
+
         }
+
+        combineSegments();
     }
     
     private static boolean isMultiSegmentName(String name) {
@@ -247,52 +252,71 @@ public class ParameterList {
      * @since    JavaMail 1.5
      */ 
     public void combineSegments() {
-        //FIXME implement combineSegments()
-        
-//        title*0*=us-ascii'en'This%20is%20even%20more%20
-//        title*1*=%2A%2A%2Afun%2A%2A%2A%20
-//        title*2="isn't it!"
-        
-          String lastName = null;
-          int lastSegmentNumber = -1;
-          StringBuilder segmentValue = new StringBuilder();
-          for (Entry<String, ParameterValue> entry: _multiSegmentParameters.entrySet()) {
-              
-              MultiSegmentEntry currentMEntry = new MultiSegmentEntry(entry.getKey());
-              
-              if(lastName == null) {
-                  lastName = currentMEntry.name;
-              }else {
-                  
-                  if(!lastName.equals(currentMEntry.name)){
-                      
-                      _parameters.put(currentMEntry.name, new ParameterValue(currentMEntry.name, segmentValue.toString()));
-                      segmentValue.setLength(0);
-                      
-                      
-                  }
-                  
-              }
-              
-              if(lastSegmentNumber == -1) {
-                  lastSegmentNumber = currentMEntry.range;
-                  
-                  if(lastSegmentNumber != 0) {
-                      
-                  }
-                  
-              }else
-              {
-                  if(lastSegmentNumber+1 != currentMEntry.range) {
-                      
-                  }
-              }
-        
-              segmentValue.append(entry.getValue().value);
-              
-          } 
-  
-        
+       
+        // title*0*=us-ascii'en'This%20is%20even%20more%20
+        // title*1*=%2A%2A%2Afun%2A%2A%2A%20
+        // title*2="isn't it!"
+
+        if (_multiSegmentParameters.size() > 0) {
+
+            final RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
+            String lastName = null;
+            int lastSegmentNumber = -1;
+            StringBuilder segmentValue = new StringBuilder();
+            for (Entry<MultiSegmentEntry, ParameterValue> entry : _multiSegmentParameters.entrySet()) {
+
+                MultiSegmentEntry currentMEntry = entry.getKey();
+
+                if (lastName == null) {
+                    lastName = currentMEntry.name;
+                } else {
+
+                    if (!lastName.equals(currentMEntry.name)) {
+
+                        _parameters.put(lastName, new ParameterValue(lastName, segmentValue.toString()));
+                        segmentValue.setLength(0);
+                        lastName = currentMEntry.name;
+
+                    }
+
+                }
+
+                if (lastSegmentNumber == -1) {
+                    lastSegmentNumber = currentMEntry.range;
+
+                    if (lastSegmentNumber != 0) {
+                        // does not start with 0
+                        // skip gracefully
+                    }
+
+                } else {
+                    if (lastSegmentNumber + 1 != currentMEntry.range) {
+                        // seems here is a gap
+                        // skip gracefully
+                    }
+                }
+
+                if (currentMEntry.encoded) {
+
+                    try {
+                        // decode the value
+                        segmentValue.append(decoder.decode(entry.getValue().value));
+                    } catch (final Exception e) {
+                        segmentValue.append(entry.getValue().value);
+                    }
+
+                } else {
+
+                    segmentValue.append(entry.getValue().value);
+
+                }
+
+            }
+
+            _parameters.put(lastName, new ParameterValue(lastName, segmentValue.toString()));
+
+        }
+
     }
 
     /**
@@ -322,7 +346,7 @@ public class ParameterList {
 
         if (isMultiSegmentName(name)) {
             // multisegment parameter
-            _multiSegmentParameters.put(name, new ParameterValue(name, value));
+            _multiSegmentParameters.put(new MultiSegmentEntry(name), new ParameterValue(name, value));
         } else {
             _parameters.put(name, new ParameterValue(name, value));
         }
@@ -349,7 +373,7 @@ public class ParameterList {
                 
                 if (isMultiSegmentName(name)) {
                     // multisegment parameter
-                    _multiSegmentParameters.put(name, new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
+                    _multiSegmentParameters.put(new MultiSegmentEntry(name), new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
                 } else {
                     _parameters.put(name, new ParameterValue(name, value, new String(out.toByteArray(), "ISO8859-1")));
                 }
@@ -364,7 +388,7 @@ public class ParameterList {
         // default in case there is an exception
         if (isMultiSegmentName(name)) {
             // multisegment parameter
-            _multiSegmentParameters.put(name, new ParameterValue(name, value));
+            _multiSegmentParameters.put(new MultiSegmentEntry(name), new ParameterValue(name, value));
         } else {
             _parameters.put(name, new ParameterValue(name, value));
         }
@@ -477,8 +501,9 @@ public class ParameterList {
         }
     }
     
-    class MultiSegmentEntry {
+    static class MultiSegmentEntry implements Comparable<MultiSegmentEntry>{
         final String original;
+        final String normalized;
         final String name;
         final int range;
         final boolean encoded;
@@ -489,18 +514,62 @@ public class ParameterList {
         
             int firstAsterixIndex1 = original.indexOf('*');
             encoded=original.endsWith("*");
-            int endIndex1 = encoded?original.length()-2:original.length()-1;
+            int endIndex1 = encoded?original.length()-1:original.length();
             name = original.substring(0, firstAsterixIndex1);
             range = Integer.parseInt(original.substring(firstAsterixIndex1+1, endIndex1));
-        
+            normalized = original.substring(0, endIndex1);
         }
-        
-        
-        
+      
+ 
+       @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((normalized == null) ? 0 : normalized.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            MultiSegmentEntry other = (MultiSegmentEntry) obj;
+            if (normalized == null) {
+                if (other.normalized != null)
+                    return false;
+            } else if (!normalized.equals(other.normalized))
+                return false;
+            return true;
+        }
+
+        public int compareTo(MultiSegmentEntry o) {
+            
+            if(this.equals(o)) return 0;
+            
+            if(name.equals(o.name)) {
+                return range>o.range?1:-1;
+            }else
+            {
+                return name.compareTo(o.name);
+            }
+            
+            
+            
+        }
+
+
+        @Override
+        public String toString() {
+            return "MultiSegmentEntry\n[original=" + original + ", name=" + name + ", range=" + range + "]\n";
+        }
         
     }
     
-    class MultiSegmentComparator implements Comparator<String> {
+    /*class MultiSegmentComparator implements Comparator<String> {
 
         public int compare(String o1, String o2) {
             
@@ -515,16 +584,15 @@ public class ParameterList {
                 return prefix1.compareTo(prefix2);
             }           
             
-            int endIndex1 = o1.endsWith("*")?o1.length()-2:o1.length()-1;           
-            int endIndex2 = o2.endsWith("*")?o2.length()-2:o2.length()-1;
+            int endIndex1 = o1.endsWith("*")?o1.length()-1:o1.length();           
+            int endIndex2 = o2.endsWith("*")?o2.length()-1:o2.length();
             
             int num1 = Integer.parseInt(o1.substring(firstAsterixIndex1+1, endIndex1));
             int num2 = Integer.parseInt(o2.substring(firstAsterixIndex2+1, endIndex2));
             
             return num1>num2?1:-1;
-
-            
+           
         }
         
-    }
+    }*/
 }

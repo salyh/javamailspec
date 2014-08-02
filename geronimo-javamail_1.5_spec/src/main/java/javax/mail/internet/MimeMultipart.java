@@ -118,10 +118,10 @@ public class MimeMultipart extends Multipart {
      */
     protected void initializeProperties() {
         
-        ignoreMissingEndBoundary = SessionUtil.getBooleanProperty(MIME_IGNORE_MISSING_ENDBOUNDARY, ignoreMissingEndBoundary);
-        ignoreMissingBoundaryParameter = SessionUtil.getBooleanProperty(MIME_IGNORE_MISSING_BOUNDARY_PARAMETER, ignoreMissingBoundaryParameter);
-        ignoreExistingBoundaryParameter = SessionUtil.getBooleanProperty(MIME_IGNORE_EXISTING_BOUNDARY_PARAMETER, ignoreExistingBoundaryParameter);
-        allowEmpty = SessionUtil.getBooleanProperty(MIME_ALLOWEMPTY, allowEmpty);
+        ignoreMissingEndBoundary = SessionUtil.getBooleanProperty(MIME_IGNORE_MISSING_ENDBOUNDARY, true);
+        ignoreMissingBoundaryParameter = SessionUtil.getBooleanProperty(MIME_IGNORE_MISSING_BOUNDARY_PARAMETER, true);
+        ignoreExistingBoundaryParameter = SessionUtil.getBooleanProperty(MIME_IGNORE_EXISTING_BOUNDARY_PARAMETER, false);
+        allowEmpty = SessionUtil.getBooleanProperty(MIME_ALLOWEMPTY, false);
          
     }
 
@@ -234,6 +234,10 @@ public class MimeMultipart extends Multipart {
         parse();
         final String boundary = type.getParameter("boundary");
         final byte[] bytes = boundary.getBytes("ISO8859-1");
+        
+        if(!allowEmpty && parts.size() == 0) {
+            throw new MessagingException("Multipart content with no body parts is not allowed");
+        }
 
         if (preamble != null) {
             final byte[] preambleBytes = preamble.getBytes("ISO8859-1");
@@ -261,24 +265,22 @@ public class MimeMultipart extends Multipart {
         if (parsed) {
             return;
         }
-        
+                
         initializeProperties();
-        
-        /*
-         * private static final String MIME_IGNORE_MISSING_ENDBOUNDARY = "mail.mime.multipart.ignoremissingendboundary";
-    private static final String MIME_IGNORE_MISSING_BOUNDARY_PARAMETER = "mail.mime.multipart.ignoremissingboundaryparameter";
-    private static final String MIME_IGNORE_EXISTING_BOUNDARY_PARAMETER = "mail.mime.multipart.ignoreexistingboundaryparameter";
-    private static final String MIME_ALLOWEMPTY = "mail.mime.multipart.allowempty";
-         */
-      //FIXME implement boundary handling
 
         try {
             final ContentType cType = new ContentType(contentType);
+            final String boundaryString = cType.getParameter("boundary");
+            
+            if(!ignoreMissingBoundaryParameter && boundaryString  == null) {
+                throw new MessagingException("Missing boundary parameter in content-type");
+            }           
+                        
             final InputStream is = new BufferedInputStream(ds.getInputStream());
             BufferedInputStream pushbackInStream = null;
-            final String boundaryString = cType.getParameter("boundary");
+            
             byte[] boundary = null;
-            if (boundaryString == null) {
+            if (boundaryString == null || ignoreExistingBoundaryParameter) {
                 pushbackInStream = new BufferedInputStream(is, 1200);
                 // read until we find something that looks like a boundary string
                 boundary = readTillFirstBoundary(pushbackInStream);
@@ -293,7 +295,7 @@ public class MimeMultipart extends Multipart {
                 MimeBodyPartInputStream partStream;
                 partStream = new MimeBodyPartInputStream(pushbackInStream, boundary);
                 addBodyPart(new MimeBodyPart(partStream));
-
+                
                 // terminated by an EOF rather than a proper boundary?
                 if (!partStream.boundaryFound) {
                     if (!ignoreMissingEndBoundary) {
@@ -306,6 +308,12 @@ public class MimeMultipart extends Multipart {
                     break;
                 }
             }
+            
+            if(!allowEmpty && parts.size() == 0) {
+                throw new MessagingException("Multipart content with no body parts is not allowed");
+            }
+            
+            
         } catch (final Exception e){
             throw new MessagingException(e.toString(),e);
         }
