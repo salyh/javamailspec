@@ -114,6 +114,40 @@ public class MimeMultipartTest extends TestCase {
         assertNotNull(object1);
         assertEquals(multiPart.getCount(), 2);
     }
+    
+    public void testJavaMail15NewConstrucor() throws IOException, MessagingException {
+        final File basedir = new File(System.getProperty("basedir", "."));
+        final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
+        BodyPart[] bps = new BodyPart[2]; 
+        bps[0] = new MimeBodyPart(new FileInputStream(testInput));
+        bps[1] = new MimeBodyPart(new FileInputStream(testInput));
+        final MimeMultipart multiPart = new MimeMultipart(bps);
+        final MimeBodyPart mimeBodyPart0 = (MimeBodyPart) multiPart.getBodyPart(0);
+        final Object object0 = mimeBodyPart0.getContent();
+        assertNotNull(object0);
+        final MimeBodyPart mimeBodyPart1 = (MimeBodyPart) multiPart.getBodyPart(1);
+        final Object object1 = mimeBodyPart1.getContent();
+        assertNotNull(object1);
+        assertEquals(multiPart.getCount(), 2);
+        assertTrue(multiPart.getContentType().startsWith("multipart/mixed"));
+    }
+    
+    public void testJavaMail15NewConstrucor2() throws IOException, MessagingException {
+        final File basedir = new File(System.getProperty("basedir", "."));
+        final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
+        BodyPart[] bps = new BodyPart[2]; 
+        bps[0] = new MimeBodyPart(new FileInputStream(testInput));
+        bps[1] = new MimeBodyPart(new FileInputStream(testInput));
+        final MimeMultipart multiPart = new MimeMultipart("alternative",bps);
+        final MimeBodyPart mimeBodyPart0 = (MimeBodyPart) multiPart.getBodyPart(0);
+        final Object object0 = mimeBodyPart0.getContent();
+        assertNotNull(object0);
+        final MimeBodyPart mimeBodyPart1 = (MimeBodyPart) multiPart.getBodyPart(1);
+        final Object object1 = mimeBodyPart1.getContent();
+        assertNotNull(object1);
+        assertEquals(multiPart.getCount(), 2);
+        assertTrue(multiPart.getContentType().startsWith("multipart/alternative"));
+    }
 
     protected void writeToSetUp() throws Exception {
         defaultMap = CommandMap.getDefaultCommandMap();

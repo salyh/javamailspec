@@ -93,6 +93,40 @@ public class HeaderTokenizerTest extends TestCase {
         checkTokenParse("(Foo \r\n Bar)", Token.COMMENT, "Foo  Bar");
         checkTokenParse("(Foo \n Bar)", Token.COMMENT, "Foo \n Bar");
     }
+    
+    public void testJava15NextMethod() throws ParseException{
+        HeaderTokenizer ht;
+        ht =
+            new HeaderTokenizer("To: \"Geronimo List\\\" <geronimo-dev@apache.org>, \n\r Geronimo User <geronimo-user@apache.org>");
+        validateToken(ht.next('>', false), Token.QUOTEDSTRING, "To: \"Geronimo List\" <geronimo-dev@apache.org");
+    }
+    
+    public void testJava15NextMethodEscapes() throws ParseException{
+        HeaderTokenizer ht;
+        ht =
+            new HeaderTokenizer("To: \"Geronimo List\\\" <geronimo-dev@apache.org>, \n\r Geronimo User <geronimo-user@apache.org>");
+        validateToken(ht.next('<', true), Token.QUOTEDSTRING, "To: \"Geronimo List\\\" ");
+    }
+    
+    public void testJava15NextMethodEscapes2() throws ParseException{
+        HeaderTokenizer ht;
+        ht =
+            new HeaderTokenizer("To: \"Geronimo List\" <geronimo-dev@apac\\he.org>, \n\r Geronimo User <geronimo-user@apache.org>");
+        ht.next();
+        ht.next();
+        ht.next();
+        validateToken(ht.next(',', false), Token.QUOTEDSTRING, "<geronimo-dev@apache.org>");
+    }
+    
+    public void testJava15NextMethodEscapes3() throws ParseException{
+        HeaderTokenizer ht;
+        ht =
+            new HeaderTokenizer("To: \"Geronimo List\" <geronimo-dev@apac\\he.org>, \n\r Geronimo User <geronimo-user@apache.org>");
+        ht.next();
+        ht.next();
+        ht.next();
+        validateToken(ht.next(',', true), Token.QUOTEDSTRING, "<geronimo-dev@apac\\he.org>");
+    }
 
     public void checkTokenParse(final String text, final int type, final String value) throws ParseException {
         HeaderTokenizer ht;
@@ -157,7 +191,7 @@ public class HeaderTokenizerTest extends TestCase {
     }
 
     private void validateToken(final HeaderTokenizer.Token token, final int type, final String value) {
-        assertEquals(token.getType(), type);
-        assertEquals(token.getValue(), value);
+        assertEquals(type, token.getType());
+        assertEquals(value, token.getValue());
     }
 }

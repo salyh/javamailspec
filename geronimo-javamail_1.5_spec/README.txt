@@ -9,8 +9,8 @@ The classes represent the JavaMail API and contain implementations of the
 classes found in the javax.mail packages. In order to function correctly,
 these classes require:
 
-o The Java Activation Framework (JAF) in javax.activation unless you are using Java SE 6 or newer
-o J2SE 5.0 or newer
+o The Java Activation Framework (JAF) 1.1 (or newer) in javax.activation unless you are using Java SE 6 or newer
+o J2SE 5.0/JDK 1.5 or newer
 o Implementations of the JavaMail providers to deal with pop/imap/etc.
   (You may use this with the geronimo-mail implementation or write your own)
 
@@ -19,6 +19,10 @@ This contains no JavaDoc: see
   http://docs.oracle.com/javaee/7/api/
 
 for more information on how to use JavaMail to send messages.
+
+JAF 1.1.1 is currently the newest version.  Note that JAF 1.1
+is included in JDK 1.6 and JAF 1.1.1 is included in JDK 1.6.0_10 and
+later.
 
 Configuration
 -------------

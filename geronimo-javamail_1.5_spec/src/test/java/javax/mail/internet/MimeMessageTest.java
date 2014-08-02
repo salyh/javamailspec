@@ -135,6 +135,27 @@ public class MimeMessageTest extends TestCase {
         msg.setSender(null);
         assertNull(msg.getSender());
     }
+    
+    public void testJava15From() throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
+        
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+
+        
+        msg.setFrom("geronimo-dev@apache.org,geronimo-user@apache.org");
+
+        Address[] from = msg.getFrom();
+        assertTrue(from.length == 2);
+        assertEquals(from[0], dev);
+        assertEquals(from[1], user);
+        
+        msg.setFrom("test@apache.org");
+        
+        from = msg.getFrom();
+        assertTrue(from.length == 1);
+        assertEquals(from[0], new InternetAddress("test@apache.org"));
+    }
 
     public void testGetAllRecipients() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);

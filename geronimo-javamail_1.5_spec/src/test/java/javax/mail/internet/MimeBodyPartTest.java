@@ -23,9 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
+import javax.mail.Part;
 
 import junit.framework.TestCase;
 
@@ -84,6 +86,14 @@ public class MimeBodyPartTest extends TestCase {
 
         part.setDisposition("inline");
         assertEquals(part.getDisposition(), "inline");
+    }
+    
+    public void testJavaMail15AttachmentDisposition() throws MessagingException, IOException {
+        final MimeBodyPart part = new MimeBodyPart();
+        assertNull(part.getDisposition());
+
+        part.attachFile("test.dat");
+        assertEquals(part.getDisposition(), Part.ATTACHMENT);
     }
 
 
