@@ -29,6 +29,8 @@ import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.Flags.Flag;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 
@@ -134,6 +136,14 @@ public class MimeMessageTest extends TestCase {
 
         msg.setSender(null);
         assertNull(msg.getSender());
+    }
+    
+    public void testJavaMail15GetSession() throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
+        assertTrue(session == msg.getSession());
+        
+        final MimeMessage msg2 = new MimeMessage((Session) null);
+        assertTrue(null == msg2.getSession());
     }
     
     public void testJava15From() throws MessagingException {
@@ -345,6 +355,32 @@ public class MimeMessageTest extends TestCase {
 
         recipients = msg.getReplyTo();
         assertNull(recipients);
+    }
+    
+    public void testJavaMail15Reply() throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        
+        msg.setFrom("test@apache.org");
+        msg.setRecipient(RecipientType.TO, dev);
+
+        Message replyMsg = msg.reply(true, true);
+        assertNotNull(replyMsg);
+        assertTrue(msg.isSet(Flag.ANSWERED));
+        assertEquals(new InternetAddress("test@apache.org"), replyMsg.getRecipients(RecipientType.TO)[0]);
+    }
+    
+    public void testJavaMail15Reply2() throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        
+        msg.setFrom("test@apache.org");
+        msg.setRecipient(RecipientType.TO, dev);
+
+        Message replyMsg = msg.reply(false, false);
+        assertNotNull(replyMsg);
+        assertFalse(msg.isSet(Flag.ANSWERED));
+        assertEquals(new InternetAddress("test@apache.org"), replyMsg.getRecipients(RecipientType.TO)[0]);
     }
 
 

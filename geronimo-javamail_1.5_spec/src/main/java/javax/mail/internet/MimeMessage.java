@@ -1044,6 +1044,10 @@ public class MimeMessage extends Message implements MimePart {
 
     @Override
     public Message reply(final boolean replyToAll) throws MessagingException {
+        return reply(replyToAll, true);
+    }
+
+    private Message replyInternal(final boolean replyToAll, boolean setOriginalAnswered) throws MessagingException {
         // create a new message in this session.
         final MimeMessage reply = createMimeMessage(session);
 
@@ -1136,7 +1140,10 @@ public class MimeMessage extends Message implements MimePart {
         // construct a flag item instance inorder to set it.
 
         // this is an answered email.
-        setFlags(new Flags(Flags.Flag.ANSWERED), true);
+        if(setOriginalAnswered) {
+            setFlags(new Flags(Flags.Flag.ANSWERED), true);
+        }
+        
         // all done, return the constructed Message object.
         return reply;
     }
@@ -1184,8 +1191,8 @@ public class MimeMessage extends Message implements MimePart {
            message when creating a reply message.
          */
         
-        this.setFlag(Flag.ANSWERED, setAnswered);
-        return reply(replyToAll);
+       return replyInternal(replyToAll, setAnswered);
+       
     }
     
 
