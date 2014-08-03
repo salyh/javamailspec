@@ -337,7 +337,7 @@ public class MimeMultipart extends Multipart {
                 // read the next line
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
-                if (line == null) {
+                if (line == null || line.length==0) { //TODO lenth 0 ok?
                     throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
                 // if this looks like a boundary, then make it so
@@ -408,7 +408,7 @@ public class MimeMultipart extends Multipart {
                 // read the next line
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
-                if (line == null) {
+                if (line == null || line.length==0) { //TODO length = 0 valid?
                     throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
 

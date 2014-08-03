@@ -315,6 +315,7 @@ public class HeaderTokenizer {
         // skip to end of comment/string
         while (++pos < _headerLength) {
             final char ch = _header.charAt(pos);
+
             if (ch == endChar) {
                 String value;
                 if (requiresEscaping) {

@@ -730,7 +730,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
     public void attachFile(final File file, final String contentType, final String encoding)
                 throws IOException, MessagingException {
      
-        final FileDataSource dataSource = new EncodingAwareFileDataSource(file,contentType, encoding);
+        final FileDataSource dataSource = new EncodingAwareFileDataSource(file, contentType, encoding);
         setDataHandler(new DataHandler(dataSource));
         setFileName(dataSource.getName());
                

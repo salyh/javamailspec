@@ -91,9 +91,24 @@ public class MimeBodyPartTest extends TestCase {
     public void testJavaMail15AttachmentDisposition() throws MessagingException, IOException {
         final MimeBodyPart part = new MimeBodyPart();
         assertNull(part.getDisposition());
-
-        part.attachFile("test.dat");
-        assertEquals(part.getDisposition(), Part.ATTACHMENT);
+        File testInput = new File(basedir, "src/test/resources/test.dat");
+        part.attachFile(testInput);
+        assertEquals(Part.ATTACHMENT, part.getDisposition());
+    }
+    
+    public void testJavaMail15EncodingAware() throws MessagingException, IOException {
+    	File testInput = new File(basedir, "src/test/resources/test.dat");
+    	final MimeBodyPart part = new MimeBodyPart();
+        part.attachFile(testInput);
+        part.updateHeaders();
+        assertTrue(part.getDataHandler().getContentType().equals("application/octet-stream"));
+        assertEquals("7bit", part.getEncoding());
+        
+        final MimeBodyPart part2 = new MimeBodyPart();
+        part2.attachFile(testInput,"application/pdf","base64");
+        part2.updateHeaders();
+        assertTrue(part2.getDataHandler().getContentType().equals("application/pdf"));
+        assertEquals("base64", part2.getEncoding());
     }
 
 
