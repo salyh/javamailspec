@@ -31,6 +31,7 @@ import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.MultipartDataSource;
+import javax.management.RuntimeErrorException;
 
 import org.apache.geronimo.mail.util.SessionUtil;
 
@@ -309,10 +310,12 @@ public class MimeMultipart extends Multipart {
 
                 // terminated by an EOF rather than a proper boundary?
                 if (!partStream.boundaryFound) {
+                	
                     if (!ignoreMissingEndBoundary) {
                         throw new MessagingException("Missing Multi-part end boundary");
                     }
                     complete = false;
+                    break;
                 }
                 // if we hit the final boundary, stop processing this
                 if (partStream.finalBoundaryFound) {
@@ -581,9 +584,7 @@ public class MimeMultipart extends Multipart {
             final int firstChar = inStream.read();
             // premature end?  Handle it like a boundary located
             if (firstChar == -1) {
-                boundaryFound = true;
-                // also mark this as the end
-                finalBoundaryFound = true;
+            	//DO NOT treat this a a boundary because if we do so we have no chance to detect missing end boundaries
                 return -1;
             }
 

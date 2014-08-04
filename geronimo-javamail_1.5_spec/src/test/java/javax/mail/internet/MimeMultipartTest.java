@@ -60,7 +60,7 @@ public class MimeMultipartTest extends TestCase {
         final MimeBodyPart part2 = new MimeBodyPart();
         part2.setContent("Hello Again", "text/plain");
         mp.addBodyPart(part2);
-        mp.writeTo(System.out);
+        //mp.writeTo(System.out);
 
         writeToTearDown();
     }
@@ -90,7 +90,7 @@ public class MimeMultipartTest extends TestCase {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         message.writeTo(out);
-        out.writeTo(System.out);
+        //out.writeTo(System.out);
 
         final ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
@@ -156,7 +156,7 @@ public class MimeMultipartTest extends TestCase {
     	InputStream source = new FileInputStream(new File("src/test/resources/multipart_msg_normal.eml"));
     	MimeMessage message = new MimeMessage(null, source);
 		message.saveChanges();
-		assertEquals("Sample message ", message.getSubject());	
+		assertEquals("Sample message", message.getSubject());	
 		assertTrue(message.getContent() instanceof MimeMultipart);
 		assertNotNull(message.cachedContent);
 		MimeMultipart mmp = (MimeMultipart) message.getContent();
@@ -267,9 +267,9 @@ public class MimeMultipartTest extends TestCase {
     	InputStream source = new FileInputStream(new File("src/test/resources/"+filename));
     	MimeMessage message = new MimeMessage(null, source);
     	try {
-			message.saveChanges();
-			assertTrue(message.getDataHandler().getContent() instanceof MimeMultipart);
-			MimeMultipart mmp = (MimeMultipart) message.getDataHandler().getContent();
+			//message.saveChanges();
+			assertTrue(message.getContent() instanceof MimeMultipart);
+			MimeMultipart mmp = (MimeMultipart) message.getContent();
 			assertEquals(count, mmp.getCount());
 			return mmp;
 		} catch (MessagingException e) {
