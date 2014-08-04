@@ -91,13 +91,13 @@ public class MimeBodyPartTest extends TestCase {
     public void testJavaMail15AttachmentDisposition() throws MessagingException, IOException {
         final MimeBodyPart part = new MimeBodyPart();
         assertNull(part.getDisposition());
-        File testInput = new File(basedir, "src/test/resources/test.dat");
+        final File testInput = new File(basedir, "src/test/resources/test.dat");
         part.attachFile(testInput);
         assertEquals(Part.ATTACHMENT, part.getDisposition());
     }
     
     public void testJavaMail15EncodingAware() throws MessagingException, IOException {
-    	File testInput = new File(basedir, "src/test/resources/test.dat");
+    	final File testInput = new File(basedir, "src/test/resources/test.dat");
     	final MimeBodyPart part = new MimeBodyPart();
         part.attachFile(testInput);
         part.updateHeaders();

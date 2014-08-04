@@ -31,7 +31,6 @@ import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.MultipartDataSource;
-import javax.management.RuntimeErrorException;
 
 import org.apache.geronimo.mail.util.SessionUtil;
 
@@ -349,7 +348,7 @@ public class MimeMultipart extends Multipart {
                 // read the next line
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
-                if (line == null || line.length==0) { //TODO lenth 0 ok?
+                if (line == null || line.length==0) {
                     return null;//throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
                 // if this looks like a boundary, then make it so
@@ -420,7 +419,7 @@ public class MimeMultipart extends Multipart {
                 // read the next line
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
-                if (line == null || line.length==0) { //TODO length = 0 valid?
+                if (line == null || line.length==0) {
                 	return false;//throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
 

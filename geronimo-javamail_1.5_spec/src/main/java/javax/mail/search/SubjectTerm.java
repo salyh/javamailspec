@@ -48,8 +48,12 @@ public final class SubjectTerm extends StringTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof SubjectTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof SubjectTerm == false) {
+			return false;
+		}
         return super.equals(other); 
     }
 }

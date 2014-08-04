@@ -60,8 +60,12 @@ public final class HeaderTerm extends StringTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof HeaderTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof HeaderTerm == false) {
+			return false;
+		}
         // we need to compare with more than just the header name. 
         return headerName.equalsIgnoreCase(((HeaderTerm) other).headerName) && super.equals(other);
     }

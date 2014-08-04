@@ -83,8 +83,12 @@ public final class AndTerm extends SearchTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof AndTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof AndTerm == false) {
+			return false;
+		}
         return Arrays.equals(terms, ((AndTerm) other).terms);
     }
 

@@ -51,8 +51,12 @@ public final class SentDateTerm extends DateTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof SentDateTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof SentDateTerm == false) {
+			return false;
+		}
         return super.equals(other);
     }
 }

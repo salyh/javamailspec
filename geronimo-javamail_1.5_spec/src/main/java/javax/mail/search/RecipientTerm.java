@@ -63,8 +63,12 @@ public final class RecipientTerm extends AddressTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof RecipientTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof RecipientTerm == false) {
+			return false;
+		}
 
         final RecipientTerm recipientTerm = (RecipientTerm) other;
         return address.equals(recipientTerm.address) && type == recipientTerm.type;

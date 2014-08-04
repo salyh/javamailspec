@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -120,7 +119,7 @@ public class MimeMultipartTest extends TestCase {
     public void testJavaMail15NewConstrucor() throws IOException, MessagingException {
         final File basedir = new File(System.getProperty("basedir", "."));
         final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
-        BodyPart[] bps = new BodyPart[2]; 
+        final BodyPart[] bps = new BodyPart[2]; 
         bps[0] = new MimeBodyPart(new FileInputStream(testInput));
         bps[1] = new MimeBodyPart(new FileInputStream(testInput));
         final MimeMultipart multiPart = new MimeMultipart(bps);
@@ -137,7 +136,7 @@ public class MimeMultipartTest extends TestCase {
     public void testJavaMail15NewConstrucor2() throws IOException, MessagingException {
         final File basedir = new File(System.getProperty("basedir", "."));
         final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
-        BodyPart[] bps = new BodyPart[2]; 
+        final BodyPart[] bps = new BodyPart[2]; 
         bps[0] = new MimeBodyPart(new FileInputStream(testInput));
         bps[1] = new MimeBodyPart(new FileInputStream(testInput));
         final MimeMultipart multiPart = new MimeMultipart("alternative",bps);
@@ -153,16 +152,16 @@ public class MimeMultipartTest extends TestCase {
     
     public void testJavaMail15CachedContent() throws IOException, MessagingException {
     	
-    	InputStream source = new FileInputStream(new File("src/test/resources/multipart_msg_normal.eml"));
-    	MimeMessage message = new MimeMessage(null, source);
+    	final InputStream source = new FileInputStream(new File("src/test/resources/multipart_msg_normal.eml"));
+    	final MimeMessage message = new MimeMessage(null, source);
 		message.saveChanges();
 		assertEquals("Sample message", message.getSubject());	
 		assertTrue(message.getContent() instanceof MimeMultipart);
 		assertNotNull(message.cachedContent);
-		MimeMultipart mmp = (MimeMultipart) message.getContent();
+		final MimeMultipart mmp = (MimeMultipart) message.getContent();
 		assertTrue(message.cachedContent == mmp);
-		MimeBodyPart bp = (MimeBodyPart) mmp.getBodyPart(0);
-		String c = (String) bp.getContent();
+		final MimeBodyPart bp = (MimeBodyPart) mmp.getBodyPart(0);
+		final String c = (String) bp.getContent();
 		assertNotNull(c);
 		assertNull(bp.cachedContent);
 		message.setDataHandler(new DataHandler("","text/plain"));
@@ -197,7 +196,7 @@ public class MimeMultipartTest extends TestCase {
 	    	try {
 				mmp0.writeTo(out);
 				fail("MessagingException excpected");
-			} catch (MessagingException e) {
+			} catch (final MessagingException e) {
 				//expected
 			}
 	    	
@@ -208,7 +207,7 @@ public class MimeMultipartTest extends TestCase {
 			mmp0.writeTo(out);
 			assertTrue(out.toString().startsWith("--"));
 	    	
-	    	MimeMultipart mmp = checkMultipartParsing("multipart_msg_empty.eml",0);
+	    	final MimeMultipart mmp = checkMultipartParsing("multipart_msg_empty.eml",0);
 	    	out = new ByteArrayOutputStream();
 	    	mmp.writeTo(out);
 	    	assertTrue(out.toString().startsWith("--simple"));
@@ -256,23 +255,23 @@ public class MimeMultipartTest extends TestCase {
     	setMultipartSystemProps(true, true, false, false);
     }
     
-    protected void setMultipartSystemProps(boolean ignoremissingendboundary, boolean ignoremissingboundaryparameter, boolean ignoreexistingboundaryparameter, boolean allowempty) {
+    protected void setMultipartSystemProps(final boolean ignoremissingendboundary, final boolean ignoremissingboundaryparameter, final boolean ignoreexistingboundaryparameter, final boolean allowempty) {
     	System.setProperty("mail.mime.multipart.ignoremissingendboundary", String.valueOf(ignoremissingendboundary));
     	System.setProperty("mail.mime.multipart.ignoremissingboundaryparameter", String.valueOf(ignoremissingboundaryparameter));
     	System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", String.valueOf(ignoreexistingboundaryparameter));
     	System.setProperty("mail.mime.multipart.allowempty", String.valueOf(allowempty));
     }
     
-    protected MimeMultipart checkMultipartParsing(String filename, int count) throws IOException, MessagingException {
-    	InputStream source = new FileInputStream(new File("src/test/resources/"+filename));
-    	MimeMessage message = new MimeMessage(null, source);
+    protected MimeMultipart checkMultipartParsing(final String filename, final int count) throws IOException, MessagingException {
+    	final InputStream source = new FileInputStream(new File("src/test/resources/"+filename));
+    	final MimeMessage message = new MimeMessage(null, source);
     	try {
 			//message.saveChanges();
 			assertTrue(message.getContent() instanceof MimeMultipart);
-			MimeMultipart mmp = (MimeMultipart) message.getContent();
+			final MimeMultipart mmp = (MimeMultipart) message.getContent();
 			assertEquals(count, mmp.getCount());
 			return mmp;
-		} catch (MessagingException e) {
+		} catch (final MessagingException e) {
 			if(count > -1) {
 				fail(e.toString());
 			}

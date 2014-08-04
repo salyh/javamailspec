@@ -38,7 +38,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Flags;
-import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.IllegalWriteException;
 import javax.mail.Message;
@@ -114,7 +113,7 @@ public class MimeMessage extends Message implements MimePart {
      *
      * @since   JavaMail 1.5
      */
-    protected Object cachedContent; //TODO test
+    protected Object cachedContent;
     
     
     
@@ -986,7 +985,7 @@ public class MimeMessage extends Message implements MimePart {
             return cachedContent;
         }
         
-        Object c = getDataHandler().getContent();
+        final Object c = getDataHandler().getContent();
         
         if (MimeBodyPart.cacheMultipart && (c instanceof Multipart || c instanceof Message) && (content != null || contentStream != null)) {
             cachedContent = c;
@@ -1047,7 +1046,7 @@ public class MimeMessage extends Message implements MimePart {
         return reply(replyToAll, true);
     }
 
-    private Message replyInternal(final boolean replyToAll, boolean setOriginalAnswered) throws MessagingException {
+    private Message replyInternal(final boolean replyToAll, final boolean setOriginalAnswered) throws MessagingException {
         // create a new message in this session.
         final MimeMessage reply = createMimeMessage(session);
 
@@ -1597,7 +1596,7 @@ public class MimeMessage extends Message implements MimePart {
                 if (contentStream != null) {
                     try {
                         contentStream.close();
-                    } catch (IOException ioex) {
+                    } catch (final IOException ioex) {
                         //np-op
                     }
                 }

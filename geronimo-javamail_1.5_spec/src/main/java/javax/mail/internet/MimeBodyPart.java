@@ -31,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.EncodingAware;
@@ -79,7 +78,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      *
      * @since   JavaMail 1.5
      */
-    protected Object cachedContent; //TODO test
+    protected Object cachedContent;
     
     
     protected byte content[];
@@ -416,7 +415,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
             return cachedContent;
         }
         
-        Object c = getDataHandler().getContent();
+        final Object c = getDataHandler().getContent();
         
         if (MimeBodyPart.cacheMultipart && (c instanceof Multipart || c instanceof Message) && (content != null || contentStream != null)) {
             cachedContent = c;
@@ -642,7 +641,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
                 if (contentStream != null) {
                     try {
                         contentStream.close();
-                    } catch (IOException ioex) {
+                    } catch (final IOException ioex) {
                         //np-op
                     }
                 }
@@ -809,10 +808,10 @@ public class MimeBodyPart extends BodyPart implements MimePart {
     }
     
     private static class EncodingAwareFileDataSource extends FileDataSource implements EncodingAware {
-        private String contentType;
-        private String encoding;
+        private final String contentType;
+        private final String encoding;
 
-        public EncodingAwareFileDataSource(File file, String contentType, String encoding) {
+        public EncodingAwareFileDataSource(final File file, final String contentType, final String encoding) {
             super(file);
             this.contentType = contentType;
             this.encoding = encoding;

@@ -754,7 +754,7 @@ public class MimeUtility {
     public static String getEncoding(final DataSource source) {
         
         if(source instanceof EncodingAware) {
-            String encoding = ((EncodingAware) source).getEncoding();
+            final String encoding = ((EncodingAware) source).getEncoding();
             
             if(encoding != null) {
                 return encoding;

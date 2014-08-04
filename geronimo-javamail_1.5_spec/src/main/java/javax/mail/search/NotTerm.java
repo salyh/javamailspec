@@ -47,8 +47,12 @@ public final class NotTerm extends SearchTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof NotTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof NotTerm == false) {
+			return false;
+		}
         return term.equals(((NotTerm) other).term);
     }
 

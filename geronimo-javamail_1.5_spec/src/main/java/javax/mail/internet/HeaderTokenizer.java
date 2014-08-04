@@ -145,7 +145,7 @@ public class HeaderTokenizer {
     private Token readAtomicToken() {
         // skip to next delimiter
         final int start = pos;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(_header.charAt(pos));
         while (++pos < _headerLength) {
             // break on the first non-atom character.
@@ -217,7 +217,7 @@ public class HeaderTokenizer {
      * @return The processed string value.
      * @exception ParseException
      */
-    private String getEscapedValue(final int start, final int end, boolean keepEscapes) throws ParseException {
+    private String getEscapedValue(final int start, final int end, final boolean keepEscapes) throws ParseException {
         final StringBuffer value = new StringBuffer();
 
         for (int i = start; i < end; i++) {
@@ -259,7 +259,7 @@ public class HeaderTokenizer {
      * @return A comment token with the token value.
      * @exception ParseException
      */
-    private Token readComment(boolean keepEscapes) throws ParseException {
+    private Token readComment(final boolean keepEscapes) throws ParseException {
         final int start = pos + 1;
         int nesting = 1;
 
@@ -308,7 +308,7 @@ public class HeaderTokenizer {
      * @return The QUOTEDSTRING token with the value.
      * @exception ParseException
      */
-    private Token readQuotedString(char endChar, boolean keepEscapes, int offset) throws ParseException {
+    private Token readQuotedString(final char endChar, final boolean keepEscapes, final int offset) throws ParseException {
         final int start = pos+offset;
         boolean requiresEscaping = false;
 
@@ -345,6 +345,8 @@ public class HeaderTokenizer {
     private void eatWhiteSpace() {
         // skip to end of whitespace
         while (++pos < _headerLength
-                && WHITE.indexOf(_header.charAt(pos)) != -1);
+                && WHITE.indexOf(_header.charAt(pos)) != -1) {
+			;
+		}
     }
 }

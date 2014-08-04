@@ -89,8 +89,12 @@ public final class FlagTerm extends SearchTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof FlagTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof FlagTerm == false) {
+			return false;
+		}
         final FlagTerm otherFlags = (FlagTerm) other;
         return otherFlags.set == this.set && otherFlags.flags.equals(flags);
     }

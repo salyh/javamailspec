@@ -156,38 +156,4 @@ public class ParameterListTest extends TestCase {
         assertEquals(value, list.get("one"));
         assertEquals(list2.toString(), encodedTest);
     }
-    
-    
-    //TODO was is doing toString();?
-    /*
-     *
-     * 
-     * public void testEncodeDecodeFail() throws Exception {
-
-        try {
-            System.setProperty("mail.mime.encodeparameters", "false");
-            System.setProperty("mail.mime.decodeparameters", "false");
-
-            final String value = " '*% abc \u0081\u0082\r\n\t";
-            final String encodedTest = "; one*=UTF-8''%20%27%2A%25%20abc%20%C2%81%C2%82%0D%0A%09";
-
-            final ParameterList list = new ParameterList();
-            list.set("one", value, "UTF-8");
-
-            assertEquals(value, list.get("one"));
-
-            final String encoded = list.toString();
-
-            assertEquals(encoded, "; one*="+value);
-
-            final ParameterList list2 = new ParameterList(encoded);
-            assertEquals(value, list.get("one"));
-            assertEquals(list2.toString(), encodedTest);
-        } finally {
-            System.setProperty("mail.mime.encodeparameters", "true");
-            System.setProperty("mail.mime.decodeparameters", "true");
-
-        }
-    }*/
-
 }

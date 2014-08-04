@@ -28,8 +28,8 @@ import java.util.Properties;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Address;
-import javax.mail.Message;
 import javax.mail.Flags.Flag;
+import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -364,7 +364,7 @@ public class MimeMessageTest extends TestCase {
         msg.setFrom("test@apache.org");
         msg.setRecipient(RecipientType.TO, dev);
 
-        Message replyMsg = msg.reply(true, true);
+        final Message replyMsg = msg.reply(true, true);
         assertNotNull(replyMsg);
         assertTrue(msg.isSet(Flag.ANSWERED));
         assertEquals(new InternetAddress("test@apache.org"), replyMsg.getRecipients(RecipientType.TO)[0]);
@@ -377,7 +377,7 @@ public class MimeMessageTest extends TestCase {
         msg.setFrom("test@apache.org");
         msg.setRecipient(RecipientType.TO, dev);
 
-        Message replyMsg = msg.reply(false, false);
+        final Message replyMsg = msg.reply(false, false);
         assertNotNull(replyMsg);
         assertFalse(msg.isSet(Flag.ANSWERED));
         assertEquals(new InternetAddress("test@apache.org"), replyMsg.getRecipients(RecipientType.TO)[0]);

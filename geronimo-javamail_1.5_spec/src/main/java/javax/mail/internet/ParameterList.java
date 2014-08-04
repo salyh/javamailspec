@@ -21,14 +21,11 @@ package javax.mail.internet;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.geronimo.mail.util.ASCIIUtil;
@@ -113,7 +110,7 @@ public class ParameterList {
      * to a String using the specified charset in the
      * combineMultisegmentNames method.
      */
-    private Map<MultiSegmentEntry, ParameterValue> _multiSegmentParameters = new TreeMap<MultiSegmentEntry, ParameterValue>();
+    private final Map<MultiSegmentEntry, ParameterValue> _multiSegmentParameters = new TreeMap<MultiSegmentEntry, ParameterValue>();
     
     private boolean encodeParameters = false;
     private boolean decodeParameters = false;
@@ -212,11 +209,13 @@ public class ParameterList {
         combineSegments();
     }
     
-    private static boolean isMultiSegmentName(String name) {
+    private static boolean isMultiSegmentName(final String name) {
         
-        if(name == null || name.length() == 0) return false;
+        if(name == null || name.length() == 0) {
+			return false;
+		}
         
-        int firstAsterixIndex = name.indexOf('*');
+        final int firstAsterixIndex = name.indexOf('*');
         
         if(firstAsterixIndex < 0) {
             return false; //no asterix at all
@@ -227,7 +226,7 @@ public class ParameterList {
                 return false;
             }
             
-            String restOfname = name.substring(firstAsterixIndex+1);
+            final String restOfname = name.substring(firstAsterixIndex+1);
             
             if(Character.isDigit(restOfname.charAt(0))) {
                 return true;
@@ -262,10 +261,10 @@ public class ParameterList {
             final RFC2231Encoder decoder = new RFC2231Encoder(HeaderTokenizer.MIME);
             String lastName = null;
             int lastSegmentNumber = -1;
-            StringBuilder segmentValue = new StringBuilder();
-            for (Entry<MultiSegmentEntry, ParameterValue> entry : _multiSegmentParameters.entrySet()) {
+            final StringBuilder segmentValue = new StringBuilder();
+            for (final Entry<MultiSegmentEntry, ParameterValue> entry : _multiSegmentParameters.entrySet()) {
 
-                MultiSegmentEntry currentMEntry = entry.getKey();
+                final MultiSegmentEntry currentMEntry = entry.getKey();
 
                 if (lastName == null) {
                     lastName = currentMEntry.name;
@@ -508,13 +507,13 @@ public class ParameterList {
         final int range;
         final boolean encoded;
         
-        public MultiSegmentEntry(String original) {
+        public MultiSegmentEntry(final String original) {
             super();
             this.original = original;
         
-            int firstAsterixIndex1 = original.indexOf('*');
+            final int firstAsterixIndex1 = original.indexOf('*');
             encoded=original.endsWith("*");
-            int endIndex1 = encoded?original.length()-1:original.length();
+            final int endIndex1 = encoded?original.length()-1:original.length();
             name = original.substring(0, firstAsterixIndex1);
             range = Integer.parseInt(original.substring(firstAsterixIndex1+1, endIndex1));
             normalized = original.substring(0, endIndex1);
@@ -530,25 +529,32 @@ public class ParameterList {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            MultiSegmentEntry other = (MultiSegmentEntry) obj;
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+				return true;
+			}
+            if (obj == null) {
+				return false;
+			}
+            if (getClass() != obj.getClass()) {
+				return false;
+			}
+            final MultiSegmentEntry other = (MultiSegmentEntry) obj;
             if (normalized == null) {
-                if (other.normalized != null)
-                    return false;
-            } else if (!normalized.equals(other.normalized))
-                return false;
+                if (other.normalized != null) {
+					return false;
+				}
+            } else if (!normalized.equals(other.normalized)) {
+				return false;
+			}
             return true;
         }
 
-        public int compareTo(MultiSegmentEntry o) {
+        public int compareTo(final MultiSegmentEntry o) {
             
-            if(this.equals(o)) return 0;
+            if(this.equals(o)) {
+				return 0;
+			}
             
             if(name.equals(o.name)) {
                 return range>o.range?1:-1;

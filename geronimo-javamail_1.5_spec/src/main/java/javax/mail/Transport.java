@@ -77,7 +77,7 @@ public abstract class Transport extends Service {
         for (int i = 0; i < addresses.length; i++) {
             final Address address = addresses[i];
             final Transport transport = session.getTransport(address);
-            List<Address> addrs = (List<Address>) msgsByTransport.get(transport);
+            List<Address> addrs = msgsByTransport.get(transport);
             if (addrs == null) {
                 addrs = new ArrayList<Address>();
                 msgsByTransport.put(transport, addrs);
@@ -99,8 +99,8 @@ public abstract class Transport extends Service {
 
         for (final Iterator<Entry<Transport, List<Address>>> i = msgsByTransport.entrySet().iterator(); i.hasNext();) {
             final Entry<Transport, List<Address>> entry = i.next();
-            final Transport transport = (Transport) entry.getKey();
-            final List<Address> addrs = (List<Address>) entry.getValue();
+            final Transport transport = entry.getKey();
+            final List<Address> addrs = entry.getValue();
             try {
                 // we MUST connect to the transport before attempting to send.
                 if(user != null) {
@@ -108,7 +108,7 @@ public abstract class Transport extends Service {
                 } else {
                     transport.connect();
                 }
-                transport.sendMessage(message, (Address[]) addrs.toArray(new Address[addrs.size()]));
+                transport.sendMessage(message, addrs.toArray(new Address[addrs.size()]));
                 // if we have to throw an exception because of another failure, these addresses need to
                 // be in the valid list.  Since we succeeded here, we can add these now.
                 sentAddresses.addAll(addrs);
@@ -172,9 +172,9 @@ public abstract class Transport extends Service {
             }
 
             // create our lists for notification and exception reporting from this point on.
-            final Address[] sent = (Address[])sentAddresses.toArray(new Address[0]);
-            final Address[] unsent = (Address[])unsentAddresses.toArray(new Address[0]);
-            final Address[] invalid = (Address[])invalidAddresses.toArray(new Address[0]);
+            final Address[] sent = sentAddresses.toArray(new Address[0]);
+            final Address[] unsent = unsentAddresses.toArray(new Address[0]);
+            final Address[] invalid = invalidAddresses.toArray(new Address[0]);
 
             throw new SendFailedException("Send failure", chainedException, sent, unsent, invalid);
         }
