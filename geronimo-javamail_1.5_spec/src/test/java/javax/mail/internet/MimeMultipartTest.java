@@ -151,8 +151,8 @@ public class MimeMultipartTest extends TestCase {
     }
     
     public void testJavaMail15CachedContent() throws IOException, MessagingException {
-    	
-    	final InputStream source = new FileInputStream(new File("src/test/resources/multipart_msg_normal.eml"));
+    	final File basedir = new File(System.getProperty("basedir", "."));
+    	final InputStream source = new FileInputStream(new File(basedir, "src/test/resources/multipart_msg_normal.eml"));
     	final MimeMessage message = new MimeMessage(null, source);
 		message.saveChanges();
 		assertEquals("Sample message", message.getSubject());	
@@ -263,7 +263,8 @@ public class MimeMultipartTest extends TestCase {
     }
     
     protected MimeMultipart checkMultipartParsing(final String filename, final int count) throws IOException, MessagingException {
-    	final InputStream source = new FileInputStream(new File("src/test/resources/"+filename));
+    	final File basedir = new File(System.getProperty("basedir", "."));
+    	final InputStream source = new FileInputStream(new File(basedir, "src/test/resources/"+filename));
     	final MimeMessage message = new MimeMessage(null, source);
     	try {
 			//message.saveChanges();

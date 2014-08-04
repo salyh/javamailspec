@@ -148,7 +148,6 @@ public class Base64Encoder
         final OutputStream    out)
         throws IOException
     {
-        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 
@@ -252,7 +251,6 @@ public class Base64Encoder
         final OutputStream    out)
         throws IOException
     {
-        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        length = 0;
 
@@ -349,7 +347,6 @@ public class Base64Encoder
      */
     public int decode(final byte[] data, final int off, final int length, final byte[] out) throws IOException
     {
-        final byte[]    bytes;
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 

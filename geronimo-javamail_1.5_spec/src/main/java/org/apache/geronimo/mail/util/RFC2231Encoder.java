@@ -247,7 +247,7 @@ public class RFC2231Encoder implements Encoder
             throw new IOException("Missing language in RFC2231 encoded value");
         }
 
-        final String language = data.substring(charsetEnd + 1, languageEnd);
+        //final String language = data.substring(charsetEnd + 1, languageEnd);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length());
 

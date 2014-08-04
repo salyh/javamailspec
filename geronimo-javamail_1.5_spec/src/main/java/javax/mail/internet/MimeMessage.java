@@ -618,7 +618,6 @@ public class MimeMessage extends Message implements MimePart {
         }
         else {
             try {
-                final String s = MimeUtility.fold(9, MimeUtility.encodeText(subject, charset, null));
                 // encode this, and then fold to fit the line lengths.
                 setHeader("Subject", MimeUtility.fold(9, MimeUtility.encodeText(subject, charset, null)));
             } catch (final UnsupportedEncodingException e) {
@@ -1079,8 +1078,6 @@ public class MimeMessage extends Message implements MimePart {
             // and this is a replacement for whatever might be there.              
             reply.setHeader("References", MimeUtility.fold("References: ".length(), references)); 
         }
-
-        final Address[] toRecipients = getReplyTo();
 
         // set the target recipients the replyTo value
         reply.setRecipients(Message.RecipientType.TO, getReplyTo());
