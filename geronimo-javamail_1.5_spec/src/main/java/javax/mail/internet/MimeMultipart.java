@@ -293,14 +293,17 @@ public class MimeMultipart extends Multipart {
                 boundaryFound = readTillFirstBoundary(pushbackInStream, boundary);
             }
             
-            if(!allowEmpty && !boundaryFound) {
-                throw new MessagingException("Multipart content with no body parts is not allowed");
-            }
+            
             
             if(allowEmpty && !boundaryFound) {
             	parsed = true;
                 return;
             }
+            
+            if(!allowEmpty && !boundaryFound) {
+                throw new MessagingException("Multipart content with no body parts is not allowed");
+            }
+            
 
             while (true) {
                 MimeBodyPartInputStream partStream;
@@ -322,8 +325,7 @@ public class MimeMultipart extends Multipart {
                 }
             }
             
-            
-            
+           
             
         } catch (final Exception e){
             throw new MessagingException(e.toString(),e);

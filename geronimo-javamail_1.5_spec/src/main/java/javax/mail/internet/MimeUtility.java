@@ -1211,7 +1211,7 @@ public class MimeUtility {
             final char ch = s.charAt(i);
 
             // we have a backslash.  In folded strings, escape characters are only processed as such if
-            // they preceed line breaks.  Otherwise, we leave it be.
+            // they precede line breaks.  Otherwise, we leave it be.
             if (ch == '\\') {
                 // escape at the very end?  Just add the character.
                 if (i == length - 1) {

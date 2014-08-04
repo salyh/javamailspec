@@ -186,7 +186,11 @@ public class URLName {
 
     @Override
     public boolean equals(final Object o) {
-        if (o instanceof URLName == false) {
+        if(this == o) {
+        	return true;
+        }
+    	
+    	if (o instanceof URLName == false) {
             return false;
         }
         final URLName other = (URLName) o;
