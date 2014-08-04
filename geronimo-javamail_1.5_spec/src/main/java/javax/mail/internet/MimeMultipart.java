@@ -278,24 +278,35 @@ public class MimeMultipart extends Multipart {
                         
             final InputStream is = new BufferedInputStream(ds.getInputStream());
             BufferedInputStream pushbackInStream = null;
+            boolean boundaryFound = false;
             
             byte[] boundary = null;
             if (boundaryString == null || ignoreExistingBoundaryParameter) {
                 pushbackInStream = new BufferedInputStream(is, 1200);
                 // read until we find something that looks like a boundary string
                 boundary = readTillFirstBoundary(pushbackInStream);
+                boundaryFound = boundary != null;
             }
             else {
                 boundary = ("--" + boundaryString).getBytes("ISO8859-1");
                 pushbackInStream = new BufferedInputStream(is, boundary.length + 1000);
-                readTillFirstBoundary(pushbackInStream, boundary);
+                boundaryFound = readTillFirstBoundary(pushbackInStream, boundary);
+            }
+            
+            if(!allowEmpty && !boundaryFound) {
+                throw new MessagingException("Multipart content with no body parts is not allowed");
+            }
+            
+            if(allowEmpty && !boundaryFound) {
+            	parsed = true;
+                return;
             }
 
             while (true) {
                 MimeBodyPartInputStream partStream;
                 partStream = new MimeBodyPartInputStream(pushbackInStream, boundary);
                 addBodyPart(new MimeBodyPart(partStream));
-                
+
                 // terminated by an EOF rather than a proper boundary?
                 if (!partStream.boundaryFound) {
                     if (!ignoreMissingEndBoundary) {
@@ -309,9 +320,7 @@ public class MimeMultipart extends Multipart {
                 }
             }
             
-            if(!allowEmpty && parts.size() == 0) {
-                throw new MessagingException("Multipart content with no body parts is not allowed");
-            }
+            
             
             
         } catch (final Exception e){
@@ -338,7 +347,7 @@ public class MimeMultipart extends Multipart {
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
                 if (line == null || line.length==0) { //TODO lenth 0 ok?
-                    throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
+                    return null;//throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
                 // if this looks like a boundary, then make it so
                 if (line.length > 2 && line[0] == '-' && line[1] == '-') {
@@ -400,7 +409,7 @@ public class MimeMultipart extends Multipart {
      * @param boundary
      * @throws MessagingException
      */
-    private void readTillFirstBoundary(final BufferedInputStream pushbackInStream, final byte[] boundary) throws MessagingException {
+    private boolean readTillFirstBoundary(final BufferedInputStream pushbackInStream, final byte[] boundary) throws MessagingException {
         final ByteArrayOutputStream preambleStream = new ByteArrayOutputStream();
 
         try {
@@ -409,7 +418,7 @@ public class MimeMultipart extends Multipart {
                 final byte[] line = readLine(pushbackInStream);
                 // hit an EOF?
                 if (line == null || line.length==0) { //TODO length = 0 valid?
-                    throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
+                	return false;//throw new MessagingException("Unexpected End of Stream while searching for first Mime Boundary");
                 }
 
                 // apply the boundary comparison rules to this
@@ -419,7 +428,7 @@ public class MimeMultipart extends Multipart {
                     if (preambleBytes.length > 0) {
                         preamble = new String(preambleBytes, "ISO8859-1");
                     }
-                    return;
+                    return true;
                 }
 
                 // this is part of the preamble.
