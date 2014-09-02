@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.geronimo.genesis</groupId>
         <artifactId>genesis-java5-flava</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
     </parent>
 
     <groupId>org.apache.geronimo.specs</groupId>
@@ -100,7 +100,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${groupId}.${artifactId};singleton=true</Bundle-SymbolicName>
                         <Specification-Title>JSR-919 Javamail API 1.5</Specification-Title>
-                        <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+                        <Specification-Vendor>Oracle</Specification-Vendor>
                         <Specification-Version>1.5</Specification-Version>
                         <Export-Package>javax.mail*;version=1.5,org.apache.geronimo.mail.util;version=1.5,org.apache.geronimo.mail.handlers;version=1.5</Export-Package>
                         <Import-Package>org.apache.geronimo.osgi.registry.api;resolution:=optional,*</Import-Package>

@@ -146,7 +146,7 @@ public class MimeMessageTest extends TestCase {
         assertTrue(null == msg2.getSession());
     }
     
-    public void testJava15From() throws MessagingException {
+    public void testJavaMail15From() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);
         
         final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
