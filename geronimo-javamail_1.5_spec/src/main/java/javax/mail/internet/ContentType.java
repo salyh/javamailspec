@@ -154,6 +154,11 @@ public class ContentType {
     }
 
     public boolean match(final ContentType other) {
+    	
+    	if(_major == null || _minor == null) {
+    		return false;
+    	}
+    	
         return _major.equalsIgnoreCase(other._major)
                 && (_minor.equalsIgnoreCase(other._minor)
                 || _minor.equals("*")

@@ -40,8 +40,6 @@ public class InternetHeaders {
     // the list of headers (to preserve order);
     protected List headers = new ArrayList();
 
-    private transient String lastHeaderName;
-
     /**
      * Create an empty InternetHeaders
      */

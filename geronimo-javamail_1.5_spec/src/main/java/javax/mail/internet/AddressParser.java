@@ -780,8 +780,6 @@ class AddressParser {
     private void scanQuotedLiteral(final TokenStream tokens) throws AddressException {
         final StringBuffer value = new StringBuffer();
 
-        // save the start position for the token.
-        final int startPosition = position;
         // step over the quote delimiter.
         nextChar();
 
@@ -1520,15 +1518,6 @@ class AddressParser {
 
     private static final byte FLG_SPECIAL = 1;
     private static final byte FLG_CONTROL = 2;
-    private static final byte FLG_SPACE = 4;
-
-    private static boolean isSpace(final char ch) {
-        if (ch > '\u007f') {
-            return false;
-        } else {
-            return (CHARMAP[ch] & FLG_SPACE) != 0;
-        }
-    }
 
     /**
      * Quick test to see if a character is an allowed atom character

@@ -94,8 +94,12 @@ public abstract class StringTerm extends SearchTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof StringTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof StringTerm == false) {
+			return false;
+		}
         
         final StringTerm term = (StringTerm)other; 
         

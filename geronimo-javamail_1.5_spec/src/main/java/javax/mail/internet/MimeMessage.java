@@ -38,7 +38,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Flags;
-import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.IllegalWriteException;
 import javax.mail.Message;
@@ -114,7 +113,7 @@ public class MimeMessage extends Message implements MimePart {
      *
      * @since   JavaMail 1.5
      */
-    protected Object cachedContent; //TODO test
+    protected Object cachedContent;
     
     
     
@@ -619,7 +618,6 @@ public class MimeMessage extends Message implements MimePart {
         }
         else {
             try {
-                final String s = MimeUtility.fold(9, MimeUtility.encodeText(subject, charset, null));
                 // encode this, and then fold to fit the line lengths.
                 setHeader("Subject", MimeUtility.fold(9, MimeUtility.encodeText(subject, charset, null)));
             } catch (final UnsupportedEncodingException e) {
@@ -986,7 +984,7 @@ public class MimeMessage extends Message implements MimePart {
             return cachedContent;
         }
         
-        Object c = getDataHandler().getContent();
+        final Object c = getDataHandler().getContent();
         
         if (MimeBodyPart.cacheMultipart && (c instanceof Multipart || c instanceof Message) && (content != null || contentStream != null)) {
             cachedContent = c;
@@ -1047,7 +1045,7 @@ public class MimeMessage extends Message implements MimePart {
         return reply(replyToAll, true);
     }
 
-    private Message replyInternal(final boolean replyToAll, boolean setOriginalAnswered) throws MessagingException {
+    private Message replyInternal(final boolean replyToAll, final boolean setOriginalAnswered) throws MessagingException {
         // create a new message in this session.
         final MimeMessage reply = createMimeMessage(session);
 
@@ -1080,8 +1078,6 @@ public class MimeMessage extends Message implements MimePart {
             // and this is a replacement for whatever might be there.              
             reply.setHeader("References", MimeUtility.fold("References: ".length(), references)); 
         }
-
-        final Address[] toRecipients = getReplyTo();
 
         // set the target recipients the replyTo value
         reply.setRecipients(Message.RecipientType.TO, getReplyTo());
@@ -1597,7 +1593,7 @@ public class MimeMessage extends Message implements MimePart {
                 if (contentStream != null) {
                     try {
                         contentStream.close();
-                    } catch (IOException ioex) {
+                    } catch (final IOException ioex) {
                         //np-op
                     }
                 }

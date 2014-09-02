@@ -64,8 +64,12 @@ public abstract class AddressTerm extends SearchTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof AddressTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof AddressTerm == false) {
+			return false;
+		}
 
         return address.equals(((AddressTerm) other).address);
     }

@@ -308,8 +308,12 @@ public class InternetAddress extends Address implements Cloneable {
      */
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof InternetAddress)) return false;
+        if (this == o) {
+			return true;
+		}
+        if (!(o instanceof InternetAddress)) {
+			return false;
+		}
 
         final InternetAddress other = (InternetAddress) o;
         final String myAddress = getAddress();

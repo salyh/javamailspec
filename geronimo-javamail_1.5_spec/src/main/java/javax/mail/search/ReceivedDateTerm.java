@@ -52,8 +52,12 @@ public final class ReceivedDateTerm extends DateTerm {
     
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof ReceivedDateTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof ReceivedDateTerm == false) {
+			return false;
+		}
         return super.equals(other); 
     }
 }

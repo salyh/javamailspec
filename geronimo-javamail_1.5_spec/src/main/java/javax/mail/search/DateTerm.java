@@ -66,8 +66,12 @@ public abstract class DateTerm extends ComparisonTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof DateTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof DateTerm == false) {
+			return false;
+		}
         final DateTerm term = (DateTerm) other;
         return this.comparison == term.comparison && this.date.equals(term.date);
     }

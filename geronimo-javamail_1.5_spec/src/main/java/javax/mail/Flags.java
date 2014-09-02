@@ -190,8 +190,12 @@ public class Flags implements Cloneable, Serializable {
      */
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof Flags == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof Flags == false) {
+			return false;
+		}
         final Flags flags = (Flags) other;
         return system_flags == flags.system_flags && user_flags.keySet().equals(flags.user_flags.keySet());
     }
@@ -212,21 +216,49 @@ public class Flags implements Cloneable, Serializable {
     public Flag[] getSystemFlags() {
         // assumption: it is quicker to calculate the size than it is to reallocate the array
         int size = 0;
-        if ((system_flags & Flag.ANSWERED.mask) != 0) size += 1;
-        if ((system_flags & Flag.DELETED.mask) != 0) size += 1;
-        if ((system_flags & Flag.DRAFT.mask) != 0) size += 1;
-        if ((system_flags & Flag.FLAGGED.mask) != 0) size += 1;
-        if ((system_flags & Flag.RECENT.mask) != 0) size += 1;
-        if ((system_flags & Flag.SEEN.mask) != 0) size += 1;
-        if ((system_flags & Flag.USER.mask) != 0) size += 1;
+        if ((system_flags & Flag.ANSWERED.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.DELETED.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.DRAFT.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.FLAGGED.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.RECENT.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.SEEN.mask) != 0) {
+			size += 1;
+		}
+        if ((system_flags & Flag.USER.mask) != 0) {
+			size += 1;
+		}
         final Flag[] result = new Flag[size];
-        if ((system_flags & Flag.USER.mask) != 0) result[--size] = Flag.USER;
-        if ((system_flags & Flag.SEEN.mask) != 0) result[--size] = Flag.SEEN;
-        if ((system_flags & Flag.RECENT.mask) != 0) result[--size] = Flag.RECENT;
-        if ((system_flags & Flag.FLAGGED.mask) != 0) result[--size] = Flag.FLAGGED;
-        if ((system_flags & Flag.DRAFT.mask) != 0) result[--size] = Flag.DRAFT;
-        if ((system_flags & Flag.DELETED.mask) != 0) result[--size] = Flag.DELETED;
-        if ((system_flags & Flag.ANSWERED.mask) != 0) result[--size] = Flag.ANSWERED;
+        if ((system_flags & Flag.USER.mask) != 0) {
+			result[--size] = Flag.USER;
+		}
+        if ((system_flags & Flag.SEEN.mask) != 0) {
+			result[--size] = Flag.SEEN;
+		}
+        if ((system_flags & Flag.RECENT.mask) != 0) {
+			result[--size] = Flag.RECENT;
+		}
+        if ((system_flags & Flag.FLAGGED.mask) != 0) {
+			result[--size] = Flag.FLAGGED;
+		}
+        if ((system_flags & Flag.DRAFT.mask) != 0) {
+			result[--size] = Flag.DRAFT;
+		}
+        if ((system_flags & Flag.DELETED.mask) != 0) {
+			result[--size] = Flag.DELETED;
+		}
+        if ((system_flags & Flag.ANSWERED.mask) != 0) {
+			result[--size] = Flag.ANSWERED;
+		}
         return result;
     }
 

@@ -28,6 +28,7 @@
         <groupId>org.apache.geronimo.genesis</groupId>
         <artifactId>genesis-java5-flava</artifactId>
         <version>2.1</version>
+        <relativePath />
     </parent>
 
     <groupId>org.apache.geronimo.specs</groupId>
@@ -38,16 +39,16 @@
 
     <description>Javamail 1.5 API Specification</description>
 
-    <url>http://geronimo.apache.org/maven/${siteId}/${version}</url>
+    <url>http://geronimo.apache.org/maven/${siteId}/${project.version}</url>
     <distributionManagement>
         <site>
             <id>apache-website</id>
-            <url>${site.deploy.url}/maven/${siteId}/${version}</url>
+            <url>${site.deploy.url}/maven/${siteId}/${project.version}</url>
         </site>
     </distributionManagement>
 
     <properties>
-        <siteId>specs/${artifactId}</siteId>
+        <siteId>specs/${project.artifactId}</siteId>
         <geronimo.osgi.private.pkg>org.apache.geronimo.mail*</geronimo.osgi.private.pkg>
         <geronimo.osgi.resources>src/main/resources/,META-INF/LICENSE.txt=LICENSE.txt,META-INF/NOTICE.txt=NOTICE.txt</geronimo.osgi.resources>
     </properties>
@@ -96,11 +97,12 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.0.1</version>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${groupId}.${artifactId};singleton=true</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton=true</Bundle-SymbolicName>
                         <Specification-Title>JSR-919 Javamail API 1.5</Specification-Title>
-                        <Specification-Vendor>Oracle</Specification-Vendor>
+                        <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
                         <Specification-Version>1.5</Specification-Version>
                         <Export-Package>javax.mail*;version=1.5,org.apache.geronimo.mail.util;version=1.5,org.apache.geronimo.mail.handlers;version=1.5</Export-Package>
                         <Import-Package>org.apache.geronimo.osgi.registry.api;resolution:=optional,*</Import-Package>
@@ -120,7 +122,7 @@
                         <!-- Override of default rat checks.  To use, type "mvn -Prat verify". -->
                         <groupId>org.apache.rat</groupId>
                         <artifactId>apache-rat-plugin</artifactId>
-                        <version>0.6</version>
+                        <version>0.10</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>

@@ -44,8 +44,12 @@ public final class SizeTerm extends IntegerComparisonTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other instanceof SizeTerm == false) return false;
+        if (this == other) {
+			return true;
+		}
+        if (other instanceof SizeTerm == false) {
+			return false;
+		}
         return super.equals(other);
     }
 }

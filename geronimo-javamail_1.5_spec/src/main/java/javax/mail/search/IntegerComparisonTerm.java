@@ -65,8 +65,12 @@ public abstract class IntegerComparisonTerm extends ComparisonTerm {
 
     @Override
     public boolean equals(final Object other) {
-        if (other == this) return true;
-        if (other instanceof IntegerComparisonTerm == false) return false;
+        if (other == this) {
+			return true;
+		}
+        if (other instanceof IntegerComparisonTerm == false) {
+			return false;
+		}
         final IntegerComparisonTerm term = (IntegerComparisonTerm) other;
         return this.comparison == term.comparison && this.number == term.number;
     }

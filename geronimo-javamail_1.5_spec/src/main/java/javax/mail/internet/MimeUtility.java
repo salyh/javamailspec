@@ -66,7 +66,6 @@ public class MimeUtility {
 
     public static final int ALL = -1;
 
-    private static String defaultJavaCharset;
     private static String escapedChars = "\"\\\r\n";
     private static String linearWhiteSpace = " \t\r\n";
 
@@ -718,7 +717,7 @@ public class MimeUtility {
 
         try {
             // get a parser that allows us to make comparisons.
-            final ContentType content = new ContentType(ds.getContentType());
+            final ContentType content = new ContentType(handler.getContentType());
 
             // The only access to the content bytes at this point is by asking the handler to write
             // the information out to a stream.  We're going to pipe this through a special stream
@@ -754,7 +753,7 @@ public class MimeUtility {
     public static String getEncoding(final DataSource source) {
         
         if(source instanceof EncodingAware) {
-            String encoding = ((EncodingAware) source).getEncoding();
+            final String encoding = ((EncodingAware) source).getEncoding();
             
             if(encoding != null) {
                 return encoding;
@@ -808,7 +807,6 @@ public class MimeUtility {
      */
     public static String quote(final String word, final String specials) {
         final int wordLength = word.length();
-        final boolean requiresQuoting = false;
         // scan the string looking for problem characters
         for (int i =0; i < wordLength; i++) {
             final char ch = word.charAt(i);
@@ -1213,7 +1211,7 @@ public class MimeUtility {
             final char ch = s.charAt(i);
 
             // we have a backslash.  In folded strings, escape characters are only processed as such if
-            // they preceed line breaks.  Otherwise, we leave it be.
+            // they precede line breaks.  Otherwise, we leave it be.
             if (ch == '\\') {
                 // escape at the very end?  Just add the character.
                 if (i == length - 1) {
@@ -1249,7 +1247,6 @@ public class MimeUtility {
             // we have an unescaped line break
             else if (ch == '\n' || ch == '\r') {
                 // remember the position in case we need to backtrack.
-                final int lineBreak = i;
                 boolean CRLF = false;
 
                 if (ch == '\r') {

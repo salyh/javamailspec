@@ -96,7 +96,6 @@ public class XTextEncoder
         final OutputStream    out)
         throws IOException
     {
-        final byte[]    bytes;
         byte    b1, b2;
         int        outLen = 0;
 
@@ -133,9 +132,7 @@ public class XTextEncoder
         final OutputStream    out)
         throws IOException
     {
-        final byte[]    bytes;
         byte    b1, b2;
-        final byte b3, b4;
         int        length = 0;
 
         final int        end = data.length();

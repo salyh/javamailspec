@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
@@ -58,7 +59,7 @@ public class MimeMultipartTest extends TestCase {
         final MimeBodyPart part2 = new MimeBodyPart();
         part2.setContent("Hello Again", "text/plain");
         mp.addBodyPart(part2);
-        mp.writeTo(System.out);
+        //mp.writeTo(System.out);
 
         writeToTearDown();
     }
@@ -88,7 +89,7 @@ public class MimeMultipartTest extends TestCase {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         message.writeTo(out);
-        out.writeTo(System.out);
+        //out.writeTo(System.out);
 
         final ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
@@ -118,7 +119,7 @@ public class MimeMultipartTest extends TestCase {
     public void testJavaMail15NewConstrucor() throws IOException, MessagingException {
         final File basedir = new File(System.getProperty("basedir", "."));
         final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
-        BodyPart[] bps = new BodyPart[2]; 
+        final BodyPart[] bps = new BodyPart[2]; 
         bps[0] = new MimeBodyPart(new FileInputStream(testInput));
         bps[1] = new MimeBodyPart(new FileInputStream(testInput));
         final MimeMultipart multiPart = new MimeMultipart(bps);
@@ -135,7 +136,7 @@ public class MimeMultipartTest extends TestCase {
     public void testJavaMail15NewConstrucor2() throws IOException, MessagingException {
         final File basedir = new File(System.getProperty("basedir", "."));
         final File testInput = new File(basedir, "src/test/resources/wmtom.bin");
-        BodyPart[] bps = new BodyPart[2]; 
+        final BodyPart[] bps = new BodyPart[2]; 
         bps[0] = new MimeBodyPart(new FileInputStream(testInput));
         bps[1] = new MimeBodyPart(new FileInputStream(testInput));
         final MimeMultipart multiPart = new MimeMultipart("alternative",bps);
@@ -147,6 +148,137 @@ public class MimeMultipartTest extends TestCase {
         assertNotNull(object1);
         assertEquals(multiPart.getCount(), 2);
         assertTrue(multiPart.getContentType().startsWith("multipart/alternative"));
+    }
+    
+    public void testJavaMail15CachedContent() throws IOException, MessagingException {
+    	final File basedir = new File(System.getProperty("basedir", "."));
+    	final InputStream source = new FileInputStream(new File(basedir, "src/test/resources/multipart_msg_normal.eml"));
+    	final MimeMessage message = new MimeMessage(null, source);
+		message.saveChanges();
+		assertEquals("Sample message", message.getSubject());	
+		assertTrue(message.getContent() instanceof MimeMultipart);
+		assertNotNull(message.cachedContent);
+		final MimeMultipart mmp = (MimeMultipart) message.getContent();
+		assertTrue(message.cachedContent == mmp);
+		final MimeBodyPart bp = (MimeBodyPart) mmp.getBodyPart(0);
+		final String c = (String) bp.getContent();
+		assertNotNull(c);
+		assertNull(bp.cachedContent);
+		message.setDataHandler(new DataHandler("","text/plain"));
+		assertNull(message.cachedContent);
+    }
+    
+    public void testJavaMail15MultipartParsingNormal() throws IOException, MessagingException {
+    	try {
+			setMultipartSystemPropsToDefault();
+			checkMultipartParsing("multipart_msg_normal.eml", 2);
+			setMultipartSystemProps(false, false, true, true);
+			checkMultipartParsing("multipart_msg_normal.eml", 2);
+		} finally{
+			setMultipartSystemPropsToDefault();
+		}
+		
+    }
+    
+    public void testJavaMail15MultipartParsingEmpty() throws IOException, MessagingException {
+    	
+    	/*
+    	 *  When writing out such a MimeMultipart, a single empty part will be
+  		 *	included.  When reading such a multipart, a MimeMultipart will be created
+  		 *	with no body parts.
+    	 */
+    	
+    	try {
+	    	setMultipartSystemPropsToDefault();
+	    	checkMultipartParsing("multipart_msg_empty.eml",-1); //-1 indicates expected exception
+	    	MimeMultipart mmp0 = new MimeMultipart();
+	    	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    	try {
+				mmp0.writeTo(out);
+				fail("MessagingException excpected");
+			} catch (final MessagingException e) {
+				//expected
+			}
+	    	
+	    	setMultipartSystemProps(false, false, true, true);
+	    	
+	    	mmp0 = new MimeMultipart();
+	    	out = new ByteArrayOutputStream();
+			mmp0.writeTo(out);
+			assertTrue(out.toString().startsWith("--"));
+	    	
+	    	final MimeMultipart mmp = checkMultipartParsing("multipart_msg_empty.eml",0);
+	    	out = new ByteArrayOutputStream();
+	    	mmp.writeTo(out);
+	    	assertTrue(out.toString().startsWith("--simple"));
+	    	
+    	} finally{
+			setMultipartSystemPropsToDefault();
+		}
+    }
+    
+    public void testJavaMail1MultipartParsingMissingBoundaryParameter() throws IOException, MessagingException {
+    	try {
+	    	setMultipartSystemPropsToDefault();
+	    	checkMultipartParsing("multipart_msg_missing_boundary_param.eml",2);
+	    	setMultipartSystemProps(false, false, false, true);
+	    	checkMultipartParsing("multipart_msg_missing_boundary_param.eml",-1);
+    	} finally{
+			setMultipartSystemPropsToDefault();
+		}
+    }
+    
+    public void testJavaMail1MultipartParsingMissingEndBoundary() throws IOException, MessagingException {
+    	try {
+	    	setMultipartSystemPropsToDefault();
+	    	setMultipartSystemProps(true, false, false, false);
+	    	checkMultipartParsing("multipart_msg_missing_end_boundary.eml",1);
+	    	setMultipartSystemProps(false, false, false, false);
+	    	checkMultipartParsing("multipart_msg_missing_end_boundary.eml",-1);
+    	} finally{
+			setMultipartSystemPropsToDefault();
+		}
+    }
+    
+    public void testJavaMail15MultipartParsingWrongBoundary() throws IOException, MessagingException {
+    	try {
+	    	setMultipartSystemPropsToDefault();
+	    	checkMultipartParsing("multipart_msg_wrong_boundary_param.eml",-1);
+	    	setMultipartSystemProps(false, false, true, true);
+	    	checkMultipartParsing("multipart_msg_wrong_boundary_param.eml",2);
+    	} finally{
+			setMultipartSystemPropsToDefault();
+		}
+    }
+    
+    protected void setMultipartSystemPropsToDefault() {
+    	setMultipartSystemProps(true, true, false, false);
+    }
+    
+    protected void setMultipartSystemProps(final boolean ignoremissingendboundary, final boolean ignoremissingboundaryparameter, final boolean ignoreexistingboundaryparameter, final boolean allowempty) {
+    	System.setProperty("mail.mime.multipart.ignoremissingendboundary", String.valueOf(ignoremissingendboundary));
+    	System.setProperty("mail.mime.multipart.ignoremissingboundaryparameter", String.valueOf(ignoremissingboundaryparameter));
+    	System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", String.valueOf(ignoreexistingboundaryparameter));
+    	System.setProperty("mail.mime.multipart.allowempty", String.valueOf(allowempty));
+    }
+    
+    protected MimeMultipart checkMultipartParsing(final String filename, final int count) throws IOException, MessagingException {
+    	final File basedir = new File(System.getProperty("basedir", "."));
+    	final InputStream source = new FileInputStream(new File(basedir, "src/test/resources/"+filename));
+    	final MimeMessage message = new MimeMessage(null, source);
+    	try {
+			//message.saveChanges();
+			assertTrue(message.getContent() instanceof MimeMultipart);
+			final MimeMultipart mmp = (MimeMultipart) message.getContent();
+			assertEquals(count, mmp.getCount());
+			return mmp;
+		} catch (final MessagingException e) {
+			if(count > -1) {
+				fail(e.toString());
+			}
+		}
+    	
+    	return null;
     }
 
     protected void writeToSetUp() throws Exception {

@@ -367,7 +367,8 @@ public class URLNameTest extends TestCase {
 
     public void testNullProtocol() {
         final URLName name1 = new URLName(null, "www.apache.org", -1, null, null, null);
-        assertTrue(!name1.equals(name1));
+        final URLName name2 = new URLName(null, "www.apache.org", -1, null, null, null);
+        assertTrue(!name2.equals(name1));
     }
 
     public void testOpaqueSchemes() {

@@ -19,17 +19,18 @@
 
 package javax.mail.internet;
 
+import junit.framework.TestCase;
+
+import javax.activation.DataHandler;
+import javax.mail.EncodingAware;
+import javax.mail.MessagingException;
+import javax.mail.Part;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
-import javax.mail.MessagingException;
-import javax.mail.Part;
-
-import junit.framework.TestCase;
 
 /**
  * @version $Rev$ $Date$
@@ -91,9 +92,24 @@ public class MimeBodyPartTest extends TestCase {
     public void testJavaMail15AttachmentDisposition() throws MessagingException, IOException {
         final MimeBodyPart part = new MimeBodyPart();
         assertNull(part.getDisposition());
-
-        part.attachFile("test.dat");
-        assertEquals(part.getDisposition(), Part.ATTACHMENT);
+        final File testInput = new File(basedir, "src/test/resources/test.dat");
+        part.attachFile(testInput);
+        assertEquals(Part.ATTACHMENT, part.getDisposition());
+    }
+    
+    public void testJavaMail15EncodingAware() throws MessagingException, IOException {
+    	final File testInput = new File(basedir, "src/test/resources/test.dat");
+    	final MimeBodyPart part = new MimeBodyPart();
+        part.attachFile(testInput, "application/octet-stream", "7bit"); // depending on the OS encoding can change
+        part.updateHeaders();
+        assertTrue(part.getDataHandler().getContentType().equals("application/octet-stream"));
+        assertEquals("7bit", part.getEncoding());
+        
+        final MimeBodyPart part2 = new MimeBodyPart();
+        part2.attachFile(testInput,"application/pdf","base64");
+        part2.updateHeaders();
+        assertTrue(part2.getDataHandler().getContentType().equals("application/pdf"));
+        assertEquals("base64", part2.getEncoding());
     }
 
 
