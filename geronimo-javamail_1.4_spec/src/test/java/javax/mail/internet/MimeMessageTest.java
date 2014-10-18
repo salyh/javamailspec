@@ -45,7 +45,7 @@ public class MimeMessageTest extends TestCase {
 
     public void testWriteTo() throws MessagingException, IOException {
         MimeMessage msg = new MimeMessage(session);
-        msg.setSender(new InternetAddress("foo"));
+        msg.setSender(new InternetAddress("foo@apache.org"));
         msg.setHeader("foo", "bar");
         MimeMultipart mp = new MimeMultipart();
         MimeBodyPart part1 = new MimeBodyPart();
@@ -64,7 +64,7 @@ public class MimeMessageTest extends TestCase {
 
         MimeMessage newMessage = new MimeMessage(session, in);
 
-        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo");
+        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo@apache.org");
 
         String[] headers = newMessage.getHeader("foo");
         assertTrue(headers.length == 1);
@@ -73,7 +73,7 @@ public class MimeMessageTest extends TestCase {
 
         newMessage = new MimeMessage(msg);
 
-        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo");
+        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo@apache.org");
         assertEquals(newMessage.getHeader("foo")[0], "bar");
     }
 

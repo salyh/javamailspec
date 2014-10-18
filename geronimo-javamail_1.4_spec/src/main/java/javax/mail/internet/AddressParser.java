@@ -1221,8 +1221,10 @@ class AddressParser {
 
     /**
      * Validate the addr-spec portion of an address.  RFC822 requires
-     * this be of the form "local-part@domain".  However, javamail also
-     * allows simple address of the form "local-part".  We only require
+     * this be of the form "local-part@domain".  
+     * 
+     * If non-strict then javamail also
+     * allows simple address of the form "local-part".  In this case we only require
      * the domain if an '@' is encountered.
      *
      * @param tokens
@@ -1231,15 +1233,38 @@ class AddressParser {
         // all addresses, even the simple ones, must have at least a local part.
         validateLocalPart(tokens);
 
-        // now see if we have a domain portion to look at.
-        AddressToken token = tokens.nextRealToken();
-        if (token.type == AT_SIGN) {
-            validateDomain(tokens);
-        }
+        AddressToken token = tokens.nextRealToken();       
+        if(validationLevel == STRICT) {
+            
+            if (token.type == AT_SIGN) {
+                validateDomain(tokens);
+            } 
+            else {
+                
+                if (token.type == RIGHT_ANGLE) {
+                    
+                    // put this back for termination
+                    tokens.pushToken(token);
+                    
+                }
+                else {
+                                
+                    //if we are strict we do not allow local parts without domain
+                    illegalAddress("Illegal Address, domain expected", token);
+                }
+            }
+            
+        } 
         else {
-            // put this back for termination
-            tokens.pushToken(token);
-        }
+            // now see if we have a domain portion to look at.
+            if (token.type == AT_SIGN) {
+                validateDomain(tokens);
+            }
+            else {
+                // put this back for termination
+                tokens.pushToken(token);
+            }
+        }       
 
     }
 
