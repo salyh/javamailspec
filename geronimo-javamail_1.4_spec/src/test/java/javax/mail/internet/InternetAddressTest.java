@@ -88,9 +88,9 @@ public class InternetAddressTest extends TestCase {
         validateTest("Foo Bar:;");
         validateTest("foo.bar@apache.org");
         validateTest("bar@apache.org");
-        validateTest("foo");
-        validateTest("foo.bar");
-        validateTest("\"foo\"");
+        validateErrorTest("foo");
+        validateErrorTest("foo.bar");
+        validateErrorTest("\"foo\"");
         validateTest("\"foo\"@apache.org");
         validateTest("foo@[apache].org");
         validateTest("foo@[apache].[org]");
@@ -105,8 +105,10 @@ public class InternetAddressTest extends TestCase {
         parseHeaderTest("(Foo) (Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo", "Foo <foo.bar@apache.org>", false);
         parseHeaderTest("<foo@apache.org>", true, "foo@apache.org", null, "foo@apache.org", false);
         parseHeaderTest("Foo Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseHeaderTest("foo", true, "foo", null, "foo", false);
-        parseHeaderTest("\"foo\"", true, "\"foo\"", null, "<\"foo\">", false);
+        parseHeaderTest("foo", false, "foo", null, "foo", false);
+        parseHeaderErrorTest("foo", true);
+        parseHeaderTest("\"foo\"", false, "\"foo\"", null, "<\"foo\">", false);
+        parseHeaderErrorTest("\"foo\"", true);
         parseHeaderTest("foo@apache.org", true, "foo@apache.org", null, "foo@apache.org", false);
         parseHeaderTest("\"foo\"@apache.org", true, "\"foo\"@apache.org", null, "<\"foo\"@apache.org>", false);
         parseHeaderTest("foo@[apache].org", true, "foo@[apache].org", null, "<foo@[apache].org>", false);
@@ -116,7 +118,8 @@ public class InternetAddressTest extends TestCase {
         parseHeaderTest("(Foo) (Bar) <foo.bar@apache.org>", true, "foo.bar@apache.org", null, "foo.bar@apache.org", false);
         parseHeaderTest("\"Foo\" Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "\"Foo\" Bar", "\"\\\"Foo\\\" Bar\" <foo.bar@apache.org>", false);
         parseHeaderTest("(Foo Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseHeaderTest("apache.org", true, "apache.org", null, "apache.org", false);
+        parseHeaderTest("apache.org", false, "apache.org", null, "apache.org", false);
+        parseHeaderErrorTest("apache.org", true);
     }
 
     public void testParse() throws Exception {
@@ -142,6 +145,7 @@ public class InternetAddressTest extends TestCase {
         parseTest("apache.org", false, "apache.org", null, "apache.org", false);
     }
 
+    //strict
     public void testDefaultParse() throws Exception {
         parseDefaultTest("<@apache.org,@apache.net:foo@apache.org>", "@apache.org,@apache.net:foo@apache.org", null, "<@apache.org,@apache.net:foo@apache.org>", false);
         parseDefaultTest("<@apache.org:foo@apache.org>", "@apache.org:foo@apache.org", null, "<@apache.org:foo@apache.org>", false);
@@ -151,8 +155,8 @@ public class InternetAddressTest extends TestCase {
         parseDefaultTest("(Foo) (Bar) foo.bar@apache.org", "foo.bar@apache.org", "Foo", "Foo <foo.bar@apache.org>", false);
         parseDefaultTest("<foo@apache.org>", "foo@apache.org", null, "foo@apache.org", false);
         parseDefaultTest("Foo Bar <foo.bar@apache.org>", "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseDefaultTest("foo", "foo", null, "foo", false);
-        parseDefaultTest("\"foo\"", "\"foo\"", null, "<\"foo\">", false);
+        parseDefaultErrorTest("foo");
+        parseDefaultErrorTest("\"foo\"");
         parseDefaultTest("foo@apache.org", "foo@apache.org", null, "foo@apache.org", false);
         parseDefaultTest("\"foo\"@apache.org", "\"foo\"@apache.org", null, "<\"foo\"@apache.org>", false);
         parseDefaultTest("foo@[apache].org", "foo@[apache].org", null, "<foo@[apache].org>", false);
@@ -162,7 +166,7 @@ public class InternetAddressTest extends TestCase {
         parseDefaultTest("(Foo) (Bar) <foo.bar@apache.org>", "foo.bar@apache.org", null, "foo.bar@apache.org", false);
         parseDefaultTest("\"Foo\" Bar <foo.bar@apache.org>", "foo.bar@apache.org", "\"Foo\" Bar", "\"\\\"Foo\\\" Bar\" <foo.bar@apache.org>", false);
         parseDefaultTest("(Foo Bar) foo.bar@apache.org", "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseDefaultTest("apache.org", "apache.org", null, "apache.org", false);
+        parseDefaultErrorTest("apache.org");
     }
 
     public void testStrictParse() throws Exception {
@@ -174,8 +178,8 @@ public class InternetAddressTest extends TestCase {
         parseTest("(Foo) (Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo", "Foo <foo.bar@apache.org>", false);
         parseTest("<foo@apache.org>", true, "foo@apache.org", null, "foo@apache.org", false);
         parseTest("Foo Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseTest("foo", true, "foo", null, "foo", false);
-        parseTest("\"foo\"", true, "\"foo\"", null, "<\"foo\">", false);
+        parseDefaultErrorTest("foo");
+        parseDefaultErrorTest("\"foo\"");
         parseTest("foo@apache.org", true, "foo@apache.org", null, "foo@apache.org", false);
         parseTest("\"foo\"@apache.org", true, "\"foo\"@apache.org", null, "<\"foo\"@apache.org>", false);
         parseTest("foo@[apache].org", true, "foo@[apache].org", null, "<foo@[apache].org>", false);
@@ -185,7 +189,7 @@ public class InternetAddressTest extends TestCase {
         parseTest("(Foo) (Bar) <foo.bar@apache.org>", true, "foo.bar@apache.org", null, "foo.bar@apache.org", false);
         parseTest("\"Foo\" Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "\"Foo\" Bar", "\"\\\"Foo\\\" Bar\" <foo.bar@apache.org>", false);
         parseTest("(Foo Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        parseTest("apache.org", true, "apache.org", null, "apache.org", false);
+        parseDefaultErrorTest("apache.org");
     }
 
     public void testConstructor() throws Exception {
@@ -211,6 +215,7 @@ public class InternetAddressTest extends TestCase {
         constructorTest("apache.org", false, "apache.org", null, "apache.org", false);
     }
 
+    //strict
     public void testDefaultConstructor() throws Exception {
         constructorDefaultTest("<@apache.org,@apache.net:foo@apache.org>", "@apache.org,@apache.net:foo@apache.org", null, "<@apache.org,@apache.net:foo@apache.org>", false);
         constructorDefaultTest("<@apache.org:foo@apache.org>", "@apache.org:foo@apache.org", null, "<@apache.org:foo@apache.org>", false);
@@ -220,8 +225,8 @@ public class InternetAddressTest extends TestCase {
         constructorDefaultTest("(Foo) (Bar) foo.bar@apache.org", "foo.bar@apache.org", "Foo", "Foo <foo.bar@apache.org>", false);
         constructorDefaultTest("<foo@apache.org>", "foo@apache.org", null, "foo@apache.org", false);
         constructorDefaultTest("Foo Bar <foo.bar@apache.org>", "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        constructorDefaultTest("foo", "foo", null, "foo", false);
-        constructorDefaultTest("\"foo\"", "\"foo\"", null, "<\"foo\">", false);
+        //constructorDefaultTest("foo", "foo", null, "foo", false);
+        //constructorDefaultTest("\"foo\"", "\"foo\"", null, "<\"foo\">", false);
         constructorDefaultTest("foo@apache.org", "foo@apache.org", null, "foo@apache.org", false);
         constructorDefaultTest("\"foo\"@apache.org", "\"foo\"@apache.org", null, "<\"foo\"@apache.org>", false);
         constructorDefaultTest("foo@[apache].org", "foo@[apache].org", null, "<foo@[apache].org>", false);
@@ -231,7 +236,7 @@ public class InternetAddressTest extends TestCase {
         constructorDefaultTest("(Foo) (Bar) <foo.bar@apache.org>", "foo.bar@apache.org", null, "foo.bar@apache.org", false);
         constructorDefaultTest("\"Foo\" Bar <foo.bar@apache.org>", "foo.bar@apache.org", "\"Foo\" Bar", "\"\\\"Foo\\\" Bar\" <foo.bar@apache.org>", false);
         constructorDefaultTest("(Foo Bar) foo.bar@apache.org", "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        constructorDefaultTest("apache.org", "apache.org", null, "apache.org", false);
+        //constructorDefaultTest("apache.org", "apache.org", null, "apache.org", false);
     }
 
     public void testStrictConstructor() throws Exception {
@@ -243,8 +248,8 @@ public class InternetAddressTest extends TestCase {
         constructorTest("(Foo) (Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo", "Foo <foo.bar@apache.org>", false);
         constructorTest("<foo@apache.org>", true, "foo@apache.org", null, "foo@apache.org", false);
         constructorTest("Foo Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        constructorTest("foo", true, "foo", null, "foo", false);
-        constructorTest("\"foo\"", true, "\"foo\"", null, "<\"foo\">", false);
+        //constructorTest("foo", true, "foo", null, "foo", false);
+        //constructorTest("\"foo\"", true, "\"foo\"", null, "<\"foo\">", false);
         constructorTest("foo@apache.org", true, "foo@apache.org", null, "foo@apache.org", false);
         constructorTest("\"foo\"@apache.org", true, "\"foo\"@apache.org", null, "<\"foo\"@apache.org>", false);
         constructorTest("foo@[apache].org", true, "foo@[apache].org", null, "<foo@[apache].org>", false);
@@ -254,7 +259,7 @@ public class InternetAddressTest extends TestCase {
         constructorTest("(Foo) (Bar) <foo.bar@apache.org>", true, "foo.bar@apache.org", null, "foo.bar@apache.org", false);
         constructorTest("\"Foo\" Bar <foo.bar@apache.org>", true, "foo.bar@apache.org", "\"Foo\" Bar", "\"\\\"Foo\\\" Bar\" <foo.bar@apache.org>", false);
         constructorTest("(Foo Bar) foo.bar@apache.org", true, "foo.bar@apache.org", "Foo Bar", "Foo Bar <foo.bar@apache.org>", false);
-        constructorTest("apache.org", true, "apache.org", null, "apache.org", false);
+        //constructorTest("apache.org", true, "apache.org", null, "apache.org", false);
     }
 
     public void testParseHeaderList() throws Exception {
@@ -312,10 +317,12 @@ public class InternetAddressTest extends TestCase {
         parseHeaderTest("Foo Bar:<foo@apache.org>,bar@apache.org;", true, "Foo Bar:<foo@apache.org>,bar@apache.org;", null, "Foo Bar:<foo@apache.org>,bar@apache.org;", true);
         parseHeaderTest("Foo Bar:Foo <foo@apache.org>,bar@apache.org;", true, "Foo Bar:Foo<foo@apache.org>,bar@apache.org;", null, "Foo Bar:Foo<foo@apache.org>,bar@apache.org;", true);
         parseHeaderTest("Foo:<foo@apache.org>,,bar@apache.org;", true, "Foo:<foo@apache.org>,,bar@apache.org;", null, "Foo:<foo@apache.org>,,bar@apache.org;", true);
-        parseHeaderTest("Foo:foo,bar;", true, "Foo:foo,bar;", null, "Foo:foo,bar;", true);
         parseHeaderTest("Foo:;", true, "Foo:;", null, "Foo:;", true);
+        parseHeaderTest("Foo:foo,bar;", false, "Foo:foo,bar;", null, "Foo:foo,bar;", true);
+        parseHeaderTest("Foo:;", false, "Foo:;", null, "Foo:;", true);
         parseHeaderTest("\"Foo\":foo@apache.org;", true, "\"Foo\":foo@apache.org;", null, "\"Foo\":foo@apache.org;", true);
 
+        parseHeaderErrorTest("Foo:foo,bar;", true);
         parseHeaderErrorTest("Foo:foo@apache.org,bar@apache.org", true);
         parseHeaderErrorTest("Foo:foo@apache.org,Bar:bar@apache.org;;", true);
         parseHeaderErrorTest(":foo@apache.org;", true);
@@ -463,7 +470,9 @@ public class InternetAddressTest extends TestCase {
     private void parseHeaderErrorTest(String address, boolean strict) throws Exception
     {
         try {
-            InternetAddress.parseHeader(address, strict);
+            InternetAddress[] addresses = InternetAddress.parseHeader(address, strict);
+            assertTrue(addresses.length == 1);
+            addresses[0].validate();
             fail("Expected AddressException");
         } catch (AddressException e) {
         }
@@ -493,6 +502,16 @@ public class InternetAddressTest extends TestCase {
         InternetAddress[] addresses = InternetAddress.parse(address, strict);
         assertTrue(addresses.length == 1);
         validateAddress(addresses[0], resultAddr, personal, toString, group);
+    }
+    
+    
+    public void testGERONIMO6533() throws AddressException{
+        try {
+            new javax.mail.internet.InternetAddress("a",true);
+            fail();
+        } catch (Exception e) {
+           //expected
+        }
     }
 
     private void parseErrorTest(String address, boolean strict) throws Exception
