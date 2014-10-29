@@ -332,10 +332,10 @@ public class MimeMessage extends Message implements MimePart {
      * @exception   IllegalStateException if this message is
      *          obtained from a READ_ONLY folder.
      * @exception   MessagingException
-     * @since       JvaMail 1.5
+     * @since       JavaMail 1.5
      */
     public void setFrom(final String address) throws MessagingException {
-        setHeader("From", InternetAddress.parse(address));       
+        setHeader("From", address==null?null:InternetAddress.parse(address));       
     }
     
     

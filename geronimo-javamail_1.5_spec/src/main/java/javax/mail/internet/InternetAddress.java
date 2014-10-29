@@ -22,9 +22,15 @@ package javax.mail.internet;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 
 import javax.mail.Address;
 import javax.mail.Session;
+
+import org.apache.james.mime4j.dom.address.Group;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.field.address.LenientAddressBuilder;
 
 /**
  * A representation of an Internet email address as specified by RFC822 in
@@ -67,17 +73,74 @@ public class InternetAddress extends Address implements Cloneable {
     }
 
     public InternetAddress(final String address, final boolean strict) throws AddressException {
-        // use the parse method to process the address.  This has the wierd side effect of creating a new
+        // use the parse method to process the address.  This has the weird side effect of creating a new
         // InternetAddress instance to create an InternetAddress, but these are lightweight objects and
         // we need access to multiple pieces of data from the parsing process.
-        final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        
+        //final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        //AddressBuilder.DEFAULT.
 
-        final InternetAddress parsedAddress = parser.parseAddress();
-        // copy the important information, which right now is just the address and
-        // personal info.
-        this.address = parsedAddress.address;
-        this.personal = parsedAddress.personal;
-        this.encodedPersonal = parsedAddress.encodedPersonal;
+        //InternetAddress parsedAddress = null;
+        
+        if(strict) {
+             try {
+                org.apache.james.mime4j.dom.address.Address _address = AddressBuilder.DEFAULT.parseAddress(address);
+                
+                
+                if(_address instanceof Mailbox) {
+                    Mailbox mailbox = (Mailbox) _address;
+                    System.out.println(mailbox.getClass());
+                    
+                    // copy the important information, which right now is just the address and
+                       // personal info.
+                       
+                       
+                       this.address = (mailbox.getRoute()!=null && mailbox.getRoute().isEmpty())?(mailbox.getRoute()+":"+mailbox.getAddress()):mailbox.getAddress();// parsedAddress.address;
+                       this.personal = mailbox.getName();//parsedAddress.personal;
+                       this.encodedPersonal = null;//parsedAddress.encodedPersonal;
+                       
+                       System.out.println("strict address: "+mailbox.getAddress());
+                       System.out.println("local part: "+mailbox.getLocalPart());
+                       System.out.println("domain part: "+mailbox.getDomain());
+                       System.out.println("name/personal: "+mailbox.getName());
+                       System.out.println("route: "+mailbox.getRoute());
+                } else {
+                    
+                    Group group = (Group) _address;
+                    System.out.println(group.getClass());
+                    
+                    // copy the important information, which right now is just the address and
+                       // personal info.
+                    this.address = address;
+                }
+                
+                
+                
+            } catch (org.apache.james.mime4j.field.address.ParseException e) {
+                throw new AddressException(e.toString());
+            }
+        } else {
+            
+                org.apache.james.mime4j.dom.address.Mailbox mailbox = LenientAddressBuilder.DEFAULT.parseMailbox(address);
+             // copy the important information, which right now is just the address and
+                // personal info.
+                this.address = mailbox.getRoute()!=null?(mailbox.getRoute()+":"+mailbox.getAddress()):mailbox.getAddress();// parsedAddress.address;
+
+                this.personal = mailbox.getName();//parsedAddress.personal;
+                this.encodedPersonal = null;//parsedAddress.encodedPersonal;
+                
+                System.out.println("non-strict address: "+mailbox.getAddress());
+                System.out.println("local part: "+mailbox.getLocalPart());
+                System.out.println("domain part: "+mailbox.getDomain());
+                System.out.println("name/personal: "+mailbox.getName());
+                
+                
+            
+        }
+        
+        
+        
+        
     }
 
     public InternetAddress(final String address, final String personal) throws UnsupportedEncodingException {
@@ -236,7 +299,7 @@ public class InternetAddress extends Address implements Cloneable {
         }
         else {
             final StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
-            buf.append(AddressParser.quoteString(p));
+            buf.append(quoteString(p));
             buf.append(" <").append(address).append(">");
             return buf.toString();
         }
@@ -257,7 +320,7 @@ public class InternetAddress extends Address implements Cloneable {
             return address;
         }
 
-        if (AddressParser.containsCharacters(a, "()<>,;:\"[]")) {
+        if (containsCharacters(a, "()<>,;:\"[]")) {
             final StringBuffer buf = new StringBuffer(address.length() + 3);
             buf.append("<").append(address).append(">");
             return buf.toString();
@@ -291,7 +354,7 @@ public class InternetAddress extends Address implements Cloneable {
         }
         else {
             final StringBuffer buf = new StringBuffer(p.length() + 8 + address.length() + 3);
-            buf.append(AddressParser.quoteString(p));
+            buf.append(quoteString(p));
             buf.append(" <").append(address).append(">");
             return buf.toString();
         }
@@ -363,10 +426,44 @@ public class InternetAddress extends Address implements Cloneable {
         if (address == null) {
             return null;
         }
+        
+        if(strict) {
+            try {
+               org.apache.james.mime4j.dom.address.Group group = AddressBuilder.DEFAULT.parseGroup(address);
+               Iterator<Mailbox> mit = group.getMailboxes().iterator();
+               InternetAddress[] retVal = new InternetAddress[group.getMailboxes().size()];
+               int i=0;
+               while (mit.hasNext()) {
+                Mailbox mailbox = mit.next();
+                retVal[i++] = new InternetAddress(mailbox.getAddress(), strict);
+                
+            }
+               
+               return retVal;
+               
+           } catch (org.apache.james.mime4j.field.address.ParseException e) {
+               throw new AddressException(e.toString());
+           }
+       } else {
+           
+           org.apache.james.mime4j.dom.address.Group group = LenientAddressBuilder.DEFAULT.parseGroup(address);
+           Iterator<Mailbox> mit = group.getMailboxes().iterator();
+           InternetAddress[] retVal = new InternetAddress[group.getMailboxes().size()];
+           int i=0;
+           while (mit.hasNext()) {
+            Mailbox mailbox = mit.next();
+            retVal[i++] = new InternetAddress(mailbox.getAddress(), strict);
+            
+        }
+           
+           return retVal;
+                       
+           
+       }
 
         // create an address parser and use it to extract the group information.
-        final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
-        return parser.extractGroupList();
+        //final AddressParser parser = new AddressParser(address, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        //return parser.extractGroupList();
     }
 
     /**
@@ -529,7 +626,30 @@ public class InternetAddress extends Address implements Cloneable {
      * @throws AddressException if address checking fails
      */
     public static InternetAddress[] parse(final String addresses, final boolean strict) throws AddressException {
-        return parse(addresses, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
+        
+        if(strict) {
+            try {
+               org.apache.james.mime4j.dom.address.Address adr = AddressBuilder.DEFAULT.parseAddress(addresses);
+            
+               System.out.println(addresses +" --> "+adr.getClass().toString());
+               
+               return new InternetAddress[]{new InternetAddress(addresses)};
+               
+           } catch (org.apache.james.mime4j.field.address.ParseException e) {
+               throw new AddressException(e.toString());
+           }
+       } else {
+           
+               //org.apache.james.mime4j.dom.address.Mailbox mailbox = LenientAddressBuilder.DEFAULT.parseMailbox(address);
+            
+               
+               
+           
+       }
+        
+        return null;
+        
+        //return parse(addresses, strict ? AddressParser.STRICT : AddressParser.NONSTRICT);
     }
 
     /**
@@ -541,7 +661,7 @@ public class InternetAddress extends Address implements Cloneable {
      * @throws AddressException if address checking fails
      */
     public static InternetAddress[] parseHeader(final String addresses, final boolean strict) throws AddressException {
-        return parse(addresses, strict ? AddressParser.STRICT : AddressParser.PARSE_HEADER);
+        return null;//return parse(addresses, strict ? AddressParser.STRICT : AddressParser.PARSE_HEADER);
     }
 
     /**
@@ -553,13 +673,13 @@ public class InternetAddress extends Address implements Cloneable {
      * @return an array of InternetAddresses parsed from the string
      * @throws AddressException
      *                if address checking fails
-     */
+    
     private static InternetAddress[] parse(final String addresses, final int level) throws AddressException {
         // create a parser and have it extract the list using the requested strictness leve.
         final AddressParser parser = new AddressParser(addresses, level);
         return parser.parseAddressList();
     }
-
+ */
     /**
      * Validate the address portion of an internet address to ensure
      * validity.   Throws an AddressException if any validity
@@ -567,10 +687,153 @@ public class InternetAddress extends Address implements Cloneable {
      *
      * @exception AddressException
      */
+    @SuppressWarnings("unused")
     public void validate() throws AddressException {
 
+        new InternetAddress(formatAddress(address), true);
+        
         // create a parser using the strictest validation level.
-        final AddressParser parser = new AddressParser(formatAddress(address), AddressParser.STRICT);
-        parser.validateAddress();
+        //final AddressParser parser = new AddressParser(formatAddress(address), AddressParser.STRICT);
+        //parser.validateAddress();
     }
+    
+    
+    
+    
+    private static final byte[] CHARMAP = {
+        0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,  0x06, 0x02, 0x06, 0x02, 0x02, 0x06, 0x02, 0x02,
+        0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,  0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+        0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,  0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x01, 0x00,
+
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+    };
+
+    private static final byte FLG_SPECIAL = 1;
+    private static final byte FLG_CONTROL = 2;
+    
+    
+    
+    /**
+     * Tests one string to determine if it contains any of the
+     * characters in a supplied test string.
+     *
+     * @param s      The string we're testing.
+     * @param chars  The set of characters we're testing against.
+     *
+     * @return true if any of the characters is found, false otherwise.
+     */
+    private static boolean containsCharacters(final String s, final String chars)
+    {
+        if(s == null || chars == null){
+            return false;
+        }
+        
+        final int len = s.length();
+        
+        for (int i = 0; i < len; i++) {
+            if (chars.indexOf(s.charAt(i)) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Quick test to see if a character is an allowed atom character
+     * or not.
+     *
+     * @param ch     The test character.
+     *
+     * @return true if this character is allowed in atoms, false for any
+     *         control characters, special characters, or blanks.
+     */
+    private static boolean isAtom(final char ch) {
+        if (ch > '\u007f') {
+            return false;
+        }
+        else if (ch == ' ') {
+            return false;
+        }
+        else {
+            return (CHARMAP[ch] & (FLG_SPECIAL | FLG_CONTROL)) == 0;
+        }
+    }
+    
+    /**
+     * Tests if a string contains any non-special characters that
+     * would require encoding the value as a quoted string rather
+     * than a simple atom value.
+     *
+     * @param s      The test string.
+     *
+     * @return True if the string contains only blanks or allowed atom
+     *         characters.
+     */
+    public static boolean containsSpecials(final String s)
+    {
+        for (int i = 0; i < s.length(); i++) {
+            final char ch = s.charAt(i);
+            // must be either a blank or an allowed atom char.
+            if (ch == ' ' || isAtom(ch)) {
+                continue;
+            }
+            else {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Apply RFC822 quoting rules to a literal string value.  This
+     * will search the string to see if there are any characters that
+     * require special escaping, and apply the escapes.  If the
+     * string is just a string of blank-delimited atoms, the string
+     * value is returned without quotes.
+     *
+     * @param s      The source string.
+     *
+     * @return A version of the string as a valid RFC822 quoted literal.
+     */
+    private static String quoteString(final String s) {
+
+        // only backslash and double quote require escaping.  If the string does not
+        // contain any of these, then we can just slap on some quotes and go.
+        if (s.indexOf('\\') == -1 && s.indexOf('"') == -1) {
+            // if the string is an atom (or a series of blank-delimited atoms), we can just return it directly.
+            if (!containsSpecials(s)) {
+                return s;
+            }
+            final StringBuffer buffer = new StringBuffer(s.length() + 2);
+            buffer.append('"');
+            buffer.append(s);
+            buffer.append('"');
+            return buffer.toString();
+        }
+
+        // get a buffer sufficiently large for the string, two quote characters, and a "reasonable"
+        // number of escaped values.
+        final StringBuffer buffer = new StringBuffer(s.length() + 10);
+        buffer.append('"');
+
+        // now check all of the characters.
+        for (int i = 0; i < s.length(); i++) {
+            final char ch = s.charAt(i);
+            // character requiring escaping?
+            if (ch == '\\' || ch == '"') {
+                // add an extra backslash
+                buffer.append('\\');
+            }
+            // and add on the character
+            buffer.append(ch);
+        }
+        buffer.append('"');
+        return buffer.toString();
+    }
+
 }

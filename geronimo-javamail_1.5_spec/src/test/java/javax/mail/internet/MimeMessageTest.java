@@ -45,7 +45,7 @@ public class MimeMessageTest extends TestCase {
 
     public void testWriteTo() throws MessagingException, IOException {
         final MimeMessage msg = new MimeMessage(session);
-        msg.setSender(new InternetAddress("foo"));
+        msg.setSender(new InternetAddress("foo@apache.org"));
         msg.setHeader("foo", "bar");
         final MimeMultipart mp = new MimeMultipart();
         final MimeBodyPart part1 = new MimeBodyPart();
@@ -64,7 +64,7 @@ public class MimeMessageTest extends TestCase {
 
         MimeMessage newMessage = new MimeMessage(session, in);
 
-        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo");
+        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo@apache.org");
 
         final String[] headers = newMessage.getHeader("foo");
         assertTrue(headers.length == 1);
@@ -73,7 +73,7 @@ public class MimeMessageTest extends TestCase {
 
         newMessage = new MimeMessage(msg);
 
-        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo");
+        assertEquals(((InternetAddress)newMessage.getSender()).getAddress(), "foo@apache.org");
         assertEquals(newMessage.getHeader("foo")[0], "bar");
     }
 
@@ -119,6 +119,46 @@ public class MimeMessageTest extends TestCase {
         assertNull(from);
     }
 
+    public void testJavaMail15From() throws MessagingException {
+        final MimeMessage msg = new MimeMessage(session);
+
+        final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
+        final InternetAddress user = new InternetAddress("geronimo-user@apache.org");
+
+        msg.setSender(dev);
+
+        Address[] from = msg.getFrom();
+        assertTrue(from.length == 1);
+        assertEquals(from[0], dev);
+
+        msg.setFrom(user);
+        from = msg.getFrom();
+        assertTrue(from.length == 1);
+        assertEquals(from[0], user);
+
+        msg.addFrom(new Address[] { dev });
+        from = msg.getFrom();
+        assertTrue(from.length == 2);
+        assertEquals(from[0], user);
+        assertEquals(from[1], dev);
+
+        msg.setFrom();
+        final InternetAddress local = InternetAddress.getLocalAddress(session);
+        from = msg.getFrom();
+
+        assertTrue(from.length == 1);
+        assertEquals(local, from[0]);
+
+        msg.setFrom((String) null);
+        from = msg.getFrom();
+
+        assertTrue(from.length == 1);
+        assertEquals(dev, from[0]);
+
+        msg.setSender(null);
+        from = msg.getFrom();
+        assertNull(from);
+    }
 
     public void testSender() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);
@@ -137,7 +177,7 @@ public class MimeMessageTest extends TestCase {
         msg.setSender(null);
         assertNull(msg.getSender());
     }
-    
+
     public void testJavaMail15GetSession() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);
         assertTrue(session == msg.getSession());
@@ -356,7 +396,7 @@ public class MimeMessageTest extends TestCase {
         recipients = msg.getReplyTo();
         assertNull(recipients);
     }
-    
+
     public void testJavaMail15Reply() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);
         final InternetAddress dev = new InternetAddress("geronimo-dev@apache.org");
@@ -382,7 +422,6 @@ public class MimeMessageTest extends TestCase {
         assertFalse(msg.isSet(Flag.ANSWERED));
         assertEquals(new InternetAddress("test@apache.org"), replyMsg.getRecipients(RecipientType.TO)[0]);
     }
-
 
     public void testSetSubject() throws MessagingException {
         final MimeMessage msg = new MimeMessage(session);
